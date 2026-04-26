@@ -152,6 +152,8 @@ class FileTaskStore(BaseTaskStore):
             if not task:
                 return None
 
+            prev_status = task.status
+
             if status == TaskStatus.in_progress:
                 self._acquire_lock(task, caller, force)
                 if not task.started_at:
@@ -197,11 +199,38 @@ class FileTaskStore(BaseTaskStore):
                 task.metadata.update(metadata)
             task.updated_at = _now_iso()
 
+            # ── P1 Drift Detection ──────────────────────────────────
+            # Trigger when task transitions to completed
+            if status == TaskStatus.completed and prev_status != TaskStatus.completed:
+                self._run_drift_detection_unlocked(task)
+
             if task.status == TaskStatus.completed:
                 self._resolve_dependents_unlocked(task_id)
 
             self._save_unlocked(task)
             return task
+
+    def _run_drift_detection_unlocked(self, task: TaskItem) -> None:
+        """Run drift detection when a task is completed.
+
+        Extracts the actual output from metadata (if available) and compares
+        it against the original task intent (subject + description).
+        Results are appended to task.drift_alerts.
+        """
+        from clawteam.team.drift import detect_drift
+
+        # Actual output may be stored in metadata by the agent
+        actual_output = (
+            task.metadata.get("output", "")
+            or task.metadata.get("result", "")
+            or task.metadata.get("completion_text", "")
+        )
+        if not actual_output:
+            return
+
+        alert = detect_drift(task, actual_output)
+        if alert is not None:
+            task.drift_alerts.append(alert)
 
     def _acquire_lock(self, task: TaskItem, caller: str, force: bool) -> None:
         if task.locked_by and task.locked_by != caller and not force:

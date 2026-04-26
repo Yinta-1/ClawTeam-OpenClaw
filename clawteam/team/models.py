@@ -126,6 +126,69 @@ class TeamMessage(BaseModel):
     idempotency_key: str | None = Field(default=None, alias="idempotencyKey")
 
 
+class QualityScore(BaseModel):
+    """Quality scoring for a completed task (5-dimension evaluation)."""
+
+    model_config = {"populate_by_name": True}
+
+    # 5 dimensions (0-10 each)
+    completeness: int = Field(default=0, ge=0, le=10, alias="completeness")
+    """是否覆盖所有要求"""
+    accuracy: int = Field(default=0, ge=0, le=10, alias="accuracy")
+    """是否有错误"""
+    quality: int = Field(default=0, ge=0, le=10, alias="quality")
+    """代码/文档质量"""
+    规范性: int = Field(default=0, ge=0, le=10, alias="规范性")
+    """是否符合规范"""
+    innovation: int = Field(default=0, ge=0, le=10, alias="innovation")
+    """是否有额外亮点"""
+
+    # metadata
+    scorer: str = Field(default="", alias="scorer")
+    """Who scored (agent name or 'leader')"""
+    scored_at: str = Field(default_factory=_now_iso, alias="scoredAt")
+    feedback: str = Field(default="", alias="feedback")
+    """Free-text feedback"""
+
+    @property
+    def total(self) -> float:
+        """Weighted total score (0-100)."""
+        weights = {
+            "completeness": 0.25,
+            "accuracy": 0.30,
+            "quality": 0.20,
+            "规范性": 0.15,
+            "innovation": 0.10,
+        }
+        return round(
+            self.completeness * weights["completeness"]
+            + self.accuracy * weights["accuracy"]
+            + self.quality * weights["quality"]
+            + self.规范性 * weights["规范性"]
+            + self.innovation * weights["innovation"],
+            1,
+        )
+
+
+class DriftAlert(BaseModel):
+    """Drift detection alert — task output diverged from original intent."""
+
+    model_config = {"populate_by_name": True}
+
+    task_id: str = Field(alias="taskId")
+    original_subject: str = Field(alias="originalSubject")
+    original_description: str = Field(alias="originalDescription")
+    actual_output: str = Field(alias="actualOutput")
+    drift_score: float = Field(alias="driftScore")
+    """0.0 = completely drifted, 1.0 = perfectly aligned"""
+    severity: str = Field(default="low")
+    """low / medium / high / critical"""
+    detected_at: str = Field(default_factory=_now_iso, alias="detectedAt")
+    acknowledged: bool = Field(default=False)
+    acknowledged_by: str = Field(default="", alias="acknowledgedBy")
+    notes: str = Field(default="")
+
+
 class TaskItem(BaseModel):
     """A task in the shared task list (aligned with teammate-tool)."""
 
@@ -146,3 +209,7 @@ class TaskItem(BaseModel):
     updated_at: str = Field(default_factory=_now_iso, alias="updatedAt")
     metadata: dict[str, Any] = Field(default_factory=dict)
     idempotency_key: str | None = Field(default=None, alias="idempotencyKey")
+    # Quality scoring (P0 enhancement)
+    scores: list[QualityScore] = Field(default_factory=list)
+    # Drift detection (P1 enhancement)
+    drift_alerts: list[DriftAlert] = Field(default_factory=list, alias="driftAlerts")

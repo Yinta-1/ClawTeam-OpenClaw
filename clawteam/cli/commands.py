@@ -14,6 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 from clawteam import __version__
+from clawteam.team.models import _now_iso
 
 app = typer.Typer(
     name="clawteam",
@@ -1838,13 +1839,13 @@ def lifecycle_check_zombies(
     if not zombies:
         _output(
             {"team": team, "zombies": []},
-            lambda d: console.print(f"[green]✓[/green] No zombie agents detected for team '{team}'"),
+            lambda d: console.print(f"[green]*[/green] No zombie agents detected for team '{team}'"),
         )
         return
 
     def _fmt(d: dict) -> None:
         console.print(
-            f"[bold yellow]⚠ {len(d['zombies'])} zombie agent(s) detected in team '{team}':[/bold yellow]"
+            f"[bold yellow]! {len(d['zombies'])} zombie agent(s) detected in team '{team}':[/bold yellow]"
         )
         for z in d["zombies"]:
             console.print(
@@ -2630,6 +2631,413 @@ def launch_team(
         console.print(f"[bold]Inbox:[/bold]  clawteam inbox peek {t_name} --agent <name>")
 
     _output(out, _human)
+
+
+# ============================================================================
+# Review Commands (P0 Quality Scoring)
+# ============================================================================
+
+review_app = typer.Typer(help="Quality review and scoring for completed tasks")
+app.add_typer(review_app, name="review")
+
+
+@review_app.command("score")
+def review_score(
+    team: str = typer.Argument(..., help="Team name"),
+    task_id: str = typer.Argument(..., help="Task ID to score"),
+    completeness: int = typer.Option(0, "--completeness", "-c", min=0, max=10, help="Completeness score (0-10)"),
+    accuracy: int = typer.Option(0, "--accuracy", "-a", min=0, max=10, help="Accuracy score (0-10)"),
+    quality: int = typer.Option(0, "--quality", "-q", min=0, max=10, help="Quality score (0-10)"),
+   规范性: int = typer.Option(0, "--规范性", "-n", min=0, max=10, help="规范性 score (0-10)"),
+    innovation: int = typer.Option(0, "--innovation", "-i", min=0, max=10, help="Innovation score (0-10)"),
+    scorer: str = typer.Option("leader", "--scorer", "-s", help="Who is scoring (agent name)"),
+    feedback: str = typer.Option("", "--feedback", "-f", help="Free-text feedback"),
+):
+    """Score a completed task on 5 dimensions."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.models import QualityScore
+
+    store = FileTaskStore(team)
+    task = store.get(task_id)
+    if task is None:
+        console.print(f"[red]Task '{task_id}' not found in team '{team}'.[/red]")
+        raise typer.Exit(1)
+
+    score = QualityScore(
+        completeness=completeness,
+        accuracy=accuracy,
+        quality=quality,
+        规范性=规范性,
+        innovation=innovation,
+        scorer=scorer,
+        feedback=feedback,
+    )
+    task.scores.append(score)
+    with store._write_lock():
+        store._save_unlocked(task)
+
+    def _human(_data):
+        console.print(f"[green]Scored task '{task_id}' ({task.subject})[/green]")
+        console.print(f"  完整性: {completeness}/10  准确性: {accuracy}/10  质量: {quality}/10")
+        console.print(f"  规范性: {规范性}/10  创新性: {innovation}/10")
+        console.print(f"  [bold]总分: {score.total}/100[/bold]")
+        if feedback:
+            console.print(f"  [dim]反馈: {feedback}[/dim]")
+
+    _output({"task_id": task_id, "subject": task.subject, "score": score.model_dump(by_alias=True)}, _human)
+
+
+@review_app.command("show")
+def review_show(
+    team: str = typer.Argument(..., help="Team name"),
+    owner: str = typer.Option(None, "--owner", "-o", help="Filter by owner (agent name)"),
+    sort_by_score: bool = typer.Option(False, "--sort", "-S", help="Sort by total score (highest first)"),
+):
+    """Show all task scores for a team."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.models import TaskStatus
+
+    store = FileTaskStore(team)
+    tasks = store.list_tasks(status=TaskStatus.completed)
+
+    if owner:
+        tasks = [t for t in tasks if t.owner == owner]
+
+    scored_tasks = [t for t in tasks if t.scores]
+    if not scored_tasks:
+        console.print(f"[yellow]No scored tasks found for team '{team}'.[/yellow]")
+        return
+
+    if sort_by_score:
+        scored_tasks.sort(key=lambda t: max((s.total for s in t.scores), default=0), reverse=True)
+
+    def _human(_data):
+        table = Table(title=f"Task Scores — Team '{team}'")
+        table.add_column("Task", style="cyan")
+        table.add_column("Owner")
+        table.add_column("完整性", justify="right")
+        table.add_column("准确性", justify="right")
+        table.add_column("质量", justify="right")
+        table.add_column("规范性", justify="right")
+        table.add_column("创新性", justify="right")
+        table.add_column("总分", justify="right", style="bold")
+
+        for t in scored_tasks:
+            best = max(t.scores, key=lambda s: s.total) if t.scores else None
+            if best:
+                table.add_row(
+                    t.subject[:30],
+                    t.owner or "-",
+                    str(best.completeness),
+                    str(best.accuracy),
+                    str(best.quality),
+                    str(best.规范性),
+                    str(best.innovation),
+                    f"{best.total}",
+                )
+        console.print(table)
+        console.print(f"\n[dim]{len(scored_tasks)} scored task(s)[/dim]")
+
+    _output(
+        [{"task_id": t.id, "subject": t.subject, "owner": t.owner, "best_score": max(t.scores, key=lambda s: s.total).model_dump(by_alias=True) if t.scores else None} for t in scored_tasks],
+        _human,
+    )
+
+
+@review_app.command("compare")
+def review_compare(
+    team: str = typer.Argument(..., help="Team name"),
+    subject_keyword: str = typer.Argument(..., help="Keyword to match task subjects for comparison"),
+):
+    """Compare scores for tasks with similar subjects (multi-agent same-task comparison)."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.models import TaskStatus
+
+    store = FileTaskStore(team)
+    tasks = store.list_tasks(status=TaskStatus.completed)
+
+    # Filter by subject keyword
+    matched = [t for t in tasks if subject_keyword.lower() in t.subject.lower() and t.scores]
+    if not matched:
+        console.print(f"[yellow]No scored tasks matching '{subject_keyword}' found.[/yellow]")
+        return
+
+    def _human(_data):
+        table = Table(title=f"Comparison — '{subject_keyword}'")
+        table.add_column("Task", style="cyan")
+        table.add_column("Owner", style="magenta")
+        table.add_column("完整性", justify="right")
+        table.add_column("准确性", justify="right")
+        table.add_column("质量", justify="right")
+        table.add_column("规范性", justify="right")
+        table.add_column("创新性", justify="right")
+        table.add_column("总分", justify="right", style="bold")
+        table.add_column("推荐", justify="center")
+
+        best_task = max(matched, key=lambda t: max((s.total for s in t.scores), default=0))
+        for t in matched:
+            best = max(t.scores, key=lambda s: s.total) if t.scores else None
+            if best:
+                is_best = "*" if t.id == best_task.id else ""
+                table.add_row(
+                    t.subject[:30],
+                    t.owner or "-",
+                    str(best.completeness),
+                    str(best.accuracy),
+                    str(best.quality),
+                    str(best.规范性),
+                    str(best.innovation),
+                    f"{best.total}",
+                    is_best,
+                )
+        console.print(table)
+        console.print(f"\n[green bold]推荐: {best_task.subject} (Owner: {best_task.owner}, Score: {max(best_task.scores, key=lambda s: s.total).total})[/green bold]")
+
+    _output(
+        [{"task_id": t.id, "subject": t.subject, "owner": t.owner, "best_score": max(t.scores, key=lambda s: s.total).model_dump(by_alias=True) if t.scores else None} for t in matched],
+        _human,
+    )
+
+
+drift_app = typer.Typer(help="Drift detection — detect when agent output diverges from task intent.")
+app.add_typer(drift_app, name="drift")
+
+
+@drift_app.command("check")
+def drift_check(
+    team: str = typer.Argument(..., help="Team name"),
+    task_id: str = typer.Argument(..., help="Task ID to check"),
+    output: str = typer.Option(..., "--output", "-o", help="Agent's completion report or deliverable description"),
+    threshold: float = typer.Option(0.5, "--threshold", "-t", min=0.0, max=1.0, help="Drift threshold (below = alert)"),
+):
+    """Check a task for drift between original intent and actual output."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.drift import check_task_drift
+
+    store = FileTaskStore(team)
+    task = store.get(task_id)
+    if task is None:
+        console.print(f"[red]Task '{task_id}' not found in team '{team}'.[/red]")
+        raise typer.Exit(1)
+
+    result = check_task_drift(task, output, threshold)
+
+    def _human(_data):
+        status_icon = "[green]* Aligned[/green]" if result["aligned"] else "[red]! DRIFT DETECTED[/red]"
+        console.print(f"[bold]Drift Check: {task.subject}[/bold] {status_icon}")
+        console.print(f"  Task ID: {task.id}")
+        console.print(f"  Drift Score: {result['drift_score']:.3f} (threshold: {threshold})")
+        console.print(f"  Keyword Overlap (Jaccard): {result['jaccard_similarity']:.3f}")
+
+        if result["missing_key_terms"]:
+            console.print(f"  [yellow]Missing key terms:[/yellow] {', '.join(result['missing_key_terms'])}")
+        if result["extra_key_terms"]:
+            console.print(f"  [dim]Extra terms in output:[/dim] {', '.join(result['extra_key_terms'])}")
+
+        if result["alert"]:
+            alert = result["alert"]
+            severity_icon = {"low": "[yellow]![/yellow]", "medium": "[orange3]!![/orange3]", "high": "[red]!!![/red]", "critical": "[red bold]XXXX[/red bold]"}.get(alert["severity"], "!")
+            console.print(f"  {severity_icon} Alert severity: [bold]{alert['severity']}[/bold] (score: {alert['driftScore']:.3f})")
+            console.print(f"  [dim]Original: {alert['originalSubject']}[/dim]")
+            console.print(f"  [dim]Actual: {alert['actualOutput'][:100]}...[/dim]")
+
+    _output(result, _human)
+
+
+@drift_app.command("list")
+def drift_list(
+    team: str = typer.Argument(..., help="Team name"),
+    severity: str = typer.Option("", "--severity", "-s", help="Filter by severity: low/medium/high/critical"),
+    unacked: bool = typer.Option(False, "--unacked", "-u", help="Show only unacknowledged alerts"),
+):
+    """List all drift alerts for a team."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.models import TaskStatus
+
+    store = FileTaskStore(team)
+    tasks = store.list_tasks(status=TaskStatus.completed)
+
+    alerts = []
+    for task in tasks:
+        for alert in task.drift_alerts:
+            if severity and alert.severity != severity:
+                continue
+            if unacked and alert.acknowledged:
+                continue
+            alerts.append({
+                "task_id": task.id,
+                "subject": task.subject,
+                "owner": task.owner,
+                **alert.model_dump(by_alias=True),
+            })
+
+    def _human(_data):
+        if not alerts:
+            console.print("[dim]No drift alerts found.[/dim]")
+            return
+
+        from rich.table import Table
+        table = Table(title=f"Drift Alerts — Team '{team}'")
+        table.add_column("Task", style="cyan")
+        table.add_column("Owner", style="blue")
+        table.add_column("Score", justify="right")
+        table.add_column("Severity")
+        table.add_column("Ack")
+
+        severity_icon = {"low": "[yellow]![/yellow]", "medium": "[orange3]!![/orange3]", "high": "[red]!!![/red]", "critical": "[red bold]XXXX[/red bold]"}
+        for a in sorted(alerts, key=lambda x: x["driftScore"]):
+            table.add_row(
+                a["originalSubject"][:30],
+                a.get("owner", ""),
+                f"{a['driftScore']:.2f}",
+                f"{severity_icon.get(a['severity'], '!')} {a['severity']}",
+                "*" if a["acknowledged"] else "-",
+            )
+        console.print(table)
+        console.print(f"\n[dim]{len(alerts)} alert(s)[/dim]")
+
+    _output(alerts, _human)
+
+
+@drift_app.command("ack")
+def drift_ack(
+    team: str = typer.Argument(..., help="Team name"),
+    task_id: str = typer.Argument(..., help="Task ID containing the alert"),
+    alert_index: int = typer.Argument(..., help="Index of alert in task.drift_alerts (0-based)"),
+    notes: str = typer.Option("", "--notes", "-n", help="Acknowledgment notes"),
+):
+    """Acknowledge a drift alert."""
+    from clawteam.store.file import FileTaskStore
+
+    store = FileTaskStore(team)
+    task = store.get(task_id)
+    if task is None:
+        console.print(f"[red]Task '{task_id}' not found.[/red]")
+        raise typer.Exit(1)
+
+    if alert_index < 0 or alert_index >= len(task.drift_alerts):
+        console.print(f"[red]Alert index {alert_index} out of range (0-{len(task.drift_alerts) - 1}).[/red]")
+        raise typer.Exit(1)
+
+    alert = task.drift_alerts[alert_index]
+    alert.acknowledged = True
+    alert.acknowledged_by = "leader"
+    alert.notes = notes
+    task.updated_at = _now_iso()
+
+    with store._write_lock():
+        store._save_unlocked(task)
+
+    def _human(_data):
+        console.print(f"[green]* Acknowledged drift alert #{alert_index} for task '{task_id}'[/green]")
+        if notes:
+            console.print(f"  [dim]Notes: {notes}[/dim]")
+
+    _output({"task_id": task_id, "alert_index": alert_index, "acknowledged": True}, _human)
+
+
+@drift_app.command("record")
+def drift_record(
+    team: str = typer.Argument(..., help="Team name"),
+    task_id: str = typer.Argument(..., help="Task ID"),
+    output: str = typer.Option(..., "--output", "-o", help="Agent's completion report"),
+    threshold: float = typer.Option(0.5, "--threshold", "-t", help="Drift threshold"),
+):
+    """Run drift check and auto-record alert on the task (for automated workflows)."""
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.drift import detect_drift
+
+    store = FileTaskStore(team)
+    task = store.get(task_id)
+    if task is None:
+        console.print(f"[red]Task '{task_id}' not found.[/red]")
+        raise typer.Exit(1)
+
+    alert = detect_drift(task, output)
+
+    def _human(_data):
+        if alert is None:
+            console.print(f"[green]* No drift detected for '{task.subject}' (score: above threshold)[/green]")
+        else:
+            severity_icon = {"low": "[yellow]![/yellow]", "medium": "[orange3]!![/orange3]", "high": "[red]!!![/red]", "critical": "[red bold]XXXX[/red bold]"}.get(alert.severity, "!")
+            console.print(f"{severity_icon} [bold]{alert.severity.upper()}[/bold] drift detected for '{task.subject}'")
+            console.print(f"  Score: {alert.drift_score:.3f} (threshold: {threshold})")
+
+    _output({"task_id": task_id, "alert": alert.model_dump(by_alias=True) if alert else None}, _human)
+
+    if alert:
+        task.drift_alerts.append(alert)
+        task.updated_at = _now_iso()
+        with store._write_lock():
+            store._save_unlocked(task)
+
+
+@drift_app.command("scan")
+def drift_scan(
+    team: str = typer.Argument(..., help="Team name"),
+    threshold: float = typer.Option(0.5, "--threshold", "-t", help="Drift threshold"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Scan all completed tasks that have output in metadata but no drift alerts yet.
+
+    This is useful for retroactively running drift detection on tasks that
+    were completed before drift detection was enabled, or after algorithm updates.
+    """
+    from clawteam.store.file import FileTaskStore
+    from clawteam.team.drift import detect_drift
+    from clawteam.team.models import TaskStatus
+
+    store = FileTaskStore(team)
+    tasks = store.list_tasks(status=TaskStatus.completed)
+
+    scanned = 0
+    new_alerts = 0
+    results = []
+
+    for task in tasks:
+        # Skip tasks that already have drift alerts
+        if task.drift_alerts:
+            continue
+
+        # Look for output in metadata
+        actual_output = (
+            task.metadata.get("output", "")
+            or task.metadata.get("result", "")
+            or task.metadata.get("completion_text", "")
+        )
+        if not actual_output:
+            continue
+
+        scanned += 1
+        alert = detect_drift(task, actual_output)
+
+        if alert is not None:
+            new_alerts += 1
+            task.drift_alerts.append(alert)
+            task.updated_at = _now_iso()
+            with store._write_lock():
+                store._save_unlocked(task)
+            results.append({
+                "task_id": task.id,
+                "subject": task.subject,
+                "drift_score": alert.drift_score,
+                "severity": alert.severity,
+            })
+
+    def _human(_data):
+        console.print(f"[bold]Drift Scan — Team '{team}'[/bold]")
+        console.print(f"  Completed tasks: {len(tasks)}")
+        console.print(f"  Scanned: {scanned}")
+        console.print(f"  New alerts: {new_alerts}")
+        if results:
+            console.print()
+            for r in results:
+                severity_icon = {"low": "[yellow]![/yellow]", "medium": "[orange3]!![/orange3]", "high": "[red]!!![/red]", "critical": "[red bold]XXXX[/red bold]"}.get(r["severity"], "!")
+                console.print(f"  {severity_icon} [{r['task_id']}] {r['subject']} — score: {r['drift_score']:.3f} ({r['severity']})")
+        else:
+            console.print("[green]* No drift detected on any completed task.[/green]")
+
+    _output({"scanned": scanned, "new_alerts": new_alerts, "results": results}, _human)
 
 
 if __name__ == "__main__":
