@@ -19,6 +19,15 @@ else:
 from clawteam.paths import ensure_within_root, validate_identifier
 from clawteam.store.base import BaseTaskStore, TaskLockError
 from clawteam.team.models import TaskItem, TaskPriority, TaskStatus, get_data_dir
+from clawteam.utils.retry import retry, RetryConfig
+
+# Default retry config for file operations
+_FILE_RETRY_CONFIG = RetryConfig(
+    max_retries=3,
+    base_delay=0.1,
+    max_delay=5.0,
+    retryable_exceptions=(OSError, IOError, PermissionError),
+)
 
 
 def _tasks_root(team_name: str) -> Path:
@@ -337,6 +346,7 @@ class FileTaskStore(BaseTaskStore):
             if _visit(node):
                 raise ValueError("Task dependencies cannot contain cycles")
 
+    @retry(config=_FILE_RETRY_CONFIG)
     def _save_unlocked(self, task: TaskItem) -> None:
         path = _task_path(self.team_name, task.id)
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -20,6 +20,15 @@ from clawteam.paths import ensure_within_root, validate_identifier
 from clawteam.team.models import get_data_dir
 from clawteam.transport.base import Transport
 from clawteam.transport.claimed import ClaimedMessage
+from clawteam.utils.retry import retry, RetryConfig
+
+# Default retry config for transport operations
+_TRANSPORT_RETRY_CONFIG = RetryConfig(
+    max_retries=3,
+    base_delay=0.1,
+    max_delay=5.0,
+    retryable_exceptions=(OSError, IOError, PermissionError),
+)
 
 
 def unlock(file_handle) -> None:
@@ -138,6 +147,7 @@ class FileTransport(Transport):
 
         return ClaimedMessage(data=data, ack=_ack, quarantine=_quarantine)
 
+    @retry(config=_TRANSPORT_RETRY_CONFIG)
     def deliver(self, recipient: str, data: bytes) -> None:
         inbox = _inbox_dir(self.team_name, recipient)
         ts = int(time.time() * 1000)

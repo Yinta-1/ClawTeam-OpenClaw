@@ -50,6 +50,11 @@ class ClawTeamConfig(BaseModel):
     spawn_ready_timeout: float = 30.0  # max seconds to poll for TUI readiness before fallback
     default_model: str = ""  # default model for all agents (fallback)
     model_tiers: dict[str, str] = {}  # custom tier overrides: {"strong": "opus", ...}
+    # Retry configuration
+    retry_max_retries: int = 3  # maximum retry attempts for transient failures
+    retry_base_delay: float = 0.5  # base delay in seconds for exponential backoff
+    retry_max_delay: float = 30.0  # maximum delay cap in seconds
+    retry_jitter: bool = True  # enable random jitter to prevent thundering herd
 
 
 def config_path() -> Path:
@@ -91,6 +96,10 @@ def get_effective(key: str) -> tuple[str, str]:
         "spawn_prompt_delay": "CLAWTEAM_SPAWN_PROMPT_DELAY",
         "spawn_ready_timeout": "CLAWTEAM_SPAWN_READY_TIMEOUT",
         "default_model": "CLAWTEAM_DEFAULT_MODEL",
+        "retry_max_retries": "CLAWTEAM_RETRY_MAX_RETRIES",
+        "retry_base_delay": "CLAWTEAM_RETRY_BASE_DELAY",
+        "retry_max_delay": "CLAWTEAM_RETRY_MAX_DELAY",
+        "retry_jitter": "CLAWTEAM_RETRY_JITTER",
     }
     defaults = ClawTeamConfig()
     cfg = load_config()
