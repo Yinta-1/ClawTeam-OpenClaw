@@ -2,6 +2,14 @@
 
 __version__ = "0.3.0+openclaw1"
 
+from clawteam.alerts import (
+    Alert,
+    AlertType,
+    acknowledge_alert,
+    check_agent_failure_rates,
+    check_task_timeouts,
+    create_alert,
+)
 from clawteam.audit import (
     AuditEvent,
     AuditEventType,
@@ -18,6 +26,13 @@ from clawteam.team import (
 )
 
 __all__ = [
+    # Alerts module
+    "Alert",
+    "AlertType",
+    "create_alert",
+    "acknowledge_alert",
+    "check_task_timeouts",
+    "check_agent_failure_rates",
     # Audit module
     "AuditEvent",
     "AuditEventType",
