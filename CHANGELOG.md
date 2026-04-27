@@ -61,6 +61,21 @@ total = topic_match(0-50) + success_score(0-30) + quality_score(0-20) - load_pen
 - 0.15-0.30：高漂移
 - < 0.15：严重漂移
 
+### CLI 命令（v0.4.0 补充，2026-04-27）
+
+**审计日志 CLI**：
+- `clawteam audit query <team>` — 查询审计日志（支持 `--action`/`--actor`/`--target`/`--limit`/`--json`）
+- `clawteam audit summary <team>` — 审计活动摘要
+- `clawteam audit log <team>` — 手动记录审计事件（测试/调试用）
+
+### 修复问题（v0.4.0 补充，2026-04-27）
+
+| 问题 | 修复内容 | 影响范围 |
+|------|----------|----------|
+| 漂移检测字段名不匹配 | `jaccard_similarity` → `jaccard`，`semantic_similarity` → `semantic` | 漂移检测 |
+| audit.py 导入路径错误 | `from clawteam.audit import AuditEventType` | 漂移检测 |
+| 审计日志 CLI 缺失 | 新增 `clawteam audit query/summary/log` | 审计日志 |
+
 ### 升级步骤
 
 ```bash
@@ -74,7 +89,8 @@ pip install -e .
 python -m pytest tests/test_audit.py tests/test_routing.py tests/test_alerts.py -v
 
 # 4. 验证 CLI
-clawteam audit list --team <your-team>
+clawteam audit query <team>
+clawteam audit summary <team>
 clawteam alert check --team <your-team>
 ```
 
