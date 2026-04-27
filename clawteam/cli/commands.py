@@ -1454,6 +1454,49 @@ def session_save(
     _output(data, lambda d: console.print(f"[green]OK[/green] Session saved for '{agent_name}'"))
 
 
+@task_app.command("route")
+def task_route(
+    team: str = typer.Argument(...),
+    subject: str = typer.Option(..., "--subject", "-s"),
+    description: str = typer.Option("", "--description", "-d"),
+    candidates: str = typer.Option(None, "--candidates", "-c", help="Comma-separated list of agent names"),
+):
+    """Find the best agent for a task using intelligent routing."""
+    from clawteam.team.router import get_router
+    
+    router = get_router(team)
+    router.update_load(team)
+    
+    cand_list = [c.strip() for c in candidates.split(",")] if candidates else None
+    
+    # Get all candidates
+    all_candidates = router.get_all_candidates(subject, description, cand_list)
+    
+    if not all_candidates:
+        console.print("[yellow]No agents available for routing.[/yellow]")
+        return
+    
+    best = all_candidates[0]
+    
+    def _human(_data):
+        console.print(f"[bold]Task Route — '{subject}'[/bold]")
+        console.print(f"  [green]Recommended: {best.name}[/green] (score: {best.match_score})")
+        console.print(f"  Success rate: {best.success_rate:.0%}  Avg score: {best.avg_score:.1f}/10  Load: {best.current_load}")
+        if best.matching_topics:
+            console.print(f"  Matching topics: {', '.join(best.matching_topics[:5])}")
+        
+        if len(all_candidates) > 1:
+            console.print()
+            console.print("[dim]Other candidates:[/dim]")
+            for c in all_candidates[1:]:
+                console.print(f"  {c.name}: score={c.match_score} (success={c.success_rate:.0%}, load={c.current_load})")
+    
+    _output({
+        "best": best.__dict__,
+        "all_candidates": [c.__dict__ for c in all_candidates],
+    }, _human)
+
+
 @session_app.command("show")
 def session_show(
     team: str = typer.Argument(..., help="Team name"),
@@ -3038,6 +3081,386 @@ def drift_scan(
             console.print("[green]* No drift detected on any completed task.[/green]")
 
     _output({"scanned": scanned, "new_alerts": new_alerts, "results": results}, _human)
+
+
+# ============================================================================
+# Alert Commands
+# ============================================================================
+
+alert_app = typer.Typer(help="Alert management commands")
+app.add_typer(alert_app, name="alert")
+
+
+@alert_app.command("check")
+def alert_check(
+    team: str = typer.Argument(..., help="Team name"),
+):
+    """Check for new alerts based on current team activity."""
+    from clawteam.alerts import check_all_alerts
+    
+    alerts = check_all_alerts(team)
+    
+    def _human(_data):
+        if not alerts:
+            console.print("[green]* No new alerts detected.[/green]")
+        else:
+            console.print(f"[bold]New Alerts — Team '{team}'[/bold]")
+            for alert in alerts:
+                severity_icon = {"low": "[yellow]![/yellow]", "medium": "[orange3]!![/orange3]", "high": "[red]!!![/red]", "critical": "[red bold]XXXX[/red bold]"}.get(alert.severity, "!")
+                console.print(f"  {severity_icon} [{alert.alert_id[:8]}] {alert.message}")
+    
+    _output({"team": team, "alerts": [a.model_dump(by_alias=True) for a in alerts]}, _human)
+
+
+@alert_app.command("list")
+def alert_list(
+    team: str = typer.Argument(..., help="Team name"),
+    acknowledged: bool = typer.Option(None, "--acknowledged/--unacknowledged", "-a/-u", help="Filter by acknowledgment status"),
+    alert_type: str = typer.Option(None, "--type", "-t", help="Filter by alert type"),
+    severity: str = typer.Option(None, "--severity", "-s", help="Filter by severity"),
+):
+    """List all alerts for a team."""
+    from clawteam.alerts import list_alerts, AlertType, AlertSeverity
+    
+    # Convert string filters to enums if provided
+    type_enum = AlertType(alert_type) if alert_type else None
+    severity_enum = AlertSeverity(severity) if severity else None
+    
+    alerts = list_alerts(
+        team=team,
+        acknowledged=acknowledged,
+        alert_type=type_enum,
+        severity=severity_enum,
+    )
+    
+    def _human(_data):
+        if not alerts:
+            console.print(f"[green]* No alerts found for team '{team}'.[/green]")
+        else:
+            console.print(f"[bold]Alerts — Team '{team}' ({len(alerts)} total)[/bold]")
+            table = Table(show_header=True, header_style="bold")
+            table.add_column("ID", style="dim", width=8)
+            table.add_column("Type")
+            table.add_column("Severity")
+            table.add_column("Acknowledged")
+            table.add_column("Message")
+            
+            for alert in alerts:
+                ack_status = "[green]✓[/green]" if alert.acknowledged else "[red]✗[/red]"
+                severity_color = {"low": "yellow", "medium": "orange3", "high": "red", "critical": "red bold"}.get(alert.severity, "white")
+                table.add_row(
+                    alert.alert_id[:8],
+                    alert.alert_type,
+                    f"[{severity_color}]{alert.severity.upper()}[/{severity_color}]",
+                    ack_status,
+                    alert.message,
+                )
+            
+            console.print(table)
+    
+    _output({"team": team, "alerts": [a.model_dump(by_alias=True) for a in alerts]}, _human)
+
+
+@alert_app.command("ack")
+def alert_acknowledge(
+    team: str = typer.Argument(..., help="Team name"),
+    alert_id: str = typer.Argument(..., help="Alert ID to acknowledge"),
+    by: str = typer.Option("cli-user", "--by", "-b", help="Who is acknowledging the alert"),
+):
+    """Acknowledge an alert."""
+    from clawteam.alerts import acknowledge_alert, get_alert
+    
+    success = acknowledge_alert(team, alert_id, by)
+    alert = get_alert(team, alert_id)
+    
+    def _human(_data):
+        if success:
+            console.print(f"[green]* Acknowledged alert '{alert_id}' by {by}[/green]")
+        else:
+            console.print(f"[red]* Failed to acknowledge alert '{alert_id}'[/red]")
+    
+    _output({"alert_id": alert_id, "acknowledged": success, "by": by}, _human)
+
+
+@alert_app.command("config")
+def alert_config(
+    team: str = typer.Argument(..., help="Team name"),
+    task_timeout: float = typer.Option(None, "--task-timeout", "-t", help="Task timeout threshold in hours"),
+    failure_rate: float = typer.Option(None, "--failure-rate", "-f", help="Agent failure rate threshold (0.0-1.0)"),
+    inactivity: float = typer.Option(None, "--inactivity", "-i", help="Team inactivity threshold in hours"),
+    show: bool = typer.Option(False, "--show", "-s", help="Show current configuration"),
+):
+    """Configure alert thresholds for a team."""
+    from clawteam.alerts import get_alert_config, save_alert_config, AlertConfig
+    
+    if show:
+        config = get_alert_config(team)
+        def _human(_data):
+            console.print(f"[bold]Alert Configuration — Team '{team}'[/bold]")
+            console.print(f"  Task timeout: {config.task_timeout_hours} hours")
+            console.print(f"  Agent failure rate: {config.agent_failure_rate_threshold:.1%}")
+            console.print(f"  Team inactivity: {config.team_inactivity_hours} hours")
+            console.print(f"  Enabled alert types: {', '.join(t.value for t in config.enabled_alert_types)}")
+        _output(config.__dict__, _human)
+        return
+    
+    # Update configuration
+    config = get_alert_config(team)
+    if task_timeout is not None:
+        config.task_timeout_hours = task_timeout
+    if failure_rate is not None:
+        config.agent_failure_rate_threshold = failure_rate
+    if inactivity is not None:
+        config.team_inactivity_hours = inactivity
+    
+    save_alert_config(team, config)
+    
+    def _human(_data):
+        console.print(f"[green]* Updated alert configuration for team '{team}'[/green]")
+    _output({"team": team, "config": config.__dict__}, _human)
+
+
+# ============================================================================
+# Alert Commands
+# ============================================================================
+
+alert_app = typer.Typer(help="Alert management commands")
+app.add_typer(alert_app, name="alert")
+
+
+@alert_app.command("check")
+def alert_check(
+    team: str = typer.Argument(..., help="Team name"),
+    timeout_threshold: int = typer.Option(60, "--timeout-threshold", "-t", help="Task timeout threshold in minutes"),
+    failure_rate_threshold: float = typer.Option(0.3, "--failure-rate-threshold", "-f", help="Agent failure rate threshold (0.0-1.0)"),
+    min_tasks: int = typer.Option(5, "--min-tasks", "-m", help="Minimum tasks for failure rate calculation"),
+):
+    """Check for and create alerts based on current team state.
+    
+    Creates alerts for:
+    - Tasks that have exceeded the timeout threshold
+    - Agents with failure rates above the threshold
+    """
+    from clawteam.alerts import check_task_timeouts, check_agent_failure_rates
+    
+    # Check task timeouts
+    timeout_alerts = check_task_timeouts(team, timeout_threshold)
+    
+    # Check agent failure rates
+    failure_alerts = check_agent_failure_rates(team, failure_rate_threshold, min_tasks)
+    
+    total_alerts = len(timeout_alerts) + len(failure_alerts)
+    
+    def _human(_data):
+        console.print(f"[bold]Alert Check — Team '{team}'[/bold]")
+        console.print(f"  Task timeout alerts created: {len(timeout_alerts)}")
+        console.print(f"  Agent failure rate alerts created: {len(failure_alerts)}")
+        console.print(f"  Total alerts created: {total_alerts}")
+        if total_alerts > 0:
+            console.print("[yellow]* New alerts have been created. Use 'clawteam alert list' to view them.[/yellow]")
+        else:
+            console.print("[green]* No new alerts created.[/green]")
+    
+    _output({
+        "timeout_alerts": timeout_alerts,
+        "failure_alerts": failure_alerts,
+        "total_alerts": total_alerts
+    }, _human)
+
+
+@alert_app.command("list")
+def alert_list(
+    team: str = typer.Argument(..., help="Team name"),
+    acknowledged: bool = typer.Option(None, "--acknowledged/--unacknowledged", help="Filter by acknowledgment status"),
+    limit: int = typer.Option(None, "--limit", "-l", help="Maximum number of alerts to show"),
+):
+    """List alerts for a team."""
+    from clawteam.alerts import list_alerts, AlertSeverity
+    
+    alerts = list_alerts(team, acknowledged=acknowledged, limit=limit)
+    
+    def _human(_data):
+        if not alerts:
+            console.print(f"[green]* No alerts found for team '{team}'.[/green]")
+            return
+            
+        console.print(f"[bold]Alerts — Team '{team}'[/bold]")
+        console.print(f"  Total alerts: {len(alerts)}")
+        console.print()
+        
+        for alert in alerts:
+            severity_icon = {
+                "low": "[yellow]![/yellow]",
+                "medium": "[orange3]!![/orange3]", 
+                "high": "[red]!!![/red]",
+                "critical": "[red bold]XXXX[/red bold]"
+            }.get(alert.severity, "!")
+            
+            ack_status = "[dim](acknowledged)[/dim]" if alert.acknowledged else ""
+            target_info = f" → {alert.target}" if alert.target else ""
+            
+            console.print(f"  {severity_icon} [{alert.alert_id[:8]}] {alert.event_type}{target_info} {ack_status}")
+            console.print(f"    {alert.timestamp} | {alert.source}")
+            if alert.details:
+                details_str = ", ".join(f"{k}: {v}" for k, v in alert.details.items() if k not in ["task_subject"])
+                if details_str:
+                    console.print(f"    Details: {details_str}")
+    
+    _output([{
+        "alert_id": a.alert_id,
+        "event_type": a.event_type,
+        "severity": a.severity,
+        "timestamp": a.timestamp,
+        "source": a.source,
+        "target": a.target,
+        "details": a.details,
+        "acknowledged": a.acknowledged,
+        "acknowledged_by": a.acknowledged_by,
+        "acknowledged_at": a.acknowledged_at
+    } for a in alerts], _human)
+
+
+@alert_app.command("ack")
+def alert_ack(
+    team: str = typer.Argument(..., help="Team name"),
+    alert_id: str = typer.Argument(..., help="Alert ID to acknowledge"),
+):
+    """Acknowledge an alert."""
+    from clawteam.alerts import acknowledge_alert
+    from clawteam.identity import AgentIdentity
+    
+    identity = AgentIdentity.from_env()
+    ack_by = identity.agent_name or "unknown"
+    
+    success = acknowledge_alert(team, alert_id, ack_by)
+    
+    def _human(_data):
+        if success:
+            console.print(f"[green]* Acknowledged alert '{alert_id}' by {ack_by}[/green]")
+        else:
+            console.print(f"[red]Error: Alert '{alert_id}' not found or already acknowledged[/red]")
+    
+    _output({"alert_id": alert_id, "acknowledged": success, "by": ack_by}, _human)
+
+
+# ============================================================================
+# Audit commands
+# ============================================================================
+
+audit_app = typer.Typer(help="Audit logging commands")
+app.add_typer(audit_app, name="audit")
+
+
+@audit_app.command("query")
+def audit_query(
+    team: str = typer.Argument(..., help="Team name"),
+    action: str = typer.Option(None, "--action", "-a", help="Filter by event type (e.g. task_created, agent_spawned)"),
+    actor: str = typer.Option("", "--actor", "-o", help="Filter by actor name"),
+    target: str = typer.Option("", "--target", "-t", help="Filter by target entity"),
+    limit: int = typer.Option(20, "--limit", "-l", help="Maximum number of entries to show"),
+):
+    """Query audit log entries for a team."""
+    from clawteam.audit import read_audit_log
+
+    events = read_audit_log(team, limit=limit)
+
+    # Apply filters
+    if action:
+        events = [e for e in events if e.event_type.value == action]
+    if actor:
+        events = [e for e in events if e.actor == actor]
+    if target:
+        events = [e for e in events if e.target == target]
+
+    def _human(_data):
+        if not events:
+            console.print("[dim]No audit entries found.[/dim]")
+            return
+        table = Table(title=f"Audit Log — {team}")
+        table.add_column("Time", style="dim", no_wrap=True)
+        table.add_column("Type", style="cyan")
+        table.add_column("Actor", style="green")
+        table.add_column("Target", style="yellow")
+        table.add_column("Details")
+        for e in events:
+            table.add_row(
+                e.timestamp[:19],
+                e.event_type.value,
+                e.actor,
+                e.target or "—",
+                json.dumps(e.details, ensure_ascii=False) if e.details else "",
+            )
+        console.print(table)
+
+    _output(
+        [{
+            "event_id": e.event_id,
+            "event_type": e.event_type.value,
+            "timestamp": e.timestamp,
+            "actor": e.actor,
+            "target": e.target,
+            "details": e.details,
+        } for e in events],
+        _human,
+    )
+
+
+@audit_app.command("summary")
+def audit_summary(
+    team: str = typer.Argument(..., help="Team name"),
+):
+    """Show audit activity summary for a team."""
+    from clawteam.audit import get_audit_summary
+
+    summary = get_audit_summary(team)
+
+    def _human(_data):
+        if summary["total_events"] == 0:
+            console.print(f"[dim]No audit entries for team '{team}'.[/dim]")
+            return
+        table = Table(title=f"Audit Summary — {team}")
+        table.add_row("Total Events", str(summary["total_events"]))
+        table.add_row("First Event", summary["first_event"][:19] if summary["first_event"] else "—")
+        table.add_row("Last Event", summary["last_event"][:19] if summary["last_event"] else "—")
+        table.add_row("Active Agents", ", ".join(summary["active_agents"]) or "—")
+        types_str = ", ".join(f"{k.value if hasattr(k, 'value') else k}={v}" for k, v in sorted(summary["event_types"].items(), key=lambda x: -x[1]))
+        table.add_row("Event Types", types_str)
+        console.print(table)
+
+    _output(summary, _human)
+
+
+@audit_app.command("log")
+def audit_log(
+    team: str = typer.Argument(..., help="Team name"),
+    event_type: str = typer.Option(..., "--type", "-T", help="Event type (e.g. task_created, agent_spawned)"),
+    actor: str = typer.Option("system", "--actor", "-o", help="Actor name"),
+    target: str = typer.Option("", "--target", "-t", help="Target entity"),
+    details: str = typer.Option("", "--details", "-d", help="Details as JSON string"),
+):
+    """Manually log an audit event (for testing/debugging)."""
+    from clawteam.audit import AuditEventType, log_audit_event
+
+    try:
+        et = AuditEventType(event_type)
+    except ValueError:
+        console.print(f"[red]Unknown event type: {event_type}[/red]")
+        console.print(f"Valid types: {', '.join(e.value for e in AuditEventType)}")
+        raise typer.Exit(1)
+
+    parsed_details = {}
+    if details:
+        try:
+            parsed_details = json.loads(details)
+        except json.JSONDecodeError:
+            parsed_details = {"raw": details}
+
+    event_id = log_audit_event(team, et, actor, target or None, parsed_details or None)
+
+    def _human(_data):
+        console.print(f"[green]* Logged audit event {event_id}[/green]")
+
+    _output({"event_id": event_id, "event_type": event_type, "team": team}, _human)
 
 
 if __name__ == "__main__":
