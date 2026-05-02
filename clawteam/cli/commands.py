@@ -1921,10 +1921,12 @@ def lifecycle_idle(
 def lifecycle_on_exit(
     team: str = typer.Option(..., "--team", "-t", help="Team name"),
     agent: str = typer.Option(..., "--agent", "-n", help="Agent name"),
+    cascade: bool = typer.Option(True, "--cascade/--no-cascade", help="Terminate child agents on exit (default: true)"),
 ):
     """Handle agent process exit: clean up session and reset in_progress tasks.
 
     This is called automatically as a post-exit hook when an agent process terminates.
+    By default, also terminates all child agents (cascade cleanup).
     """
     import subprocess
 
@@ -1933,17 +1935,44 @@ def lifecycle_on_exit(
         is_agent_alive,
         list_dead_agents,
         unregister_agent,
+        get_children_of,
+        terminate_agent_tree,
     )
     from clawteam.spawn.sessions import SessionStore
+    from clawteam.team.lifecycle import LifecycleManager
     from clawteam.team.mailbox import MailboxManager
     from clawteam.team.manager import TeamManager
     from clawteam.team.models import TaskStatus
     from clawteam.team.tasks import TaskStore
+    from clawteam.team.parent_child import ParentChildRegistry
 
     # Always clean up the agent's session file, regardless of task status.
     # Without this, session files accumulate indefinitely under
     # ~/.clawteam/sessions/{team}/ after every agent exit.
     SessionStore(team).clear(agent)
+
+    # --- Cascade child cleanup: terminate all descendants before we exit ---
+    # This ensures child agents don't become orphaned zombies.
+    # get_descendants includes direct children (and their children), so we
+    # terminate the full list bottom-up (leaves first) to avoid double-kills.
+    children_cleaned: list[str] = []
+    if cascade:
+        descendants = ParentChildRegistry.get_descendants(team, agent)
+        for descendant in reversed(descendants):
+            try:
+                terminate_agent_tree(team, descendant)
+            except Exception:
+                pass
+            try:
+                ParentChildRegistry.unregister(team, descendant)
+            except Exception:
+                pass
+            children_cleaned.append(descendant)
+        # Unregister this agent from parent-child registry
+        try:
+            ParentChildRegistry.unregister(team, agent)
+        except Exception:
+            pass
 
     store = TaskStore(team)
 
@@ -1972,6 +2001,18 @@ def lifecycle_on_exit(
     if not abandoned:
         # Agent exited cleanly (all tasks already completed or pending)
         # Registry cleanup has already happened above.
+        if children_cleaned:
+            _output(
+                {
+                    "status": "agent_exited",
+                    "agent": agent,
+                    "children_terminated": children_cleaned,
+                },
+                lambda d: console.print(
+                    f"[yellow]Agent '{agent}' exited.[/yellow] "
+                    f"Terminated {len(d['children_terminated'])} child agent(s)."
+                ),
+            )
         return
 
     for t in abandoned:
@@ -2012,10 +2053,12 @@ def lifecycle_on_exit(
             "status": "agent_exited",
             "agent": agent,
             "abandoned_tasks": [{"id": t.id, "subject": t.subject} for t in abandoned],
+            "children_terminated": children_cleaned,
         },
         lambda d: console.print(
             f"[yellow]Agent '{agent}' exited.[/yellow] "
             f"Reset {len(d['abandoned_tasks'])} task(s) to pending."
+            + (f" Terminated {len(d['children_terminated'])} child agent(s)." if d['children_terminated'] else "")
         ),
     )
 
@@ -2060,6 +2103,214 @@ def lifecycle_check_zombies(
     raise typer.Exit(1)
 
 
+@lifecycle_app.command("terminate-children")
+def lifecycle_terminate_children(
+    team: str = typer.Option(..., "--team", "-t", help="Team name"),
+    parent: str = typer.Option(..., "--parent", "-p", help="Parent agent name"),
+    cascade: bool = typer.Option(False, "--cascade/--no-cascade", help="Also terminate grandchildren and deeper descendants"),
+    force: bool = typer.Option(False, "--force", "-f", help="Force terminate even if agent is alive"),
+):
+    """Terminate child agents of a parent agent.
+
+    By default only direct children are terminated. Use --cascade to also
+    terminate grandchildren, great-grandchildren, etc.
+    """
+    from clawteam.team.lifecycle import LifecycleManager
+    from clawteam.team.mailbox import MailboxManager
+    from clawteam.spawn.registry import get_agent_info, is_agent_alive
+
+    mailbox = MailboxManager(team)
+    lm = LifecycleManager(team, mailbox)
+
+    if not cascade:
+        children = lm.get_children(parent)
+        if not children:
+            _output(
+                {"status": "no_children", "parent": parent, "children": []},
+                lambda d: console.print(f"[dim]No children found for agent '{parent}'[/dim]"),
+            )
+            return
+
+        terminated: list[str] = []
+        for child in children:
+            alive = is_agent_alive(team, child)
+            if alive is True and not force:
+                info = get_agent_info(team, child)
+                backend = info.get("backend", "?") if info else "?"
+                console.print(
+                    f"[yellow]! Skipping '{child}' (still alive, backend={backend}). "
+                    f"Use --force to terminate anyway.[/yellow]"
+                )
+                continue
+            try:
+                from clawteam.spawn.registry import terminate_agent_tree
+                terminate_agent_tree(team, child)
+            except Exception:
+                pass
+            lm.terminate_children(parent, cascade=False)
+            terminated.append(child)
+
+        _output(
+            {"status": "terminated", "parent": parent, "cascade": False, "terminated": terminated},
+            lambda d: console.print(
+                f"[green]Terminated {len(d['terminated'])} child agent(s) of '{d['parent']}'[/green]"
+            ),
+        )
+    else:
+        # Cascade: terminate entire tree
+        descendants = lm.get_tree(parent)
+        if not descendants.get("children"):
+            _output(
+                {"status": "no_children", "parent": parent, "children": []},
+                lambda d: console.print(f"[dim]No descendants found for agent '{parent}'[/dim]"),
+            )
+            return
+
+        try:
+            terminated = lm.terminate_tree(parent)
+        except Exception as e:
+            _output({"status": "error", "error": str(e)}, lambda d: console.print(f"[red]Error: {d['error']}[/red]"))
+            raise typer.Exit(1)
+
+        _output(
+            {"status": "terminated", "parent": parent, "cascade": True, "terminated": terminated},
+            lambda d: console.print(
+                f"[green]Terminated tree rooted at '{d['parent']}': {len(d['terminated'])} agent(s)[/green]"
+            ),
+        )
+
+
+@lifecycle_app.command("terminate-tree")
+def lifecycle_terminate_tree(
+    team: str = typer.Option(..., "--team", "-t", help="Team name"),
+    root: str = typer.Option(..., "--root", "-r", help="Root agent name (tree is terminated from this agent downward)"),
+):
+    """Terminate an entire agent tree (root + all descendants).
+
+    This sends SIGTERM to all processes in the tree and removes registry entries.
+    Use this when a parent agent exits and its children need to be cleaned up.
+    """
+    from clawteam.team.lifecycle import LifecycleManager
+    from clawteam.team.mailbox import MailboxManager
+
+    mailbox = MailboxManager(team)
+    lm = LifecycleManager(team, mailbox)
+
+    try:
+        terminated = lm.terminate_tree(root)
+    except Exception as e:
+        _output({"status": "error", "error": str(e)}, lambda d: console.print(f"[red]Error: {d['error']}[/red]"))
+        raise typer.Exit(1)
+
+    _output(
+        {"status": "terminated", "root": root, "terminated": terminated},
+        lambda d: console.print(
+            f"[green]Terminated tree rooted at '{d['root']}': {len(d['terminated'])} agent(s)[/green]"
+        ),
+    )
+
+
+@lifecycle_app.command("list-children")
+def lifecycle_list_children(
+    team: str = typer.Option(..., "--team", "-t", help="Team name"),
+    agent: str = typer.Option(..., "--agent", "-a", help="Agent name"),
+    recursive: bool = typer.Option(False, "--recursive/-r", help="Show full descendant tree"),
+):
+    """List child agents of a given agent.
+
+    By default shows only direct children. Use --recursive to show
+    the full descendant tree.
+    """
+    from clawteam.team.lifecycle import LifecycleManager
+    from clawteam.team.mailbox import MailboxManager
+
+    mailbox = MailboxManager(team)
+    lm = LifecycleManager(team, mailbox)
+
+    if not recursive:
+        children = lm.get_children(agent)
+        _output(
+            {"agent": agent, "children": children},
+            lambda d: console.print(f"[dim]Children of '{d['agent']}': {d['children'] or '(none)'}[/dim]"),
+        )
+    else:
+        tree = lm.get_tree(agent)
+
+        def _fmt_tree(t: dict, indent: int = 0) -> str:
+            prefix = "  " * indent
+            result = f"{prefix}├── {t['agent']}\n"
+            for child in t.get("children", []):
+                result += _fmt_tree(child, indent + 1)
+            return result
+
+        tree_str = _fmt_tree(tree)
+        _output(
+            {"agent": agent, "tree": tree},
+            lambda d: console.print(f"[dim]Tree for '{d['agent']}':\n{tree_str}[/dim]"),
+        )
+
+
+@lifecycle_app.command("show-parent")
+def lifecycle_show_parent(
+    team: str = typer.Option(..., "--team", "-t", help="Team name"),
+    agent: str = typer.Option(..., "--agent", "-a", help="Agent name"),
+):
+    """Show the parent of an agent, and optionally its full ancestor chain.
+    """
+    from clawteam.team.lifecycle import LifecycleManager
+    from clawteam.team.mailbox import MailboxManager
+
+    mailbox = MailboxManager(team)
+    lm = LifecycleManager(team, mailbox)
+
+    parent = lm.get_parent(agent)
+    ancestors = lm.get_ancestors(agent)
+
+    _output(
+        {
+            "agent": agent,
+            "parent": parent,
+            "ancestors": ancestors,
+        },
+        lambda d: console.print(
+            f"[dim]Agent '{d['agent']}'\n"
+            f"  Parent: {d['parent'] or '(none)'}\n"
+            f"  Ancestors: {d['ancestors'] or '(none)'}[/dim]"
+        ),
+    )
+
+
+@lifecycle_app.command("register-child")
+def lifecycle_register_child(
+    team: str = typer.Option(..., "--team", "-t", help="Team name"),
+    parent: str = typer.Option(..., "--parent", "-p", help="Parent agent name"),
+    child: str = typer.Option(..., "--child", "-c", help="Child agent name"),
+):
+    """Register a child relationship between parent and child agents.
+
+    This should be called when an agent spawns a child so that the
+    parent-child relationship is tracked for cascade cleanup.
+    """
+    from clawteam.team.lifecycle import LifecycleManager
+    from clawteam.team.mailbox import MailboxManager
+
+    mailbox = MailboxManager(team)
+    lm = LifecycleManager(team, mailbox)
+
+    try:
+        lm.register_child(parent, child)
+    except Exception as e:
+        _output({"status": "error", "error": str(e)}, lambda d: console.print(f"[red]Error: {d['error']}[/red]"))
+        raise typer.Exit(1)
+
+    _output(
+        {"status": "registered", "parent": parent, "child": child},
+        lambda d: console.print(
+            f"[green]Registered '{d['child']}' as child of '{d['parent']}'[/green]"
+        ),
+    )
+
+
 # ============================================================================
 # Spawn Command
 # ============================================================================
@@ -2079,6 +2330,7 @@ def spawn_agent(
     openclaw_agent: Optional[str] = typer.Option(None, "--openclaw-agent", help="OpenClaw agent id to use (routes to a specific agent config/model)"),
     force: bool = typer.Option(False, "--force", "-f", help="Suppress max-agent warnings"),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Model alias or ID (passed to backend via --model)"),
+    parent: Optional[str] = typer.Option(None, "--parent", "-p", help="Parent agent name (for parent-child lifecycle management)"),
 ):
     """Spawn a new agent process with identity + task as its initial prompt.
 
@@ -2207,6 +2459,7 @@ def spawn_agent(
         skip_permissions=skip_permissions,
         openclaw_agent=openclaw_agent,
         model=model,
+        parent_agent=parent or "",
     )
 
     if result.startswith("Error"):
@@ -2220,8 +2473,30 @@ def spawn_agent(
         _output({"error": result}, lambda d: console.print(f"[red]{d['error']}[/red]"))
         raise typer.Exit(1)
 
+    # Register parent-child relationship if --parent was specified
+    child_registered = False
+    if parent:
+        try:
+            from clawteam.team.parent_child import ParentChildRegistry
+            ParentChildRegistry.register(_team, _name, parent)
+            child_registered = True
+            console.print(f"[dim]Registered '{_name}' as child of '{parent}'[/dim]")
+        except Exception as e:
+            console.print(f"[yellow]Warning: Failed to register parent-child relationship: {e}[/yellow]")
+
+    spawn_data = {
+        "status": "spawned",
+        "backend": backend,
+        "agentName": _name,
+        "agentId": _id,
+        "message": result,
+    }
+    if parent:
+        spawn_data["parent"] = parent
+        spawn_data["childRegistered"] = child_registered
+
     _output(
-        {"status": "spawned", "backend": backend, "agentName": _name, "agentId": _id, "message": result},
+        spawn_data,
         lambda d: console.print(f"[green]OK[/green] {d['message']}"),
     )
 

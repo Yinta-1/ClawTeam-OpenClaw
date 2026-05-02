@@ -46,6 +46,7 @@ class SubprocessBackend(SpawnBackend):
         skip_permissions: bool = False,
         openclaw_agent: str | None = None,
         model: str | None = None,
+        parent_agent: str = "",
     ) -> str:
         if openclaw_agent:
             raise NotImplementedError(
@@ -63,6 +64,8 @@ class SubprocessBackend(SpawnBackend):
             "CLAWTEAM_AGENT_LEADER": "0",
             "CLAWTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
         })
+        if parent_agent:
+            spawn_env["CLAWTEAM_PARENT_AGENT"] = parent_agent
         # Propagate user if set
         user = os.environ.get("CLAWTEAM_USER", "")
         if user:
@@ -154,6 +157,7 @@ class SubprocessBackend(SpawnBackend):
             backend="subprocess",
             pid=process.pid,
             command=list(final_command),
+            parent_agent=parent_agent,
         )
 
         return f"Agent '{agent_name}' spawned as subprocess (pid={process.pid})"

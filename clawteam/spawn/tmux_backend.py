@@ -95,6 +95,7 @@ class TmuxBackend(SpawnBackend):
         skip_permissions: bool = False,
         openclaw_agent: str | None = None,
         model: str | None = None,
+        parent_agent: str = "",
     ) -> str:
         if not shutil.which("tmux"):
             return "Error: tmux not installed"
@@ -124,6 +125,8 @@ class TmuxBackend(SpawnBackend):
             "CLAWTEAM_AGENT_LEADER": "0",
             "CLAWTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
         })
+        if parent_agent:
+            env_vars["CLAWTEAM_PARENT_AGENT"] = parent_agent
         # Propagate user if set
         user = os.environ.get("CLAWTEAM_USER", "")
         if user:
@@ -335,6 +338,7 @@ class TmuxBackend(SpawnBackend):
             tmux_target=target,
             pid=pane_pid,
             command=list(normalized_command),
+            parent_agent=parent_agent,
         )
 
         return f"Agent '{agent_name}' spawned in tmux ({target})"

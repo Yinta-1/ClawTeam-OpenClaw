@@ -149,18 +149,22 @@ def register_agent(
     tmux_target: str = "",
     pid: int = 0,
     command: list[str] | None = None,
+    parent_agent: str = "",
 ) -> None:
     """Record spawn info for an agent (atomic + locked write)."""
     path = _registry_path(team_name)
     with file_locked(path):
         registry = _load(path)
-        registry[agent_name] = {
+        entry = {
             "backend": backend,
             "tmux_target": tmux_target,
             "pid": pid,
             "command": command or [],
             "spawned_at": time.time(),
         }
+        if parent_agent:
+            entry["parent_agent"] = parent_agent
+        registry[agent_name] = entry
         _save(path, registry)
 
 
@@ -309,6 +313,85 @@ def _pid_alive(pid: int) -> bool:
         except OSError:
             # On some systems, OSError can be raised for non-existent processes
             return False
+
+
+def get_children_of(team_name: str, parent_agent: str) -> list[str]:
+    """Return all direct child agents of a given parent agent."""
+    registry = get_registry(team_name)
+    return [
+        name for name, info in registry.items()
+        if info.get("parent_agent") == parent_agent
+    ]
+
+
+def get_descendants_of(team_name: str, parent_agent: str) -> list[str]:
+    """Return all descendant agents of a given parent (children, grandchildren, etc.).
+
+    Returns agents in breadth-first order (children before grandchildren).
+    """
+    registry = get_registry(team_name)
+    children = get_children_of(team_name, parent_agent)
+    descendants: list[str] = []
+    queue = list(children)
+    while queue:
+        child = queue.pop(0)
+        descendants.append(child)
+        grandchildren = get_children_of(team_name, child)
+        queue.extend(grandchildren)
+    return descendants
+
+
+def terminate_agent_tree(team_name: str, root_agent: str) -> list[str]:
+    """Terminate an entire agent tree, bottom-up (leaves first).
+
+    This kills actual processes via tmux/subprocess, then unregisters.
+    Returns list of agent names that were terminated in order.
+    """
+    import subprocess as _subprocess
+
+    descendants = get_descendants_of(team_name, root_agent)
+    # Reverse so leaves are terminated before their parents
+    terminated: list[str] = []
+    for agent in reversed(descendants):
+        info = get_agent_info(team_name, agent)
+        if info:
+            _kill_agent_process(info)
+        unregister_agent(team_name, agent)
+        terminated.append(agent)
+
+    # Finally terminate the root
+    info = get_agent_info(team_name, root_agent)
+    if info:
+        _kill_agent_process(info)
+    unregister_agent(team_name, root_agent)
+    terminated.append(root_agent)
+    return terminated
+
+
+def _kill_agent_process(info: dict) -> None:
+    """Kill the process for an agent given its spawn info."""
+    backend = info.get("backend", "")
+    pid = info.get("pid", 0)
+
+    if backend == "tmux" and info.get("tmux_target"):
+        target = info["tmux_target"]
+        try:
+            _subprocess.run(
+                ["tmux", "kill-window", "-t", target],
+                capture_output=True, timeout=10,
+            )
+        except Exception:
+            pass
+    elif backend == "subprocess" and pid > 0:
+        try:
+            import os as _os
+            import signal as _signal
+            if sys.platform == "win32":
+                _subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True)
+            else:
+                _os.kill(pid, _signal.SIGTERM)
+        except Exception:
+            pass
 
 
 def _load(path: Path) -> dict:
