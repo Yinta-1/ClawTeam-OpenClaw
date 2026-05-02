@@ -1,5 +1,95 @@
 # ClawTeam 升级日志
 
+## v0.5.0（2026-05-03）— P26-P37 多 Agent 协作增强
+
+### 新增模块
+
+#### P26: Parent-Child 生命周期管理 ✅
+- **commit**: `cb52d4e feat(lifecycle): implement Parent-Child lifecycle management (P26)`
+- **文件**: `clawteam/team/lifecycle.py`
+- **新增功能**:
+  - `ParentChildRegistry` - 追踪父子关系
+  - `parentToAgents: Map[parentSessionId, Set[agentId]]` - 父子映射
+  - `cleanupChildAgents(sessionId)` - 级联终止所有子 Agent
+  - 5 个新 CLI 命令：
+    - `terminate-children` - 终止子 Agent
+    - `terminate-tree` - 终止整个 Agent 树
+    - `list-children` - 列出子 Agent
+    - `show-parent` - 显示父 Agent
+    - `register-child` - 注册子 Agent
+  - `--parent` flag for spawn command
+
+#### P28: 工具注册增强 🔄
+- **文件**: `clawteam/tools/registry.py`
+- **状态**: 修改中
+- **目标**: 增强工具注册表，支持动态工具发现
+
+#### P29: 协作增强 🔄
+- **目录**: `clawteam/collaboration/`
+- **状态**: 创建中
+- **目标功能**:
+  - Activity Feed（活动流）
+  - Presence（在线状态）
+  - Mentions（@提及）
+  - Context Board（上下文面板）
+
+#### P30-P33: 多模态支持 🔄
+- **文档**: `docs/superpowers/specs/P30-P33-multimodal-support-design.md`
+- **状态**: 设计中
+- **目标**:
+  - 音频输入/输出
+  - 视觉理解
+  - 文件处理
+  - 截图/屏幕捕获
+
+#### P34: Dashboard 监控面板 🔄
+- **新增文件**:
+  - `clawteam/api/monitor.py`
+  - `clawteam/board/dashboard.py`
+- **状态**: 实现中
+- **目标**: 实时会话监控、Token 使用统计、风险评估
+
+#### P35: 事件追踪系统 🔄
+- **目录**: `clawteam/events/`
+- **状态**: 创建中
+- **目标**: 40+ 事件类型、SQLite 持久化、事件查询 API
+
+#### P36: 实时 SSE 推送 🔄
+- **修改文件**:
+  - `clawteam/board/server.py`
+  - `clawteam/board/static/index.html`
+- **状态**: 修改中
+- **目标**: Server-Sent Events、实时日志推送
+
+### 已实现的核心功能（v0.4.0 确认）
+
+| 模块 | 文件 | 功能 | 状态 |
+|------|------|------|------|
+| **MailboxManager** | `clawteam/team/mailbox.py` | Agent 间消息传递 | ✅ |
+| **P2P Transport** | `clawteam/transport/p2p.py` | ZeroMQ PUSH/PULL + 文件回退 | ✅ |
+| **RoleStore** | `clawteam/team/roles.py` | 动态角色分配 | ✅ |
+| **BaseTaskStore** | `clawteam/store/base.py` | 任务存储抽象 | ✅ |
+| **WebSocketManager** | `clawteam/board/websocket.py` | WebSocket 连接管理 | ✅ |
+| **Board Server** | `clawteam/board/server.py` | HTTP API + SSE | ✅ |
+| **Transport 抽象** | `clawteam/transport/base.py` | File/P2P/Redis | ✅ |
+| **LifecycleManager** | `clawteam/team/lifecycle.py` | Agent 生命周期状态机 | ✅ |
+| **OpenClaw SDK Backend** | `clawteam/spawn/openclaw_sdk_backend.py` | Gateway Sessions API 集成 | ✅ |
+
+### 升级团队状态（2026-05-03）
+
+| Agent | 任务 | Worktree | 状态 |
+|-------|------|----------|------|
+| arch-p27 | Parent-Child 生命周期 | `upgrade-squad/arch-p27` | ✅ 已完成 |
+| arch-p28 | 工具注册增强 | `upgrade-squad/arch-p28` | 🔄 进行中 |
+| arch-p29 | 协作增强 | `upgrade-squad/arch-p29` | 🔄 进行中 |
+| arch-p30-33 | 多模态支持 | `upgrade-squad/arch-p30-33` | 🔄 进行中 |
+| arch-dashboard | Dashboard 监控 | `monitor-squad/arch-dashboard` | 🔄 进行中 |
+| arch-events | 事件追踪 | `monitor-squad/arch-events` | 🔄 进行中 |
+| arch-realtime | SSE 实时推送 | `monitor-squad/arch-realtime` | 🔄 进行中 |
+| arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | ⬜ 待开始 |
+
+---
+
 ## v0.4.0（2026-04-26）— P1 工程化改进
 
 ### 新增模块
@@ -124,4 +214,4 @@ clawteam alert check --team <your-team>
 
 ---
 
-_最后更新：2026-04-26_
+_最后更新：2026-05-03_

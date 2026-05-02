@@ -95,6 +95,13 @@ clawteam board serve --port 8080
 - **动态角色分配** — 基于任务类型自动分配 Agent 角色
 - **DAG 依赖管理** — 任务拓扑排序，智能调度
 - **P0-P33 分层测试** — 1790+ 测试用例，全面覆盖
+- **MailboxManager** — Agent 间消息传递，Transport 抽象层支持 File/P2P/Redis
+- **P2P Transport** — ZeroMQ PUSH/PULL + 文件回退，无需 Redis
+- **RoleStore** — 动态角色分配（developer/reviewer/tester/architect/coordinator）
+- **BaseTaskStore** — 任务存储抽象，文件锁并发控制
+- **WebSocketManager** — WebSocket 连接管理
+- **Parent-Child 生命周期** — 父子 Agent 级联管理
+- **OpenClaw SDK Backend** — 基于 Gateway Sessions API 的原生多 Agent 协作
 
 ### 🌐 Web UI 看板
 - **实时会话监控** — 每秒刷新，看得见每个 Agent 在做什么
@@ -158,6 +165,10 @@ clawteam board serve --port 8080
 | 测试覆盖 | ~100 | **1790+** |
 | 重试框架 | ❌ | ✅ |
 | 结构化日志 | ❌ | ✅ |
+| MailboxManager | ❌ | ✅ (P2P/ZeroMQ) |
+| Parent-Child 生命周期 | ❌ | ✅ (P26) |
+| OpenClaw SDK Backend | ❌ | ✅ (原生集成) |
+| WebSocket 实时推送 | ❌ | ✅ (SSE) |
 
 ---
 
