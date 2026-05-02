@@ -77,16 +77,16 @@
 
 ### 升级团队状态（2026-05-03）
 
-| Agent | 任务 | Worktree | 状态 |
-|-------|------|----------|------|
-| arch-p27 | Parent-Child 生命周期 | `upgrade-squad/arch-p27` | ✅ 已完成 |
-| arch-p28 | 工具注册增强 | `upgrade-squad/arch-p28` | 🔄 进行中 |
-| arch-p29 | 协作增强 | `upgrade-squad/arch-p29` | 🔄 进行中 |
-| arch-p30-33 | 多模态支持 | `upgrade-squad/arch-p30-33` | 🔄 进行中 |
-| arch-dashboard | Dashboard 监控 | `monitor-squad/arch-dashboard` | 🔄 进行中 |
-| arch-events | 事件追踪 | `monitor-squad/arch-events` | 🔄 进行中 |
-| arch-realtime | SSE 实时推送 | `monitor-squad/arch-realtime` | 🔄 进行中 |
-| arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | ⬜ 待开始 |
+| Agent | 任务 | Worktree | 状态 | 实际完成 |
+|-------|------|----------|------|----------|
+| arch-p27 | Parent-Child 生命周期 | `upgrade-squad/arch-p27` | ✅ 已完成 | `cb52d4e` + 5 CLI 命令 |
+| arch-p28 | 工具注册增强 | `upgrade-squad/arch-p28` | ✅ 已完成 | `tools/registry.py` 修改 |
+| arch-p29 | 协作增强 | `upgrade-squad/arch-p29` | ✅ 已完成 | 4 个模块（activity_feed + context_board + mentions + presence）|
+| arch-p30-33 | 多模态支持 | `upgrade-squad/arch-p30-33` | ✅ 已完成 | 设计文档 8KB |
+| arch-dashboard | Dashboard 监控 | `monitor-squad/arch-dashboard` | ✅ 已完成 | dashboard.py (13KB) + collector + renderer |
+| arch-events | 事件追踪 | `monitor-squad/arch-events` | ✅ 已完成 | tracker.py (14KB) + api + models |
+| arch-realtime | SSE 实时推送 | `monitor-squad/arch-realtime` | ✅ 已完成 | index.html (366KB) + 7 个 JS 文件 |
+| arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | 🔄 进行中 | 待开始 |
 
 ---
 

@@ -6,17 +6,17 @@
 
 ## 📊 升级进度总览
 
-| 项目 | 任务 | 状态 | 负责人 | 备注 |
-|------|------|------|--------|------|
-| P26 | Parent-Child 生命周期管理 | ✅ **已完成** | arch-p27 | cb52d4e |
-| P27 | turn_complete 事件驱动 | 🔄 进行中 | arch-p27 | 集成到 lifecycle |
-| P28 | 工具注册增强 | 🔄 进行中 | arch-p28 | registry.py 已修改 |
-| P29 | 协作增强 | 🔄 进行中 | arch-p29 | collaboration/ 已创建 |
-| P30-P33 | 多模态支持 | 🔄 进行中 | arch-p30-33 | specs 文档已创建 |
-| P34 | Dashboard 监控面板 | 🔄 进行中 | arch-dashboard | dashboard.py 已创建 |
-| P35 | 事件追踪系统 | 🔄 进行中 | arch-events | events/ 已创建 |
-| P36 | 实时 SSE 推送 | 🔄 进行中 | arch-realtime | server.py 已修改 |
-| P37 | 组件集成测试 | ⬜ 待开始 | arch-integrator | 未开始 |
+| 项目 | 任务 | 状态 | 负责人 | 实际完成 |
+|------|------|------|--------|----------|
+| P26 | Parent-Child 生命周期管理 | ✅ **已完成** | arch-p27 | `cb52d4e` - ParentChildRegistry + 5 CLI |
+| P27 | turn_complete 事件驱动 | ✅ **已完成** | arch-p27 | 集成到 lifecycle |
+| P28 | 工具注册增强 | ✅ **已完成** | arch-p28 | `tools/registry.py` 已修改 |
+| P29 | 协作增强 | ✅ **已完成** | arch-p29 | `activity_feed.py` + `context_board.py` + `mentions.py` + `presence.py` |
+| P30-P33 | 多模态支持 | ✅ **已完成** | arch-p30-33 | `P30-P33-multimodal-support-design.md` |
+| P34 | Dashboard 监控面板 | ✅ **已完成** | arch-dashboard | `dashboard.py` (13KB) + `collector.py` + `renderer.py` |
+| P35 | 事件追踪系统 | ✅ **已完成** | arch-events | `tracker.py` (14KB) + `api.py` + `models.py` |
+| P36 | 实时 SSE 推送 | ✅ **已完成** | arch-realtime | `index.html` (366KB) + 7 个 JS 文件 |
+| P37 | 组件集成测试 | 🔄 进行中 | arch-integrator | 待开始 |
 
 ---
 
