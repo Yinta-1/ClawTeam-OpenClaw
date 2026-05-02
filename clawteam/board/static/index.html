@@ -1687,7 +1687,7 @@
                     </div>
                     <div class="teams-main">
                         <div class="teams-tabs">
-                            <div class="teams-tab active" data-tab="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>对话</div>
+                            <div class="teams-tab active" data-tab="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>对话<span id="sse-update-indicator" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:6px;opacity:0.3;transition:opacity 0.3s;" title="实时更新已连接"></span></div>
                             <div class="teams-tab" data-tab="tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>任务</div>
                             <div class="teams-tab" data-tab="members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>成员</div>
                             <div class="teams-tab" data-tab="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>分析</div>
@@ -3362,6 +3362,73 @@
             loadTeamHealth(teamName);
             loadTeamAnalytics(teamName);
             loadTeamMessages(teamName);
+
+            // Connect to SSE for real-time updates (SpectrAI-inspired)
+            teamSSEClient.connect(teamName);
+            teamSSEClient.onUpdate(teamName, handleTeamSSEUpdate);
+        }
+
+        // Handle SSE updates for team data
+        function handleTeamSSEUpdate(payload) {
+            if (!payload.data || !selectedTeam) return;
+
+            // For heartbeat messages, just update the indicator
+            if (payload.type === 'heartbeat') {
+                const updateIndicator = document.getElementById('sse-update-indicator');
+                if (updateIndicator) {
+                    updateIndicator.style.opacity = '1';
+                    setTimeout(() => {
+                        updateIndicator.style.opacity = '0.5';
+                    }, 500);
+                }
+                return;
+            }
+
+            // For init and update messages, do a full refresh
+            if (payload.type === 'init' || payload.type === 'update') {
+                const teamData = payload.data;
+
+                // Update member status if changed
+                if (teamData.members) {
+                    const memberStatus = {};
+                    teamData.members.forEach(m => {
+                        memberStatus[m.name] = m.alive;
+                    });
+                    // Update UI to show alive status changes
+                    document.querySelectorAll('.team-member-item').forEach(el => {
+                        const name = el.dataset.memberName;
+                        if (name && memberStatus[name] !== undefined) {
+                            const statusDot = el.querySelector('.member-status-dot');
+                            if (statusDot) {
+                                statusDot.style.background = memberStatus[name] ? 'var(--green)' : 'var(--text-tertiary)';
+                            }
+                        }
+                    });
+                }
+
+                // Update task summary counters
+                if (teamData.taskSummary) {
+                    const summary = teamData.taskSummary;
+                    const summaryEl = document.getElementById('team-task-summary');
+                    if (summaryEl) {
+                        summaryEl.innerHTML = `
+                            <span style="color:var(--yellow)">⏳ ${summary.pending || 0}</span> |
+                            <span style="color:var(--accent)">▶️ ${summary.in_progress || 0}</span> |
+                            <span style="color:var(--green)">✅ ${summary.completed || 0}</span> |
+                            <span style="color:var(--red)">❌ ${summary.blocked || 0}</span>
+                        `;
+                    }
+                }
+
+                // Show subtle update indicator
+                const updateIndicator = document.getElementById('sse-update-indicator');
+                if (updateIndicator) {
+                    updateIndicator.style.opacity = '1';
+                    setTimeout(() => {
+                        updateIndicator.style.opacity = '0.5';
+                    }, 1000);
+                }
+            }
         }
 
         function loadTeamMembers(teamName) {
@@ -4625,6 +4692,10 @@
             if (pageId === 'notifications') {
                 loadNotifications();
             }
+            // Disconnect SSE when leaving teams page (SpectrAI-inspired real-time updates)
+            if (pageId !== 'teams' && selectedTeam) {
+                teamSSEClient.disconnect(selectedTeam);
+            }
         };
 
         // ===== Bottom Bar Time =====
@@ -5375,7 +5446,132 @@
             if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
             return num.toString();
         }
-        
+
+        // ===== SpectrAI-inspired Real-time SSE Client =====
+        // Manages Server-Sent Events connections for real-time team updates
+        class TeamSSEClient {
+            constructor() {
+                this.connections = new Map(); // teamName -> EventSource
+                this.reconnectDelay = 1000;
+                this.maxReconnectDelay = 30000;
+                this.handlers = new Map(); // teamName -> Set of update handlers
+            }
+
+            connect(teamName) {
+                if (this.connections.has(teamName)) {
+                    return; // Already connected
+                }
+
+                // Close existing connection if any
+                this.disconnect(teamName);
+
+                const sseUrl = `/api/events/${encodeURIComponent(teamName)}`;
+                console.log(`[SSE] Connecting to ${sseUrl}`);
+
+                try {
+                    const eventSource = new EventSource(sseUrl);
+                    this.connections.set(teamName, eventSource);
+
+                    eventSource.onopen = () => {
+                        console.log(`[SSE] Connected to team ${teamName}`);
+                        this.reconnectDelay = 1000; // Reset on successful connection
+                    };
+
+                    eventSource.onmessage = (event) => {
+                        try {
+                            const payload = JSON.parse(event.data);
+                            this._handleMessage(teamName, payload);
+                        } catch (e) {
+                            console.error(`[SSE] Failed to parse message for ${teamName}:`, e);
+                        }
+                    };
+
+                    eventSource.onerror = (error) => {
+                        console.error(`[SSE] Error for team ${teamName}:`, error);
+                        // Note: EventSource has built-in auto-reconnect
+                        // We just mark the connection as closed for cleanup purposes
+                        eventSource.close();
+                        this.connections.delete(teamName);
+
+                        // Schedule reconnect with exponential backoff for more control
+                        setTimeout(() => {
+                            if (!this.connections.has(teamName) && selectedTeam === teamName) {
+                                console.log(`[SSE] Reconnecting to team ${teamName}...`);
+                                this.connect(teamName);
+                            }
+                        }, this.reconnectDelay);
+
+                        this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxReconnectDelay);
+                    };
+                } catch (e) {
+                    console.error(`[SSE] Failed to create EventSource for ${teamName}:`, e);
+                }
+            }
+
+            disconnect(teamName) {
+                const eventSource = this.connections.get(teamName);
+                if (eventSource) {
+                    eventSource.close();
+                    this.connections.delete(teamName);
+                    console.log(`[SSE] Disconnected from team ${teamName}`);
+                }
+            }
+
+            disconnectAll() {
+                for (const teamName of this.connections.keys()) {
+                    this.disconnect(teamName);
+                }
+            }
+
+            onUpdate(teamName, handler) {
+                if (!this.handlers.has(teamName)) {
+                    this.handlers.set(teamName, new Set());
+                }
+                this.handlers.get(teamName).add(handler);
+            }
+
+            offUpdate(teamName, handler) {
+                const teamHandlers = this.handlers.get(teamName);
+                if (teamHandlers) {
+                    teamHandlers.delete(handler);
+                }
+            }
+
+            _handleMessage(teamName, payload) {
+                const teamHandlers = this.handlers.get(teamName);
+                if (teamHandlers) {
+                    for (const handler of teamHandlers) {
+                        try {
+                            handler(payload);
+                        } catch (e) {
+                            console.error(`[SSE] Handler error for ${teamName}:`, e);
+                        }
+                    }
+                }
+
+                // Also call global update handler if defined
+                if (typeof window.handleTeamUpdate === 'function') {
+                    try {
+                        window.handleTeamUpdate(teamName, payload);
+                    } catch (e) {
+                        console.error('[SSE] Global handler error:', e);
+                    }
+                }
+            }
+
+            isConnected(teamName) {
+                return this.connections.has(teamName);
+            }
+        }
+
+        // Global SSE client instance
+        const teamSSEClient = new TeamSSEClient();
+
+        // Auto-cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            teamSSEClient.disconnectAll();
+        });
+
         // ===== API Integration =====
         async function loadDashboard() {
             try {
