@@ -14,15 +14,17 @@ ClawTeam 自动经验捕获引擎 - P12 .learnings 自动闭环实现
 """
 
 from __future__ import annotations
-from enum import Enum
-from typing import List, Optional, Dict, Any, Literal, Tuple
-from pydantic import BaseModel, Field, ConfigDict
-from datetime import datetime, timedelta
-from pathlib import Path
+
 import json
-import uuid
 import logging
 import re
+import uuid
+from datetime import datetime, timedelta
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 
@@ -84,11 +86,7 @@ class PatternDetector:
                     "end_index": i + window_size - 1,
                     "error_count": error_count,
                     "error_types": list(
-                        set(
-                            a.get("error_type", "unknown")
-                            for a in window
-                            if a.get("status") == "error"
-                        )
+                        set(a.get("error_type", "unknown") for a in window if a.get("status") == "error")
                     ),
                     "confidence": min(1.0, error_count / window_size),
                     "activities": window,
@@ -109,9 +107,7 @@ class PatternDetector:
 
         return patterns
 
-    def calculate_pattern_confidence(
-        self, pattern: Dict[str, Any], occurrences: List[Dict[str, Any]]
-    ) -> float:
+    def calculate_pattern_confidence(self, pattern: Dict[str, Any], occurrences: List[Dict[str, Any]]) -> float:
         """计算模式置信度"""
         if pattern["type"] == "error_cluster":
             # 基于错误频率和相似性计算置信度
@@ -318,9 +314,7 @@ class AutoCaptureEngine:
             existing.last_seen = datetime.now()
             existing.occurrences.extend(entry.occurrences)
             existing.session_ids = list(set(existing.session_ids + entry.session_ids))
-            existing.related_task_ids = list(
-                set(existing.related_task_ids + entry.related_task_ids)
-            )
+            existing.related_task_ids = list(set(existing.related_task_ids + entry.related_task_ids))
 
             # 更新优先级的逻辑：基于出现次数
             if existing.count >= 10:
@@ -333,9 +327,7 @@ class AutoCaptureEngine:
                 existing.priority = "low"
 
             self._save_experience(existing)
-            logger.info(
-                f"Merged experience into existing entry {similar_entry_id} (count: {existing.count})"
-            )
+            logger.info(f"Merged experience into existing entry {similar_entry_id} (count: {existing.count})")
             return similar_entry_id
         else:
             # 新增条目
@@ -382,9 +374,7 @@ class AutoCaptureEngine:
 
         return len(intersection) / len(union) if union else 0.0
 
-    def check_for_promotion(
-        self, min_occurrences: int = 3, min_confidence: float = 0.8
-    ) -> List[ExperienceEntry]:
+    def check_for_promotion(self, min_occurrences: int = 3, min_confidence: float = 0.8) -> List[ExperienceEntry]:
         """检查是否需要晋升到 AGENTS.md/TOOLS.md/SOUL.md
 
         Args:

@@ -175,9 +175,7 @@ class PluginManager:
         self._initialized = True
 
         self._plugins: dict[str, Plugin] = {}
-        self._plugin_hooks: dict[
-            str, list[tuple[str, Callable]]
-        ] = {}  # plugin_id -> [(hook_name, handler)]
+        self._plugin_hooks: dict[str, list[tuple[str, Callable]]] = {}  # plugin_id -> [(hook_name, handler)]
         self._hook_registry = HookRegistry()
         self._lock = threading.Lock()
         self._discovered_paths: list[str] = []
@@ -216,11 +214,7 @@ class PluginManager:
 
                             for attr_name in dir(module):
                                 attr = getattr(module, attr_name)
-                                if (
-                                    isinstance(attr, type)
-                                    and issubclass(attr, Plugin)
-                                    and attr != Plugin
-                                ):
+                                if isinstance(attr, type) and issubclass(attr, Plugin) and attr != Plugin:
                                     plugin = attr()
                                     discovered.append(
                                         PluginMetadata(

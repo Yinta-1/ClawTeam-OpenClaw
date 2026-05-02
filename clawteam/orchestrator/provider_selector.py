@@ -36,9 +36,7 @@ def _now_iso() -> str:
 
 def _provider_root(team_name: str) -> Path:
     """Get the provider data directory for a team."""
-    d = ensure_within_root(
-        get_data_dir() / "providers", validate_identifier(team_name, "team name")
-    )
+    d = ensure_within_root(get_data_dir() / "providers", validate_identifier(team_name, "team name"))
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -397,9 +395,7 @@ class ProviderSelector:
         # Check if cooldown has expired
         if provider.last_failure_at:
             try:
-                last_failure = datetime.fromisoformat(
-                    provider.last_failure_at.replace("Z", "+00:00")
-                )
+                last_failure = datetime.fromisoformat(provider.last_failure_at.replace("Z", "+00:00"))
                 elapsed = time.time() - last_failure.timestamp()
                 if elapsed >= self.cooldown_seconds:
                     # Exit cooldown
@@ -518,9 +514,7 @@ class ProviderSelector:
                             adapter_type=provider.adapter_type,
                             reason="Preferred provider selected",
                             fallback_chain=[
-                                p
-                                for p in chain.providers
-                                if p != preferred_provider and self._is_available(p)
+                                p for p in chain.providers if p != preferred_provider and self._is_available(p)
                             ],
                             confidence=1.0,
                             task_type=task_type.value,
@@ -586,9 +580,7 @@ class ProviderSelector:
         if best_provider:
             # Build fallback chain (remaining available providers)
             fallback = [
-                p
-                for p in chain.providers
-                if p != best_provider.name and self._is_available(p) and p not in exclude
+                p for p in chain.providers if p != best_provider.name and self._is_available(p) and p not in exclude
             ]
 
             return SelectionResult(
@@ -661,9 +653,7 @@ class ProviderSelector:
             task_type=task_type.value,
         )
 
-    def fallback(
-        self, failed_provider: str, task_type: TaskType = TaskType.general
-    ) -> SelectionResult:
+    def fallback(self, failed_provider: str, task_type: TaskType = TaskType.general) -> SelectionResult:
         """Get a fallback provider after a failure.
 
         Args:
@@ -848,9 +838,7 @@ class ProviderSelector:
                     }
                     for name, p in self.providers.items()
                 },
-                "quotas": {
-                    name: q.model_dump(by_alias=True) for name, q in self._quota_info.items()
-                },
+                "quotas": {name: q.model_dump(by_alias=True) for name, q in self._quota_info.items()},
                 "updatedAt": _now_iso(),
             }
 
@@ -986,9 +974,7 @@ class ProviderAutoSwitchManager:
 
         return result
 
-    def handle_quota_exceeded(
-        self, provider_name: str, task_type: TaskType = TaskType.general
-    ) -> SelectionResult:
+    def handle_quota_exceeded(self, provider_name: str, task_type: TaskType = TaskType.general) -> SelectionResult:
         """处理额度不足情况
 
         当 Provider 额度不足时，自动切换到备用 Provider。
@@ -1031,9 +1017,7 @@ class ProviderAutoSwitchManager:
 
         return result
 
-    def handle_rate_limit(
-        self, provider_name: str, task_type: TaskType = TaskType.general
-    ) -> SelectionResult:
+    def handle_rate_limit(self, provider_name: str, task_type: TaskType = TaskType.general) -> SelectionResult:
         """处理速率限制情况
 
         当 Provider 达到速率限制时，自动切换到备用 Provider。
@@ -1172,9 +1156,7 @@ class ProviderAutoSwitchManager:
                 quota = self.selector.get_quota(name)
                 if quota and quota.quota_reset_at:
                     try:
-                        reset_time = datetime.fromisoformat(
-                            quota.quota_reset_at.replace("Z", "+00:00")
-                        )
+                        reset_time = datetime.fromisoformat(quota.quota_reset_at.replace("Z", "+00:00"))
                         if datetime.now(timezone.utc) > reset_time:
                             provider.status = ProviderStatus.available
                             quota.quota_remaining = quota.quota_limit
@@ -1188,9 +1170,7 @@ class ProviderAutoSwitchManager:
                 # 检查冷却是否结束
                 if provider.last_failure_at:
                     try:
-                        failure_time = datetime.fromisoformat(
-                            provider.last_failure_at.replace("Z", "+00:00")
-                        )
+                        failure_time = datetime.fromisoformat(provider.last_failure_at.replace("Z", "+00:00"))
                         cooldown_end = failure_time.timestamp() + self.selector.cooldown_seconds
                         if time.time() > cooldown_end:
                             provider.status = ProviderStatus.available

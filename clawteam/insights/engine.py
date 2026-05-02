@@ -11,13 +11,14 @@
 """
 
 from __future__ import annotations
+
 import json
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from pathlib import Path
 import logging
+import sqlite3
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -161,16 +162,10 @@ class InsightsEngine:
         # 创建索引
         conn.execute("CREATE INDEX IF NOT EXISTS idx_tool_usage_timestamp ON tool_usage(timestamp)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_tool_usage_tool ON tool_usage(tool_name)")
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_skill_usage_timestamp ON skill_usage(timestamp)"
-        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_skill_usage_timestamp ON skill_usage(timestamp)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_skill_usage_skill ON skill_usage(skill_name)")
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_activity_log_timestamp ON activity_log(timestamp)"
-        )
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_activity_log_event ON activity_log(event_type)"
-        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_activity_log_timestamp ON activity_log(timestamp)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_activity_log_event ON activity_log(event_type)")
 
         conn.commit()
 
@@ -184,7 +179,6 @@ class InsightsEngine:
     ):
         """记录工具使用"""
         import uuid
-        import time
 
         self._ensure_tables()
         conn = self._get_conn()
@@ -266,9 +260,7 @@ class InsightsEngine:
                 task_id,
                 "skill_invoke",
                 timestamp,
-                json.dumps(
-                    {"skill": skill_name, "result_length": result_length, **(metadata or {})}
-                ),
+                json.dumps({"skill": skill_name, "result_length": result_length, **(metadata or {})}),
             ),
         )
 
@@ -507,9 +499,7 @@ class InsightsEngine:
 
         return stats
 
-    def generate_report(
-        self, days: int = 30, team_id: str = None, format: str = "json"
-    ) -> Dict[str, Any]:
+    def generate_report(self, days: int = 30, team_id: str = None, format: str = "json") -> Dict[str, Any]:
         """生成综合报告"""
         report = {
             "generated_at": datetime.now().isoformat(),

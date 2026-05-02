@@ -9,18 +9,13 @@ Provides integration with:
 
 from __future__ import annotations
 
-import json
 import logging
 import threading
-from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
-from clawteam.parser import OutputParser, ActivityEvent, ActivityEventType
-from clawteam.parser.output_parser import get_parser
-from clawteam.notification import NotificationManager, NotificationType
-from clawteam.notification.manager import get_notification_manager
 from clawteam.audit import AuditEventType, log_audit_event
-
+from clawteam.notification import NotificationManager
+from clawteam.parser import ActivityEvent, ActivityEventType, OutputParser
 
 logger = logging.getLogger(__name__)
 
@@ -130,9 +125,7 @@ class ClawTeamIntegration:
         """Set callback for WebSocket push."""
         self._websocket_push_callback = callback
 
-    def parse_output(
-        self, session_id: str, data: str, provider_id: str | None = None
-    ) -> list[ActivityEvent]:
+    def parse_output(self, session_id: str, data: str, provider_id: str | None = None) -> list[ActivityEvent]:
         """Parse output data and trigger notifications."""
         if provider_id:
             self._parser.set_provider(session_id, provider_id)
@@ -186,9 +179,7 @@ def remove_integration(team_name: str) -> None:
 
 
 # Convenience functions
-def parse_and_notify(
-    team_name: str, session_id: str, data: str, provider_id: str | None = None
-) -> list[ActivityEvent]:
+def parse_and_notify(team_name: str, session_id: str, data: str, provider_id: str | None = None) -> list[ActivityEvent]:
     """Parse output and trigger notifications using global integration."""
     integration = get_integration(team_name)
     return integration.parse_output(session_id, data, provider_id)

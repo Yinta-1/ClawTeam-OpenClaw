@@ -79,9 +79,7 @@ class BaseTaskStore(ABC):
         """
         tasks = self.list_tasks()
         completed = [t for t in tasks if t.status == TaskStatus.completed]
-        durations = [
-            t.metadata["duration_seconds"] for t in completed if "duration_seconds" in t.metadata
-        ]
+        durations = [t.metadata["duration_seconds"] for t in completed if "duration_seconds" in t.metadata]
         avg_duration = sum(durations) / len(durations) if durations else 0.0
         return {
             "total": len(tasks),

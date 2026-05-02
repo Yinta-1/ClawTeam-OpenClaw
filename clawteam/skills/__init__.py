@@ -12,8 +12,8 @@ ClawTeam 自主技能创建系统 - P13 实现
 
 from .auto_creator import (
     DetectedPattern,
-    SkillSpec,
     SkillAutoCreator,
+    SkillSpec,
     SkillUsageTracker,
 )
 

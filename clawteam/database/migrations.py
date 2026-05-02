@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, List, Tuple, Optional
 import sqlite3
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,7 @@ class Migration:
 # Migration helper functions
 def table_exists(db: sqlite3.Connection, table_name: str) -> bool:
     """Check if a table exists."""
-    cursor = db.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,)
-    )
+    cursor = db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
     return cursor.fetchone() is not None
 
 
@@ -37,9 +35,7 @@ def get_column_names(db: sqlite3.Connection, table_name: str) -> List[str]:
     return [row[1] for row in cursor.fetchall()]
 
 
-def add_column_if_not_exists(
-    db: sqlite3.Connection, table: str, column: str, definition: str
-) -> bool:
+def add_column_if_not_exists(db: sqlite3.Connection, table: str, column: str, definition: str) -> bool:
     """Add column if it doesn't exist."""
     cols = get_column_names(db, table)
     if column not in cols:
@@ -149,9 +145,7 @@ def run_migrations(db: sqlite3.Connection) -> None:
                 raise
 
     if applied > 0:
-        logger.info(
-            f"Applied {applied} migration(s), current version: {sorted_migrations[-1].version}"
-        )
+        logger.info(f"Applied {applied} migration(s), current version: {sorted_migrations[-1].version}")
     else:
         logger.info(f"Database is up to date at version {current_version}")
 

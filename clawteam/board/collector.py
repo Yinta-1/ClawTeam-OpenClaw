@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import json
 
+from clawteam.profiler import get_profiler
 from clawteam.spawn.registry import is_agent_alive
 from clawteam.team.mailbox import MailboxManager
 from clawteam.team.manager import TeamManager
 from clawteam.team.tasks import TaskStore
-from clawteam.profiler import get_profiler
 
 
 class BoardCollector:
@@ -71,9 +71,7 @@ class BoardCollector:
         try:
             events = mailbox.get_event_log(limit=200)
             for msg in events:
-                all_messages.append(
-                    json.loads(msg.model_dump_json(by_alias=True, exclude_none=True))
-                )
+                all_messages.append(json.loads(msg.model_dump_json(by_alias=True, exclude_none=True)))
         except Exception:
             pass
 

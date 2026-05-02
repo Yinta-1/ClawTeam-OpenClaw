@@ -8,16 +8,16 @@
 - 记忆同步与检索接口
 """
 
-from clawteam.memory.provider import MemoryProvider
 from clawteam.memory.fts5_provider import FTS5MemoryProvider
 from clawteam.memory.layered import (
-    LayeredMemoryProvider,
     L1WorkingMemory,
     L2SessionMemory,
     L3CrossSessionMemory,
     L4KnowledgeBase,
+    LayeredMemoryProvider,
     MemoryEntry,
 )
+from clawteam.memory.provider import MemoryProvider
 
 __all__ = [
     "MemoryProvider",

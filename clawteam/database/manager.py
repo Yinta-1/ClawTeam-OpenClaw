@@ -2,28 +2,24 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sqlite3
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
-import json
-import logging
+from typing import Any, Dict, List, Optional
 
 from . import migrations
-from .types import (
-    DatabaseTask,
-    DatabaseSession,
-    DatabaseAgent,
-    DatabaseMessage,
-    DatabaseAlert,
-    DatabaseUsage,
-)
-from .repositories.task import TaskRepository
-from .repositories.session import SessionRepository
 from .repositories.agent import AgentRepository
-from .repositories.message import MessageRepository
 from .repositories.alert import AlertRepository
+from .repositories.message import MessageRepository
+from .repositories.session import SessionRepository
+from .repositories.task import TaskRepository
 from .repositories.usage import UsageRepository
+from .types import (
+    DatabaseAgent,
+    DatabaseSession,
+    DatabaseTask,
+)
 
 logger = logging.getLogger(__name__)
 

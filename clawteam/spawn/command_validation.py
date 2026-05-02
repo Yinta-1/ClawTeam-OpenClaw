@@ -32,10 +32,7 @@ def validate_spawn_command(
     if shutil.which(executable, path=path):
         return None
 
-    return (
-        f"Error: command '{executable}' not found in PATH. "
-        "Install the agent CLI first or pass an executable path."
-    )
+    return f"Error: command '{executable}' not found in PATH. Install the agent CLI first or pass an executable path."
 
 
 def normalize_spawn_command(command: list[str]) -> list[str]:

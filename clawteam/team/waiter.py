@@ -179,9 +179,7 @@ class TaskWaiter:
 
             # Find this agent's in_progress tasks and reset them
             tasks = self.task_store.list_tasks()
-            abandoned = [
-                t for t in tasks if t.owner == agent_name and t.status == TaskStatus.in_progress
-            ]
+            abandoned = [t for t in tasks if t.owner == agent_name and t.status == TaskStatus.in_progress]
             for t in abandoned:
                 self.task_store.update(t.id, status=TaskStatus.pending)
 

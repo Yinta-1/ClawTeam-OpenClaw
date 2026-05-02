@@ -82,8 +82,7 @@ class InboxWatcher:
             print(msg.model_dump_json(by_alias=True, exclude_none=True), flush=True)
         else:
             print(
-                f"[{msg.timestamp}] {msg.type.value} from={msg.from_agent} "
-                f"to={msg.to}: {msg.content}",
+                f"[{msg.timestamp}] {msg.type.value} from={msg.from_agent} to={msg.to}: {msg.content}",
                 flush=True,
             )
 

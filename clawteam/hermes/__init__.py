@@ -10,11 +10,11 @@ ClawTeam Hermes 集成层
 - Phase 5: 洞察报告系统
 """
 
-from .sync_engine import HermesSyncEngine
-from .skill_tracker import SkillUsageTracker
-from .user_profile import UserProfileManager
 from .memory_sync import MemorySyncEngine
+from .skill_tracker import SkillUsageTracker
+from .sync_engine import HermesSyncEngine
 from .usage_stats import UsageStatsCollector
+from .user_profile import UserProfileManager
 
 __all__ = [
     "HermesSyncEngine",

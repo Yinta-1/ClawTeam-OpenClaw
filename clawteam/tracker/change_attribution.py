@@ -13,7 +13,6 @@ import logging
 import os
 import threading
 import time
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -23,7 +22,7 @@ from pydantic import BaseModel, Field
 from clawteam.fileutil import atomic_write_text
 from clawteam.paths import ensure_within_root, validate_identifier
 from clawteam.team.models import get_data_dir
-from clawteam.tracker.file_watcher import WatchEvent, ChangeType
+from clawteam.tracker.file_watcher import WatchEvent
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +33,7 @@ def _now_iso() -> str:
 
 def _attribution_root(team_name: str) -> Path:
     """Get the attribution data directory for a team."""
-    d = ensure_within_root(
-        get_data_dir() / "attribution", validate_identifier(team_name, "team name")
-    )
+    d = ensure_within_root(get_data_dir() / "attribution", validate_identifier(team_name, "team name"))
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -261,9 +258,7 @@ class ChangeAttributor:
             recent_threshold = time.time() - 5
             for session_id, session in self._active_sessions.items():
                 try:
-                    last_activity = datetime.fromisoformat(
-                        session.last_activity_at.replace("Z", "+00:00")
-                    )
+                    last_activity = datetime.fromisoformat(session.last_activity_at.replace("Z", "+00:00"))
                     if last_activity.timestamp() > recent_threshold:
                         return AttributionResult(
                             success=True,

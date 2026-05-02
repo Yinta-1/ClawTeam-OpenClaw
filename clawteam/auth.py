@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
+import json
 import os
+import secrets
 import time
 from dataclasses import dataclass, field
 from typing import Optional
-import secrets
-import base64
-import json
 
 
 # JWT-like token implementation (no external dependencies)
@@ -80,9 +80,7 @@ class AuthManager:
         payload_b64 = base64.urlsafe_b64encode(json.dumps(payload.to_dict()).encode()).decode()
 
         # Signature
-        signature = hmac.new(
-            self._jwt_secret.encode(), f"{header_b64}.{payload_b64}".encode(), hashlib.sha256
-        ).digest()
+        signature = hmac.new(self._jwt_secret.encode(), f"{header_b64}.{payload_b64}".encode(), hashlib.sha256).digest()
         signature_b64 = base64.urlsafe_b64encode(signature).decode()
 
         return f"{header_b64}.{payload_b64}.{signature_b64}"

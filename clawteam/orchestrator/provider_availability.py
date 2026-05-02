@@ -10,14 +10,11 @@ from __future__ import annotations
 
 import logging
 import os
-import shutil
 import subprocess
 import threading
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -132,9 +129,7 @@ def _get_cache_key(command: str, node_version: str = "") -> str:
     return command
 
 
-def _check_command_available(
-    command: str, node_version: str = ""
-) -> tuple[bool, str, str, float | None]:
+def _check_command_available(command: str, node_version: str = "") -> tuple[bool, str, str, float | None]:
     """检测单个命令是否在 PATH 中可用
 
     Returns:
@@ -232,9 +227,7 @@ def check_provider_availability(provider_id: str) -> ProviderAvailability:
             error="Unknown provider",
         )
 
-    available, version, error, checked_at = _check_command_available(
-        config.command, config.node_version
-    )
+    available, version, error, checked_at = _check_command_available(config.command, config.node_version)
 
     # Use cached timestamp if available
     if checked_at is not None:

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
-from datetime import datetime
 import json
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .base import BaseRepository
 from ..types import DatabaseAgent
+from .base import BaseRepository
 
 
 class AgentRepository(BaseRepository[DatabaseAgent]):
@@ -59,9 +59,7 @@ class AgentRepository(BaseRepository[DatabaseAgent]):
             "result_data": self._serialize_json_field(model.result_data),
         }
 
-    def list(
-        self, team_id: Optional[str] = None, status: Optional[str] = None
-    ) -> List[DatabaseAgent]:
+    def list(self, team_id: Optional[str] = None, status: Optional[str] = None) -> List[DatabaseAgent]:
         """Get agents with optional filters."""
         filters = {}
         if team_id is not None:

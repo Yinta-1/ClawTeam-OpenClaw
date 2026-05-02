@@ -28,9 +28,9 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Optional
-from enum import Enum
 
 
 class AgentState(Enum):
@@ -223,9 +223,7 @@ class CTTeam:
     def _save_state(self) -> None:
         """Save state to disk"""
         agents_file = self.data_dir / "agents.json"
-        agents_file.write_text(
-            json.dumps({n: a.to_dict() for n, a in self.agents.items()}, indent=2), encoding="utf-8"
-        )
+        agents_file.write_text(json.dumps({n: a.to_dict() for n, a in self.agents.items()}, indent=2), encoding="utf-8")
 
         tasks_file = self.data_dir / "tasks.json"
         tasks_file.write_text(
@@ -234,9 +232,7 @@ class CTTeam:
         )
 
         inbox_file = self.data_dir / "inbox.json"
-        inbox_file.write_text(
-            json.dumps([m.to_dict() for m in self.inbox], indent=2), encoding="utf-8"
-        )
+        inbox_file.write_text(json.dumps([m.to_dict() for m in self.inbox], indent=2), encoding="utf-8")
 
     def spawn(
         self,
@@ -386,9 +382,7 @@ class CTTeam:
             "tasks": {
                 "total": len(self.tasks),
                 "completed": sum(1 for t in self.tasks.values() if t.state == TaskState.COMPLETED),
-                "in_progress": sum(
-                    1 for t in self.tasks.values() if t.state == TaskState.IN_PROGRESS
-                ),
+                "in_progress": sum(1 for t in self.tasks.values() if t.state == TaskState.IN_PROGRESS),
             },
             "inbox": {
                 "total": len(self.inbox),
@@ -416,6 +410,4 @@ AgentStatus = AgentState
 TaskStatus = TaskState
 
 create_team = lambda name: CTTeam(name)
-get_team = lambda name: (
-    CTTeam(name) if Path(f"~/.clawteam/teams/{name}").expanduser().exists() else None
-)
+get_team = lambda name: CTTeam(name) if Path(f"~/.clawteam/teams/{name}").expanduser().exists() else None

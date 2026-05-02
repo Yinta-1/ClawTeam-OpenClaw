@@ -10,12 +10,13 @@
 """
 
 from __future__ import annotations
-import sqlite3
+
 import json
+import logging
+import sqlite3
 import time
 from pathlib import Path
-from typing import List, Optional, Tuple
-import logging
+from typing import List, Optional
 
 from .provider import MemoryProvider
 
@@ -94,12 +95,8 @@ class FTS5MemoryProvider(MemoryProvider):
             """)
 
             # 创建索引
-            self.conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memory_fallback_timestamp ON memory_fallback(timestamp);"
-            )
-            self.conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_memory_fallback_session ON memory_fallback(session_id);"
-            )
+            self.conn.execute("CREATE INDEX IF NOT EXISTS idx_memory_fallback_timestamp ON memory_fallback(timestamp);")
+            self.conn.execute("CREATE INDEX IF NOT EXISTS idx_memory_fallback_session ON memory_fallback(session_id);")
 
             self.conn.commit()
             self._initialized = True

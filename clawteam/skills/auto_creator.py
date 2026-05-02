@@ -9,15 +9,16 @@ ClawTeam 自主技能创建引擎 - P13 实现
 """
 
 from __future__ import annotations
-from typing import List, Dict, Any, Optional, Tuple
-from pydantic import BaseModel, Field
-from datetime import datetime, timedelta
-from pathlib import Path
+
 import json
-import uuid
-import yaml
 import logging
 import re
+import uuid
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -138,9 +139,7 @@ class SkillUsageTracker:
         # 保存到文件
         self._save_usage_record(record)
 
-        logger.debug(
-            f"Recorded skill usage: {skill_name} (success: {success}, duration: {duration_ms}ms)"
-        )
+        logger.debug(f"Recorded skill usage: {skill_name} (success: {success}, duration: {duration_ms}ms)")
 
     def get_skill_stats(self, skill_name: Optional[str] = None, days: int = 30) -> Dict[str, Any]:
         """获取技能统计
@@ -166,9 +165,7 @@ class SkillUsageTracker:
 
             records = self._usage_data[skill]
             recent_records = [
-                r
-                for r in records
-                if datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")) >= cutoff_date
+                r for r in records if datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")) >= cutoff_date
             ]
 
             if not recent_records:
@@ -178,11 +175,7 @@ class SkillUsageTracker:
             total_count = len(recent_records)
             success_rate = success_count / total_count if total_count > 0 else 0
 
-            avg_duration = (
-                sum(r["duration_ms"] for r in recent_records) / total_count
-                if total_count > 0
-                else 0
-            )
+            avg_duration = sum(r["duration_ms"] for r in recent_records) / total_count if total_count > 0 else 0
 
             # 分析常用输入模式
             input_patterns = {}
@@ -196,9 +189,7 @@ class SkillUsageTracker:
                 "avg_duration_ms": avg_duration,
                 "success_count": success_count,
                 "failure_count": total_count - success_count,
-                "input_patterns": sorted(input_patterns.items(), key=lambda x: x[1], reverse=True)[
-                    :5
-                ],
+                "input_patterns": sorted(input_patterns.items(), key=lambda x: x[1], reverse=True)[:5],
                 "first_use": min(r["timestamp"] for r in recent_records),
                 "last_use": max(r["timestamp"] for r in recent_records),
             }
@@ -287,9 +278,7 @@ class SkillAutoCreator:
             for inputs_str, count in input_patterns:
                 if count >= min_occurrences:
                     # 分析输入模式以提取步骤
-                    pattern = self._analyze_input_pattern(
-                        skill_name, inputs_str, count, skill_stats
-                    )
+                    pattern = self._analyze_input_pattern(skill_name, inputs_str, count, skill_stats)
                     if pattern and pattern.confidence >= min_confidence:
                         detected_patterns.append(pattern)
 
@@ -331,7 +320,7 @@ class SkillAutoCreator:
             steps = [
                 f"调用 {skill_name} 技能",
                 f"提供输入参数: {len(inputs)} 个参数",
-                f"处理并返回结果",
+                "处理并返回结果",
             ]
 
             # 计算预计节省步数（基于使用频率）
@@ -364,9 +353,7 @@ class SkillAutoCreator:
             logger.warning(f"Failed to analyze input pattern: {e}")
             return None
 
-    def detect_skill_creation_intent(
-        self, conversation: List[Dict[str, str]]
-    ) -> Optional[Dict[str, Any]]:
+    def detect_skill_creation_intent(self, conversation: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
         """检测对话中的技能创建意图
 
         Args:
@@ -429,9 +416,7 @@ class SkillAutoCreator:
 
         return skill_info
 
-    def create_skill_from_pattern(
-        self, pattern: DetectedPattern, confirm: bool = True
-    ) -> Optional[SkillSpec]:
+    def create_skill_from_pattern(self, pattern: DetectedPattern, confirm: bool = True) -> Optional[SkillSpec]:
         """基于模式创建技能
 
         Args:
@@ -459,9 +444,7 @@ class SkillAutoCreator:
             for i, step in enumerate(pattern.steps, 1):
                 instructions += f"{i}. {step}\n"
 
-            instructions += (
-                f"\n## 预计节省\n预计每次使用可节省 {pattern.estimated_savings} 步操作。"
-            )
+            instructions += f"\n## 预计节省\n预计每次使用可节省 {pattern.estimated_savings} 步操作。"
 
             # 定义输入参数
             inputs = []
@@ -477,9 +460,7 @@ class SkillAutoCreator:
                 )
             else:
                 # 默认输入参数
-                inputs.append(
-                    {"name": "task", "type": "string", "description": "任务描述", "required": True}
-                )
+                inputs.append({"name": "task", "type": "string", "description": "任务描述", "required": True})
 
             # 定义输出
             outputs = [{"name": "result", "type": "string", "description": "执行结果"}]
@@ -535,13 +516,9 @@ class SkillAutoCreator:
         skill_name = re.sub(r"[^a-zA-Z0-9-_]", "-", skill_name).lower()
 
         # 生成技能描述（从对话中提取）
-        description_match = re.search(
-            r"(?:description|描述)[:\s]+(.+?)(?:\n|$)", full_text, re.IGNORECASE
-        )
+        description_match = re.search(r"(?:description|描述)[:\s]+(.+?)(?:\n|$)", full_text, re.IGNORECASE)
         description = (
-            description_match.group(1).strip()
-            if description_match
-            else f"基于对话自动创建的技能: {skill_name}"
+            description_match.group(1).strip() if description_match else f"基于对话自动创建的技能: {skill_name}"
         )
 
         # 生成指令
@@ -561,7 +538,7 @@ class SkillAutoCreator:
             instructions += f"\n## 相关经验\n{learnings_context}\n"
 
         # 添加使用说明
-        instructions += f"""
+        instructions += """
 ## 使用方法
 1. 调用此技能时提供必要的输入参数
 2. 技能会根据对话中展示的模式执行相应操作
@@ -653,9 +630,7 @@ class SkillAutoCreator:
 
             if spec.metadata:
                 skill_md += "\n## 元数据\n"
-                skill_md += (
-                    f"```json\n{json.dumps(spec.metadata, ensure_ascii=False, indent=2)}\n```\n"
-                )
+                skill_md += f"```json\n{json.dumps(spec.metadata, ensure_ascii=False, indent=2)}\n```\n"
 
             # 写入 SKILL.md
             skill_md_path = skill_dir / "SKILL.md"
@@ -755,9 +730,7 @@ class SkillAutoCreator:
         evaluations.sort(key=lambda x: x["score"], reverse=True)
         return evaluations
 
-    def optimize_skill(
-        self, skill_name: str, based_on_feedback: Optional[List[Dict[str, Any]]] = None
-    ) -> bool:
+    def optimize_skill(self, skill_name: str, based_on_feedback: Optional[List[Dict[str, Any]]] = None) -> bool:
         """优化技能
 
         Args:
@@ -875,9 +848,7 @@ class SkillAutoCreator:
             "input_patterns": skill_stats.get("input_patterns", []),
             "first_use": skill_stats.get("first_use", ""),
             "last_use": skill_stats.get("last_use", ""),
-            "time_saved_minutes": skill_stats.get("estimated_savings", 0)
-            * total_uses
-            / 10.0,  # 估算节省时间
+            "time_saved_minutes": skill_stats.get("estimated_savings", 0) * total_uses / 10.0,  # 估算节省时间
         }
 
         return metrics

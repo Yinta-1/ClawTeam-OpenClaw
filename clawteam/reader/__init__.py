@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from clawteam.reader.types import (
-    OutputEvent,
-    TokenUsage,
-    ReaderState,
-    OutputEventType,
-    BaseOutputReader,
-)
-from clawteam.reader.manager import OutputReaderManager
 from clawteam.reader.jsonl_parser import ClaudeJsonlReader
+from clawteam.reader.manager import OutputReaderManager
+from clawteam.reader.types import (
+    BaseOutputReader,
+    OutputEvent,
+    OutputEventType,
+    ReaderState,
+    TokenUsage,
+)
 
 __all__ = [
     "OutputEvent",

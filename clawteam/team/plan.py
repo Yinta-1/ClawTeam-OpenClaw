@@ -28,10 +28,7 @@ def _team_plans_root(team_name: str) -> Path:
 
 
 def _plan_filename(agent_name: str, plan_id: str) -> str:
-    return (
-        f"{validate_identifier(agent_name, 'agent name')}"
-        f"-{validate_identifier(plan_id, 'plan id')}.md"
-    )
+    return f"{validate_identifier(agent_name, 'agent name')}-{validate_identifier(plan_id, 'plan id')}.md"
 
 
 def _team_plan_path(team_name: str, agent_name: str, plan_id: str) -> Path:

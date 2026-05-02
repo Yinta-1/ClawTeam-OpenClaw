@@ -11,15 +11,15 @@ from clawteam.notification.manager import (
     get_notification_manager,
     notify_confirmation,
     notify_error,
-    notify_task_complete,
     notify_stuck,
+    notify_task_complete,
 )
 from clawteam.notification.types import (
     Notification,
-    NotificationType,
-    NotificationPriority,
-    NotificationEvent,
     NotificationConfig,
+    NotificationEvent,
+    NotificationPriority,
+    NotificationType,
 )
 
 __all__ = [

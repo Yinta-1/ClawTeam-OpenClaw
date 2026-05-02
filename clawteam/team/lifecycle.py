@@ -5,14 +5,12 @@ from __future__ import annotations
 import shutil
 
 from clawteam.paths import ensure_within_root, validate_identifier
+from clawteam.spawn.registry import (
+    terminate_agent_tree,
+)
 from clawteam.team.mailbox import MailboxManager
 from clawteam.team.models import MessageType, get_data_dir
 from clawteam.team.parent_child import ParentChildRegistry
-from clawteam.spawn.registry import (
-    get_children_of,
-    get_descendants_of,
-    terminate_agent_tree,
-)
 
 
 class LifecycleManager:

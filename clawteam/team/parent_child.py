@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Any
 
 from clawteam.fileutil import atomic_write_text, file_locked
 from clawteam.paths import ensure_within_root, validate_identifier
@@ -208,7 +207,7 @@ class ParentChildRegistry:
         validate_identifier(team_name, "team name")
         validate_identifier(root_agent, "root agent name")
 
-        from clawteam.spawn.registry import get_agent_info, is_agent_alive, unregister_agent
+        from clawteam.spawn.registry import unregister_agent
 
         terminated: list[str] = []
         # Get all descendants first (they need to be terminated before the root)

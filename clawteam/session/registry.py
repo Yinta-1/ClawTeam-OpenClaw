@@ -16,7 +16,7 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -317,9 +317,7 @@ class SessionRegistry:
 
         return {
             "session": session.model_dump(by_alias=True, exclude_none=True),
-            "recentActivities": [
-                a.model_dump(by_alias=True, exclude_none=True) for a in activities
-            ],
+            "recentActivities": [a.model_dump(by_alias=True, exclude_none=True) for a in activities],
             "statistics": {
                 "filesModifiedCount": len(session.files_modified),
                 "commandsExecutedCount": len(session.commands_executed),
@@ -496,9 +494,7 @@ class SessionRegistry:
 
         for session in self.list_sessions(status=SessionStatus.active):
             try:
-                last_heartbeat = datetime.fromisoformat(
-                    session.last_heartbeat.replace("Z", "+00:00")
-                )
+                last_heartbeat = datetime.fromisoformat(session.last_heartbeat.replace("Z", "+00:00"))
                 age_hours = (now - last_heartbeat).total_seconds() / 3600
 
                 if age_hours > max_age_hours:

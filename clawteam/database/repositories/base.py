@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Type, TypeVar, Generic
 from datetime import datetime
-import json
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 T = TypeVar("T")
 

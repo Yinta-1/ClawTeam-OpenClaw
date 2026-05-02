@@ -8,17 +8,17 @@ Key components:
 - CrossSessionBus: Message bus for cross-session communication
 """
 
-from clawteam.session.registry import (
-    SessionRegistry,
-    SessionInfo,
-    SessionStatus,
-    get_session_registry,
-)
 from clawteam.session.cross_session import (
     CrossSessionBus,
     CrossSessionMessage,
     NotificationType,
     get_cross_session_bus,
+)
+from clawteam.session.registry import (
+    SessionInfo,
+    SessionRegistry,
+    SessionStatus,
+    get_session_registry,
 )
 
 __all__ = [

@@ -280,8 +280,8 @@ def _pid_alive(pid: int) -> bool:
     """Check if a process with the given PID is still running."""
     if pid <= 0:
         return False
-    import sys
     import os
+    import sys
 
     if sys.platform == "win32":
         # Windows doesn't support os.kill(pid, 0) for process checking
@@ -345,7 +345,6 @@ def terminate_agent_tree(team_name: str, root_agent: str) -> list[str]:
     This kills actual processes via tmux/subprocess, then unregisters.
     Returns list of agent names that were terminated in order.
     """
-    import subprocess as _subprocess
 
     descendants = get_descendants_of(team_name, root_agent)
     # Reverse so leaves are terminated before their parents

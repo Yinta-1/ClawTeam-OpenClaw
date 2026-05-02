@@ -8,14 +8,14 @@ P12 .learnings 自动闭环集成
 """
 
 from __future__ import annotations
-from typing import Optional, List, Dict, Any
-from pathlib import Path
+
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from clawteam.learnings.auto_capture import (
     AutoCaptureEngine,
     LearningType,
-    ExperienceEntry,
 )
 
 logger = logging.getLogger(__name__)

@@ -8,12 +8,12 @@ to accurately determine session state.
 
 from __future__ import annotations
 
+import logging
 import re
 import time
-import logging
-from typing import Dict, Optional, Set, Tuple
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +84,7 @@ class StateInference:
         # Callbacks
         self._status_callbacks = []
 
-    def register_session_config(
-        self, session_id: str, config: Optional[ProviderStateConfig] = None
-    ):
+    def register_session_config(self, session_id: str, config: Optional[ProviderStateConfig] = None):
         """Register provider state configuration for session.
 
         Args:
@@ -99,9 +97,7 @@ class StateInference:
         # Compile startup detection regex
         if merged.startup_pattern:
             try:
-                self._startup_patterns[session_id] = re.compile(
-                    merged.startup_pattern, re.IGNORECASE
-                )
+                self._startup_patterns[session_id] = re.compile(merged.startup_pattern, re.IGNORECASE)
             except re.error:
                 self._startup_patterns[session_id] = None
         else:

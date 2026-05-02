@@ -9,8 +9,8 @@ When adding a new Provider: new XxxReader() → register_reader()
 from __future__ import annotations
 
 import logging
-from typing import Dict, Optional, List
 from dataclasses import dataclass
+from typing import Dict, List
 
 from clawteam.reader.types import BaseOutputReader, OutputEvent
 

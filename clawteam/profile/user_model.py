@@ -9,14 +9,15 @@ ClawTeam 用户画像系统 - P14 实现
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Any, Set, Literal
-from pydantic import BaseModel, Field, ConfigDict
+
+import json
+import logging
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
-import json
-import re
-import logging
-import uuid
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -185,9 +186,7 @@ class BehaviorAnalyzer:
     def __init__(self):
         self.pattern_window_days = 7
 
-    def analyze_working_hours(
-        self, conversation_times: List[datetime]
-    ) -> Optional[BehavioralPattern]:
+    def analyze_working_hours(self, conversation_times: List[datetime]) -> Optional[BehavioralPattern]:
         """分析工作时间模式"""
         if len(conversation_times) < 3:
             return None
@@ -308,17 +307,13 @@ class UserProfileManager:
                             for pref in data["preferences"].values():
                                 for key in ["created_at", "updated_at"]:
                                     if key in pref and isinstance(pref[key], str):
-                                        pref[key] = datetime.fromisoformat(
-                                            pref[key].replace("Z", "+00:00")
-                                        )
+                                        pref[key] = datetime.fromisoformat(pref[key].replace("Z", "+00:00"))
                         # 转换 behavioral_patterns 中的 datetime
                         if "behavioral_patterns" in data:
                             for bp in data["behavioral_patterns"].values():
                                 for key in ["first_observed", "last_observed"]:
                                     if key in bp and isinstance(bp[key], str):
-                                        bp[key] = datetime.fromisoformat(
-                                            bp[key].replace("Z", "+00:00")
-                                        )
+                                        bp[key] = datetime.fromisoformat(bp[key].replace("Z", "+00:00"))
                         profile = UserProfile(**data)
                         self._profiles[profile.user_id] = profile
                 except Exception as e:
@@ -429,9 +424,7 @@ class UserProfileManager:
 
         return changes
 
-    def update_profile(
-        self, user_id: str, changes: List[Dict[str, Any]], source: str = "conversation"
-    ) -> UserProfile:
+    def update_profile(self, user_id: str, changes: List[Dict[str, Any]], source: str = "conversation") -> UserProfile:
         """更新用户画像
 
         Args:
@@ -468,9 +461,7 @@ class UserProfileManager:
                     profile.projects[project_name] = value
 
         # 记录进化
-        profile.evolution.append(
-            {"timestamp": datetime.now().isoformat(), "changes": changes, "source": source}
-        )
+        profile.evolution.append({"timestamp": datetime.now().isoformat(), "changes": changes, "source": source})
         profile.updated_at = datetime.now()
 
         self._save_profile(profile)
@@ -491,12 +482,7 @@ class UserProfileManager:
         profile = self.get_profile(user_id)
 
         # 如果什么都没有，返回空
-        if (
-            not profile.preferences
-            and not profile.behavioral_patterns
-            and not profile.identity
-            and not profile.name
-        ):
+        if not profile.preferences and not profile.behavioral_patterns and not profile.identity and not profile.name:
             return ""
 
         context_parts = ["## 用户上下文"]
@@ -536,9 +522,7 @@ class UserProfileManager:
 
         # 项目信息
         if profile.projects:
-            active_projects = [
-                name for name, info in profile.projects.items() if info.get("status") == "active"
-            ]
+            active_projects = [name for name, info in profile.projects.items() if info.get("status") == "active"]
             if active_projects:
                 context_parts.append(f"**活跃项目**: {', '.join(active_projects)}")
 

@@ -350,8 +350,8 @@ class DiffTracker:
         diff = difflib.unified_diff(
             old_lines,
             new_lines,
-            fromfile=f"a/{path}" if old_content else f"/dev/null",
-            tofile=f"b/{path}" if new_content else f"/dev/null",
+            fromfile=f"a/{path}" if old_content else "/dev/null",
+            tofile=f"b/{path}" if new_content else "/dev/null",
             lineterm="",
         )
 
@@ -520,9 +520,7 @@ class DiffTracker:
 
         return content
 
-    def get_change_summary(
-        self, agent_name: str | None = None, since: str | None = None
-    ) -> dict[str, Any]:
+    def get_change_summary(self, agent_name: str | None = None, since: str | None = None) -> dict[str, Any]:
         """Get a summary of changes.
 
         Args:
@@ -605,8 +603,7 @@ def create_diff_handler(
 
         if entry:
             logger.info(
-                f"Generated diff for {event.path}: "
-                f"+{entry.lines_added} -{entry.lines_removed} ~{entry.lines_changed}"
+                f"Generated diff for {event.path}: +{entry.lines_added} -{entry.lines_removed} ~{entry.lines_changed}"
             )
 
     return handler

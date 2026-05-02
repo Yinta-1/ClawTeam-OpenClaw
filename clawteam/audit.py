@@ -13,7 +13,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from clawteam.fileutil import atomic_write_text
 from clawteam.paths import ensure_within_root, validate_identifier
 
 

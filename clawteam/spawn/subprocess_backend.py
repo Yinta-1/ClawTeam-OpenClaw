@@ -138,10 +138,7 @@ class SubprocessBackend(SpawnBackend):
         # Wrap with on-exit hook so task status updates immediately on exit
         cmd_str = " ".join(shlex.quote(c) for c in final_command)
         exit_cmd = shlex.quote(clawteam_bin) if os.path.isabs(clawteam_bin) else "clawteam"
-        exit_hook = (
-            f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} "
-            f"--agent {shlex.quote(agent_name)}"
-        )
+        exit_hook = f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} --agent {shlex.quote(agent_name)}"
         shell_cmd = f'trap "{exit_hook}" EXIT; {cmd_str}'
 
         process = subprocess.Popen(

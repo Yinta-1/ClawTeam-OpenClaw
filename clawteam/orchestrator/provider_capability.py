@@ -324,17 +324,13 @@ class ProviderCapabilityRegistry:
         return {
             "totalProviders": len(PROVIDER_CAPABILITIES),
             "providers": [cap.to_dict() for cap in PROVIDER_CAPABILITIES.values()],
-            "nativeMcpProviders": [
-                pid for pid, cap in PROVIDER_CAPABILITIES.items() if cap.mcp_support.native
-            ],
+            "nativeMcpProviders": [pid for pid, cap in PROVIDER_CAPABILITIES.items() if cap.mcp_support.native],
             "fallbackMcpProviders": [
                 pid
                 for pid, cap in PROVIDER_CAPABILITIES.items()
                 if cap.mcp_support.fallback == McpFallbackType.PROMPT_INJECTION
             ],
             "slashCommandProviders": [
-                pid
-                for pid, cap in PROVIDER_CAPABILITIES.items()
-                if cap.skill_support.slash_commands
+                pid for pid, cap in PROVIDER_CAPABILITIES.items() if cap.skill_support.slash_commands
             ],
         }

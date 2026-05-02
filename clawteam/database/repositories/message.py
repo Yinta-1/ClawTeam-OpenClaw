@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .base import BaseRepository
 from ..types import DatabaseMessage
+from .base import BaseRepository
 
 
 class MessageRepository(BaseRepository[DatabaseMessage]):

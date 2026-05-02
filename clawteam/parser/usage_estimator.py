@@ -9,10 +9,10 @@ from __future__ import annotations
 import json
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from clawteam.parser.types import UsageSummary
 
@@ -244,4 +244,3 @@ class UsageEstimator:
 
 # Import timedelta for get_usage_history
 from datetime import timedelta
-from dataclasses import field

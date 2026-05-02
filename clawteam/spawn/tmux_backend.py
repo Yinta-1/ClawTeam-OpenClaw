@@ -234,18 +234,13 @@ class TmuxBackend(SpawnBackend):
             final_command.append(prompt)
         elif prompt and is_gemini_command(normalized_command):
             final_command.extend(["-p", prompt])
-        elif prompt and (
-            is_qwen_command(normalized_command) or is_opencode_command(normalized_command)
-        ):
+        elif prompt and (is_qwen_command(normalized_command) or is_opencode_command(normalized_command)):
             final_command.extend(["-p", prompt])
 
         cmd_str = " ".join(shlex.quote(c) for c in final_command)
         # Append on-exit hook: runs immediately when agent process exits
         exit_cmd = shlex.quote(clawteam_bin) if os.path.isabs(clawteam_bin) else "clawteam"
-        exit_hook = (
-            f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} "
-            f"--agent {shlex.quote(agent_name)}"
-        )
+        exit_hook = f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} --agent {shlex.quote(agent_name)}"
         # Unset nesting-detection env vars so spawned agents
         # don't refuse to start when the leader is itself a session.
         unset_clause = "unset CLAUDECODE CLAUDE_CODE_ENTRYPOINT CLAUDE_CODE_SESSION OPENCLAW_NESTED 2>/dev/null; "
@@ -365,10 +360,7 @@ class TmuxBackend(SpawnBackend):
         return f"Agent '{agent_name}' spawned in tmux ({target})"
 
     def list_running(self) -> list[dict[str, str]]:
-        return [
-            {"name": name, "target": target, "backend": "tmux"}
-            for name, target in self._agents.items()
-        ]
+        return [{"name": name, "target": target, "backend": "tmux"} for name, target in self._agents.items()]
 
     def inject_runtime_message(self, team: str, agent_name: str, envelope) -> tuple[bool, str]:
         """Best-effort runtime injection into an existing tmux agent pane."""
@@ -458,9 +450,7 @@ class TmuxBackend(SpawnBackend):
             capture_output=True,
             text=True,
         )
-        final_panes = (
-            len(pane_count.stdout.strip().splitlines()) if pane_count.returncode == 0 else 0
-        )
+        final_panes = len(pane_count.stdout.strip().splitlines()) if pane_count.returncode == 0 else 0
         return f"Tiled {final_panes} panes in {session}"
 
     @staticmethod
@@ -564,16 +554,11 @@ def _looks_like_workspace_trust_prompt(command: list[str], pane_text: str) -> bo
 
     if is_claude_command(command):
         return ("trust this folder" in pane_text or "trust the contents" in pane_text) and (
-            "enter to confirm" in pane_text
-            or "press enter" in pane_text
-            or "enter to continue" in pane_text
+            "enter to confirm" in pane_text or "press enter" in pane_text or "enter to continue" in pane_text
         )
 
     if is_codex_command(command):
-        return (
-            "trust the contents of this directory" in pane_text
-            and "press enter to continue" in pane_text
-        )
+        return "trust the contents of this directory" in pane_text and "press enter to continue" in pane_text
 
     if is_gemini_command(command):
         return "trust folder" in pane_text or "trust parent folder" in pane_text
@@ -752,9 +737,7 @@ def _inject_prompt_via_buffer(
     after the paste to confirm and submit.
     """
     buf_name = f"prompt-{agent_name}"
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".txt", delete=False, prefix="clawteam-prompt-"
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, prefix="clawteam-prompt-") as f:
         f.write(prompt)
         tmp_path = f.name
 

@@ -221,14 +221,14 @@ class FileWatcher:
             return
 
         try:
-            from watchdog.observers import Observer
             from watchdog.events import (
-                FileSystemEventHandler,
                 FileCreatedEvent,
-                FileModifiedEvent,
                 FileDeletedEvent,
+                FileModifiedEvent,
                 FileMovedEvent,
+                FileSystemEventHandler,
             )
+            from watchdog.observers import Observer
 
             class Handler(FileSystemEventHandler):
                 def __init__(self, watcher: FileWatcher):

@@ -4,7 +4,6 @@ Provides isolated Git worktrees for concurrent tasks, enabling parallel
 development without conflicts.
 """
 
-import asyncio
 import json
 import subprocess
 import uuid
@@ -182,9 +181,7 @@ class WorktreeManager:
             raise GitCommandError("git worktree add", returncode, stderr)
 
         # Checkout branch
-        returncode, stdout, stderr = self._run_git(
-            ["checkout", "-b", branch_name], cwd=worktree_dir
-        )
+        returncode, stdout, stderr = self._run_git(["checkout", "-b", branch_name], cwd=worktree_dir)
         if returncode != 0:
             # Clean up worktree if checkout fails
             self._run_git(["worktree", "remove", "--force", str(worktree_dir)])
@@ -268,9 +265,7 @@ class WorktreeManager:
 
         if wt_path.exists():
             # Check branch existence
-            returncode, stdout, stderr = self._run_git(
-                ["branch", "--list", wt.branch_name], cwd=wt_path
-            )
+            returncode, stdout, stderr = self._run_git(["branch", "--list", wt.branch_name], cwd=wt_path)
             status["branch_exists"] = returncode == 0 and wt.branch_name in stdout
 
             # Check uncommitted changes
@@ -350,13 +345,9 @@ class WorktreeManager:
             self._save_metadata()
 
             # Get merged commits
-            returncode, stdout, stderr = self._run_git(
-                ["log", f"{target_branch}..{wt.branch_name}", "--oneline"]
-            )
+            returncode, stdout, stderr = self._run_git(["log", f"{target_branch}..{wt.branch_name}", "--oneline"])
             if returncode == 0:
-                result["merged_commits"] = [
-                    line.strip() for line in stdout.split("\n") if line.strip()
-                ]
+                result["merged_commits"] = [line.strip() for line in stdout.split("\n") if line.strip()]
 
         return result
 
@@ -441,9 +432,7 @@ class WorktreeManager:
                             )
 
                     # Remove worktree
-                    returncode, stdout, stderr = self._run_git(
-                        ["worktree", "remove", "--force", str(wt_path)]
-                    )
+                    returncode, stdout, stderr = self._run_git(["worktree", "remove", "--force", str(wt_path)])
                     if returncode == 0:
                         cleaned.append(wt.worktree_id)
                         self._worktrees.remove(wt)

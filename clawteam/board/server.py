@@ -65,9 +65,7 @@ def _generate_simple_response(message: str) -> str:
 
     # Team related
     if "团队" in message or "team" in msg_lower:
-        return (
-            "要创建团队，可以使用「新建团队」按钮。我可以帮你设置团队模板、分配成员、跟踪进度等。"
-        )
+        return "要创建团队，可以使用「新建团队」按钮。我可以帮你设置团队模板、分配成员、跟踪进度等。"
 
     # Task related
     if "任务" in message or "task" in msg_lower:
@@ -316,7 +314,6 @@ class BoardHandler(BaseHTTPRequestHandler):
 
                 tmpl = load_template(template_name)
                 # Convert to TOML string
-                import io
                 import tomllib
 
                 tmpl_dict = {
@@ -325,17 +322,9 @@ class BoardHandler(BaseHTTPRequestHandler):
                         "description": tmpl.description,
                         "command": tmpl.command,
                         "backend": tmpl.backend,
-                        "leader": tmpl.leader.model_dump()
-                        if hasattr(tmpl.leader, "model_dump")
-                        else dict(tmpl.leader),
-                        "agents": [
-                            a.model_dump() if hasattr(a, "model_dump") else dict(a)
-                            for a in tmpl.agents
-                        ],
-                        "tasks": [
-                            t.model_dump() if hasattr(t, "model_dump") else dict(t)
-                            for t in tmpl.tasks
-                        ],
+                        "leader": tmpl.leader.model_dump() if hasattr(tmpl.leader, "model_dump") else dict(tmpl.leader),
+                        "agents": [a.model_dump() if hasattr(a, "model_dump") else dict(a) for a in tmpl.agents],
+                        "tasks": [t.model_dump() if hasattr(t, "model_dump") else dict(t) for t in tmpl.tasks],
                     }
                 }
                 # Use tomllib.dumps if available (Python 3.11+)
@@ -347,9 +336,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                     toml_str = tomli.dumps(tmpl_dict)
                 self.send_response(200)
                 self.send_header("Content-Type", "text/plain; charset=utf-8")
-                self.send_header(
-                    "Content-Disposition", f"attachment; filename={template_name}.toml"
-                )
+                self.send_header("Content-Disposition", f"attachment; filename={template_name}.toml")
                 self.end_headers()
                 self.wfile.write(toml_str.encode("utf-8"))
             except FileNotFoundError as e:
@@ -399,7 +386,6 @@ class BoardHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length).decode("utf-8")
             try:
-                import io
                 import tomllib
 
                 # Parse TOML content
@@ -434,9 +420,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 with open(toml_path, "w", encoding="utf-8") as f:
                     f.write(toml_str)
 
-                self._serve_json(
-                    {"success": True, "template": template_name, "path": str(toml_path)}
-                )
+                self._serve_json({"success": True, "template": template_name, "path": str(toml_path)})
             except Exception as e:
                 self.send_error(400, f"Failed to import template: {e}")
             return
@@ -522,14 +506,11 @@ class BoardHandler(BaseHTTPRequestHandler):
                         tmpl = load_template(template_name)
                         leader_name = tmpl.leader.name
                         description = description or tmpl.description
-                        agents_data = [
-                            {"name": a.name, "type": a.type, "task": a.task} for a in tmpl.agents
-                        ]
+                        agents_data = [{"name": a.name, "type": a.type, "task": a.task} for a in tmpl.agents]
                         tasks_data = [
-                            {"subject": t.subject, "owner": t.owner, "description": t.description}
-                            for t in tmpl.tasks
+                            {"subject": t.subject, "owner": t.owner, "description": t.description} for t in tmpl.tasks
                         ]
-                    except FileNotFoundError as e:
+                    except FileNotFoundError:
                         self.send_error(400, f"Template '{template_name}' not found")
                         return
                     except Exception as e:
@@ -594,15 +575,13 @@ class BoardHandler(BaseHTTPRequestHandler):
                                 "description": config.description,
                                 "leadAgentId": config.lead_agent_id,
                                 "leaderName": leader_name,
-                                "members": [
-                                    {"name": m.name, "type": m.agent_type} for m in config.members
-                                ],
+                                "members": [{"name": m.name, "type": m.agent_type} for m in config.members],
                                 "tasks": created_tasks or tasks_data,
                                 "template": template_name or None,
                             },
                         }
                     )
-                except Exception as e:
+                except Exception:
                     # If TeamManager.create_team fails, try using subprocess to create via CLI
                     import subprocess
 
@@ -699,8 +678,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 return
 
             try:
-                from clawteam.team.manager import TeamManager
-                from clawteam.team.manager import _save_config
+                from clawteam.team.manager import TeamManager, _save_config
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -738,8 +716,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "Team name required")
                 return
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.spawn.registry import get_registry, is_agent_alive
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -788,8 +766,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "Team name required")
                 return
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.spawn.registry import get_registry, is_agent_alive
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -815,9 +793,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                     if not alive or (health_data and health_data.state.value != "healthy"):
                         overall_healthy = False
 
-                self._serve_json(
-                    {"team": team_name, "healthy": overall_healthy, "members": members_health}
-                )
+                self._serve_json({"team": team_name, "healthy": overall_healthy, "members": members_health})
             except Exception as e:
                 self.send_error(400, str(e))
             return
@@ -828,8 +804,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "Team name required")
                 return
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.spawn.registry import get_registry
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -938,9 +914,9 @@ class BoardHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "Team name required")
                 return
             try:
+                from clawteam.spawn.registry import get_registry, is_agent_alive
                 from clawteam.team.manager import TeamManager
                 from clawteam.team.tasks import TaskStore
-                from clawteam.spawn.registry import get_registry, is_agent_alive
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -976,9 +952,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 # Calculate team health
                 alive_count = sum(1 for m in members_stats if m["alive"])
                 total_count = len(members_stats)
-                team_health = (
-                    "healthy" if alive_count == total_count and total_count > 0 else "degraded"
-                )
+                team_health = "healthy" if alive_count == total_count and total_count > 0 else "degraded"
 
                 # Get team age (assuming first member is leader, created when team was created)
                 import time
@@ -1020,8 +994,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                     self.send_error(400, "Message is required")
                     return
 
-                from clawteam.team.manager import TeamManager
                 from clawteam.team.mailbox import MailboxManager
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -1041,9 +1015,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                         },
                     )
 
-                self._serve_json(
-                    {"success": True, "team": team_name, "recipients": len(config.members)}
-                )
+                self._serve_json({"success": True, "team": team_name, "recipients": len(config.members)})
             except Exception as e:
                 self.send_error(400, str(e))
             return
@@ -1062,8 +1034,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 return
 
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.team.mailbox import MailboxManager
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -1085,8 +1057,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 return
 
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.team.mailbox import MailboxManager
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -1164,9 +1136,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 self._save_chat_message(response)
 
                 # Return success
-                self._serve_json(
-                    {"success": True, "message": "Message sent successfully", "response": response}
-                )
+                self._serve_json({"success": True, "message": "Message sent successfully", "response": response})
 
             except json.JSONDecodeError:
                 self.send_error(400, "Invalid JSON")
@@ -1188,9 +1158,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 if payload.get("maxConcurrentSessions"):
                     os.environ["CLAWTEAM_MAX_SESSIONS"] = str(payload["maxConcurrentSessions"])
                 if payload.get("maxTokensPerSession"):
-                    os.environ["CLAWTEAM_MAX_TOKENS_PER_SESSION"] = str(
-                        payload["maxTokensPerSession"]
-                    )
+                    os.environ["CLAWTEAM_MAX_TOKENS_PER_SESSION"] = str(payload["maxTokensPerSession"])
                 if payload.get("maxQueueLength"):
                     os.environ["CLAWTEAM_MAX_QUEUE_LENGTH"] = str(payload["maxQueueLength"])
                 if payload.get("timeoutMinutes"):
@@ -1247,9 +1215,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 if not response:
                     try:
                         # Read MiniMax API key from openclaw.json
-                        config_path = os.path.join(
-                            os.path.expanduser("~"), ".openclaw", "openclaw.json"
-                        )
+                        config_path = os.path.join(os.path.expanduser("~"), ".openclaw", "openclaw.json")
                         minimax_key = None
                         minimax_url = "https://api.minimaxi.com/anthropic/v1/messages"
 
@@ -1309,9 +1275,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 if not response:
                     response = _generate_simple_response(message)
 
-                self._serve_json(
-                    {"response": response, "message": message, "timestamp": _now_iso()}
-                )
+                self._serve_json({"response": response, "message": message, "timestamp": _now_iso()})
             except Exception as e:
                 self.send_error(400, str(e))
             return
@@ -1330,8 +1294,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 body = self.rfile.read(content_length).decode("utf-8")
                 try:
                     payload = json.loads(body)
-                    from clawteam.team.tasks import TaskStore
                     from clawteam.team.models import TaskStatus
+                    from clawteam.team.tasks import TaskStore
 
                     store = TaskStore(team_name)
 
@@ -1374,8 +1338,8 @@ class BoardHandler(BaseHTTPRequestHandler):
                 return
 
             try:
-                from clawteam.team.manager import TeamManager
                 from clawteam.spawn.registry import get_registry
+                from clawteam.team.manager import TeamManager
 
                 config = TeamManager.get_team(team_name)
                 if not config:
@@ -1393,9 +1357,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 # Delete team via TeamManager
                 TeamManager.delete_team(team_name)
 
-                self._serve_json(
-                    {"success": True, "team": team_name, "message": f"Team '{team_name}' deleted"}
-                )
+                self._serve_json({"success": True, "team": team_name, "message": f"Team '{team_name}' deleted"})
             except Exception as e:
                 self.send_error(400, str(e))
             return
@@ -1418,9 +1380,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         """Serve list of files in the workspace."""
         import os
 
-        workspace = os.environ.get(
-            "CLAWTEAM_WORKSPACE", os.path.expanduser("~/.clawteam/workspace")
-        )
+        workspace = os.environ.get("CLAWTEAM_WORKSPACE", os.path.expanduser("~/.clawteam/workspace"))
         files = []
 
         try:
@@ -1428,10 +1388,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 for root, dirs, filenames in os.walk(workspace):
                     # Skip hidden directories and common ignore patterns
                     dirs[:] = [
-                        d
-                        for d in dirs
-                        if not d.startswith(".")
-                        and d not in ("__pycache__", "node_modules", ".git")
+                        d for d in dirs if not d.startswith(".") and d not in ("__pycache__", "node_modules", ".git")
                     ]
                     for filename in filenames:
                         if filename.startswith("."):
@@ -1447,7 +1404,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                                 "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
                             }
                         )
-        except Exception as e:
+        except Exception:
             pass
 
         # If no files found, return some default files
@@ -1861,9 +1818,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 "category": "analysis",
                 "description": "Security audit for command injection, XSS, unsafe patterns.",
                 "icon": "🔒",
-                "variables": [
-                    {"name": "target", "type": "text", "required": True, "label": "Target Files"}
-                ],
+                "variables": [{"name": "target", "type": "text", "required": True, "label": "Target Files"}],
             },
             {
                 "id": "benchmark",
@@ -1992,7 +1947,6 @@ class BoardHandler(BaseHTTPRequestHandler):
     def _save_providers(self, data):
         """Save providers to configuration file."""
         import json
-        import os
 
         providers_file = self._get_providers_file()
         with open(providers_file, "w", encoding="utf-8") as f:
@@ -2001,7 +1955,6 @@ class BoardHandler(BaseHTTPRequestHandler):
     def _serve_providers(self):
         """Serve providers list or save new provider."""
         import json
-        import os
 
         if self.command == "GET":
             # Return list of providers (without API keys)
@@ -2080,7 +2033,6 @@ class BoardHandler(BaseHTTPRequestHandler):
     def _serve_settings(self):
         """Serve settings configuration."""
         import json
-        import os
         from pathlib import Path
 
         # Get settings file path
@@ -2131,7 +2083,6 @@ class BoardHandler(BaseHTTPRequestHandler):
 
     def _delete_provider(self, provider_name):
         """Delete a provider by name."""
-        import json
         import urllib.parse
 
         # URL decode the name
@@ -2190,9 +2141,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                 with _subscriber_lock:
                     while len(_chat_event_queue) > last_event_idx:
                         event = _chat_event_queue[last_event_idx]
-                        self.wfile.write(
-                            f"data: {json.dumps(event, ensure_ascii=False)}\n\n".encode("utf-8")
-                        )
+                        self.wfile.write(f"data: {json.dumps(event, ensure_ascii=False)}\n\n".encode("utf-8"))
                         self.wfile.flush()
                         last_event_idx += 1
 
@@ -2265,7 +2214,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                         # Count by status
                         status = task_data.get("status", "unknown")
                         task_statuses[status] = task_statuses.get(status, 0) + 1
-                except Exception as e:
+                except Exception:
                     # If task store fails for a team, continue with other teams
                     pass
 
@@ -2288,9 +2237,7 @@ class BoardHandler(BaseHTTPRequestHandler):
 
             # Check if agent is in registry
             registry = get_registry()
-            is_alive = (
-                registry.is_agent_alive(agent_id) if hasattr(registry, "is_agent_alive") else False
-            )
+            is_alive = registry.is_agent_alive(agent_id) if hasattr(registry, "is_agent_alive") else False
 
             # Create detector for readiness check
             config = DetectorConfig(agent_id=agent_id)
@@ -2518,11 +2465,10 @@ You can also type regular messages to communicate with the team.""",
 
             # Try to create task
             try:
-                from clawteam.team.tasks import TaskStore
-                from clawteam.transport import get_transport
-
                 # Get transport from environment or default to "file"
                 import os
+
+                from clawteam.team.tasks import TaskStore
 
                 transport_name = os.environ.get("CLAWTEAM_TRANSPORT", "file")
                 store = TaskStore(transport_name)
@@ -2612,14 +2558,12 @@ You can also type regular messages to communicate with the team.""",
                     "timestamp": _now_iso(),
                     "assistant": "楚灵",
                 }
-        except Exception as ai_error:
+        except Exception:
             pass
 
         # Try MiniMax API as fallback
         try:
-            config_path = os.path.join(
-                os.path.dirname(__file__), "..", "..", "..", "..", "openclaw.json"
-            )
+            config_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "openclaw.json")
             minimax_key = None
             minimax_url = "https://api.minimaxi.com/anthropic/v1/messages"
 
@@ -2705,7 +2649,7 @@ You can also type regular messages to communicate with the team.""",
                     "timestamp": _now_iso(),
                     "assistant": "楚灵",
                 }
-        except Exception as fallback_error:
+        except Exception:
             # Use simple response when AI is unavailable
             return {
                 "role": "assistant",

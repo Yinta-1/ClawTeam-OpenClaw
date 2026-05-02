@@ -19,7 +19,7 @@ else:
 from clawteam.paths import ensure_within_root, validate_identifier
 from clawteam.store.base import BaseTaskStore, TaskLockError
 from clawteam.team.models import TaskItem, TaskPriority, TaskStatus, get_data_dir
-from clawteam.utils.retry import retry, RetryConfig
+from clawteam.utils.retry import RetryConfig, retry
 
 # Default retry config for file operations
 _FILE_RETRY_CONFIG = RetryConfig(
@@ -325,18 +325,14 @@ class FileTaskStore(BaseTaskStore):
                 TaskPriority.medium: 2,
                 TaskPriority.low: 3,
             }
-            tasks.sort(
-                key=lambda task: (priority_order.get(task.priority, 2), task.created_at, task.id)
-            )
+            tasks.sort(key=lambda task: (priority_order.get(task.priority, 2), task.created_at, task.id))
         return tasks
 
     def _validate_blocked_by_unlocked(self, task_id: str, blocked_by: list[str]) -> None:
         if task_id in blocked_by:
             raise ValueError(f"Task '{task_id}' cannot be blocked by itself")
 
-        graph: dict[str, list[str]] = {
-            task.id: list(task.blocked_by) for task in self._list_tasks_unlocked()
-        }
+        graph: dict[str, list[str]] = {task.id: list(task.blocked_by) for task in self._list_tasks_unlocked()}
         graph[task_id] = list(blocked_by)
 
         visiting: set[str] = set()

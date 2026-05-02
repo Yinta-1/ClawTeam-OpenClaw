@@ -4,10 +4,10 @@ ClawTeam Exception System
 Hierarchical exception classes with error codes, recovery strategies, and context tracking.
 """
 
-from typing import Optional, Any
-from dataclasses import dataclass, field
 import asyncio
 import traceback
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 
 @dataclass
@@ -256,37 +256,27 @@ class ErrorRecovery:
         else:
             return await self._recover_generic(context, retry_count, delay)
 
-    async def _recover_agent_spawn(
-        self, context: dict, retry_count: int, delay: float
-    ) -> tuple[bool, Any]:
+    async def _recover_agent_spawn(self, context: dict, retry_count: int, delay: float) -> tuple[bool, Any]:
         """Recover from agent spawn failure"""
         await asyncio.sleep(delay)
         return True, {"action": "retry_spawn", "retry_count": retry_count + 1}
 
-    async def _recover_timeout(
-        self, context: dict, retry_count: int, delay: float
-    ) -> tuple[bool, Any]:
+    async def _recover_timeout(self, context: dict, retry_count: int, delay: float) -> tuple[bool, Any]:
         """Recover from timeout"""
         await asyncio.sleep(delay)
         return True, {"action": "retry", "retry_count": retry_count + 1}
 
-    async def _recover_transport(
-        self, context: dict, retry_count: int, delay: float
-    ) -> tuple[bool, Any]:
+    async def _recover_transport(self, context: dict, retry_count: int, delay: float) -> tuple[bool, Any]:
         """Recover from transport error"""
         await asyncio.sleep(delay)
         return True, {"action": "reconnect", "retry_count": retry_count + 1}
 
-    async def _recover_rate_limit(
-        self, context: dict, retry_count: int, delay: float
-    ) -> tuple[bool, Any]:
+    async def _recover_rate_limit(self, context: dict, retry_count: int, delay: float) -> tuple[bool, Any]:
         """Recover from rate limit"""
         await asyncio.sleep(delay * 2)
         return True, {"action": "backoff", "retry_count": retry_count + 1}
 
-    async def _recover_generic(
-        self, context: dict, retry_count: int, delay: float
-    ) -> tuple[bool, Any]:
+    async def _recover_generic(self, context: dict, retry_count: int, delay: float) -> tuple[bool, Any]:
         """Generic recovery"""
         await asyncio.sleep(delay)
         return True, {"action": "retry", "retry_count": retry_count + 1}

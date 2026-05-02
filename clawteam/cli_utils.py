@@ -6,7 +6,6 @@ Provides interactive CLI features like colored output and progress indicators.
 
 import os
 import sys
-from typing import Optional
 
 
 def is_color_supported() -> bool:

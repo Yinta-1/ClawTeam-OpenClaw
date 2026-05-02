@@ -12,23 +12,20 @@ import json
 import re
 import threading
 import time
-import uuid
 from collections import defaultdict
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
+from clawteam.parser.confirmation_detector import ConfirmationDetector
+from clawteam.parser.rules import PARSER_RULES
 from clawteam.parser.types import (
     ActivityEvent,
     ActivityEventType,
-    ParserState,
     ParserRule,
-    ConfirmationDetection,
+    ParserState,
     UsageSummary,
 )
-from clawteam.parser.rules import PARSER_RULES
-from clawteam.parser.confirmation_detector import ConfirmationDetector, detect_confirmation
 from clawteam.parser.usage_estimator import UsageEstimator
 
 
@@ -134,7 +131,7 @@ class OutputParser:
                 reverse=True,
             )
 
-        except (json.JSONDecodeError, IOError) as e:
+        except (json.JSONDecodeError, IOError):
             pass
 
     def _validate_and_convert_rule(self, data: dict[str, Any]) -> ParserRule | None:

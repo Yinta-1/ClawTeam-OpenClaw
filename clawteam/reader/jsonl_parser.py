@@ -17,12 +17,11 @@ This reader is responsible for:
 from __future__ import annotations
 
 import json
-import os
-import time
 import logging
+import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Set
-from dataclasses import dataclass
 
 from clawteam.reader.types import BaseOutputReader, OutputEvent, OutputEventType, TokenUsage
 
@@ -140,9 +139,7 @@ class ClaudeJsonlReader(BaseOutputReader):
         watch.file_offset = 0
         watch.line_buffer = ""
 
-        logger.info(
-            "[ClaudeJsonlReader] Bound conversation %s → %s", conversation_id, new_file_path
-        )
+        logger.info("[ClaudeJsonlReader] Bound conversation %s → %s", conversation_id, new_file_path)
         self._start_file_reading(watch)
 
     def stop_watching(self, session_id: str) -> None:

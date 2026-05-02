@@ -10,13 +10,11 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import threading
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -335,9 +333,7 @@ class UsageEstimator:
 
                 # Provider 统计
                 if usage.provider:
-                    provider_breakdown[usage.provider] = (
-                        provider_breakdown.get(usage.provider, 0) + usage.tokens
-                    )
+                    provider_breakdown[usage.provider] = provider_breakdown.get(usage.provider, 0) + usage.tokens
 
                 active_sessions += 1
 
@@ -381,9 +377,7 @@ class UsageEstimator:
             # 添加今日活跃会话数据
             today_str = today.strftime("%Y-%m-%d")
             today_tokens = sum(u.tokens for u in self._session_usage.values())
-            today_minutes = sum(
-                int((time.time() - u.start_time) // 60) for u in self._session_usage.values()
-            )
+            today_minutes = sum(int((time.time() - u.start_time) // 60) for u in self._session_usage.values())
 
             if today_str in self._daily_history:
                 self._daily_history[today_str].tokens += today_tokens
@@ -444,9 +438,7 @@ class UsageEstimator:
             # 从活跃会话统计
             for usage in self._session_usage.values():
                 if usage.provider:
-                    provider_totals[usage.provider] = (
-                        provider_totals.get(usage.provider, 0) + usage.tokens
-                    )
+                    provider_totals[usage.provider] = provider_totals.get(usage.provider, 0) + usage.tokens
                     provider_sessions[usage.provider] = provider_sessions.get(usage.provider, 0) + 1
 
             # 从历史统计
@@ -638,9 +630,7 @@ def accumulate_usage(session_id: str, text: str, provider: str = "") -> int:
     return get_usage_estimator().accumulate_usage(session_id, text, provider)
 
 
-def record_request(
-    session_id: str, input_tokens: int, output_tokens: int, provider: str = ""
-) -> int:
+def record_request(session_id: str, input_tokens: int, output_tokens: int, provider: str = "") -> int:
     """记录请求（便捷函数）"""
     return get_usage_estimator().record_request(session_id, input_tokens, output_tokens, provider)
 

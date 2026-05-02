@@ -13,7 +13,6 @@ import json
 import os
 import subprocess
 import threading
-import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -69,7 +68,7 @@ class OpenClawAPIBackend(SpawnBackend):
     ) -> str:
         """Spawn an OpenClaw agent and wait for its result."""
         if openclaw_agent:
-            return f"Error: openclaw_agent is not supported with openclaw_api backend"
+            return "Error: openclaw_agent is not supported with openclaw_api backend"
 
         # 构建 openclaw agent 命令
         cmd = list(command) if command else ["openclaw"]
@@ -177,9 +176,7 @@ class OpenClawAPIBackend(SpawnBackend):
         )
         thread.start()
 
-        return (
-            f"Agent '{agent_name}' spawned via openclaw_api (pid={proc.pid}, session={session_key})"
-        )
+        return f"Agent '{agent_name}' spawned via openclaw_api (pid={proc.pid}, session={session_key})"
 
     def _wait_for_process(
         self,

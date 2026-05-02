@@ -11,7 +11,6 @@ from typing import Any
 
 from clawteam.team.models import DriftAlert, TaskItem
 
-
 # Common English and Chinese stop words to filter out
 STOP_WORDS = frozenset(
     {

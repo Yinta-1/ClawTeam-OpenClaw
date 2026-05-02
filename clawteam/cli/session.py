@@ -1,10 +1,11 @@
 """Session awareness CLI commands for ClawTeam (Typer)."""
 
 import json
-import typer
 from datetime import datetime
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+import typer
 
 session_app = typer.Typer(
     name="session",
@@ -26,8 +27,8 @@ def list_sessions(
 ):
     """List all sessions."""
     from ..session_awareness import (
-        get_session_awareness_manager,
         SessionActivityLevel,
+        get_session_awareness_manager,
     )
 
     manager = get_session_awareness_manager(team)

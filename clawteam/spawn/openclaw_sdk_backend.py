@@ -88,9 +88,7 @@ class OpenClawSDKBackend(SpawnBackend):
         # 尝试不同平台的命令
         for cmd in ["openclaw", "openclaw.exe"]:
             try:
-                r = subprocess.run(
-                    ["cmd", "/c", cmd, "gateway", "health"], capture_output=True, timeout=5
-                )
+                r = subprocess.run(["cmd", "/c", cmd, "gateway", "health"], capture_output=True, timeout=5)
                 if r.returncode == 0:
                     return cmd
             except Exception:
@@ -122,9 +120,7 @@ class OpenClawSDKBackend(SpawnBackend):
             raise RuntimeError(f"Gateway call exception: {e}")
 
         if result.returncode != 0:
-            raise RuntimeError(
-                f"Gateway call failed (code {result.returncode}): {stderr or stdout}"
-            )
+            raise RuntimeError(f"Gateway call failed (code {result.returncode}): {stderr or stdout}")
 
         output = stdout.strip()
         lines = output.split("\n")
@@ -135,7 +131,7 @@ class OpenClawSDKBackend(SpawnBackend):
 
         try:
             return json.loads(json_str)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             raise RuntimeError(f"Invalid JSON from gateway: {json_str[:200]}")
 
     def spawn(
@@ -233,7 +229,7 @@ class OpenClawSDKBackend(SpawnBackend):
             "",
             "**When you complete your task:**",
             "```bash",
-            f"# 1. Update task status (if task was assigned)",
+            "# 1. Update task status (if task was assigned)",
             f"clawteam task update {team_name} [TASK_ID] --status completed",
             "",
             "# 2. Send result to leader",
@@ -286,9 +282,7 @@ class OpenClawSDKBackend(SpawnBackend):
             "registered_at": time.time(),
         }
 
-        registry_path.write_text(
-            json.dumps(registry, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
+        registry_path.write_text(json.dumps(registry, indent=2, ensure_ascii=False), encoding="utf-8")
 
     def list_running(self) -> list[dict[str, str]]:
         """列出正在运行的 Agents"""

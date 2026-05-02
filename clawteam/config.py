@@ -5,7 +5,7 @@ Provides centralized configuration with validation and environment variable supp
 """
 
 import os
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Optional, TypeVar
@@ -194,9 +194,7 @@ class BaseConfig:
 
             # Type check
             if value is not None and not isinstance(value, field_info.field_type):
-                errors.append(
-                    f"{name}: expected {field_info.field_type.__name__}, got {type(value).__name__}"
-                )
+                errors.append(f"{name}: expected {field_info.field_type.__name__}, got {type(value).__name__}")
                 continue
 
             # Custom validator

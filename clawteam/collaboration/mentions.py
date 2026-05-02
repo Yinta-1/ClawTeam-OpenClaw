@@ -7,11 +7,9 @@ allowing agents to directly notify each other.
 from __future__ import annotations
 
 import re
-import threading
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable, Pattern
+from typing import Any, Callable, Dict, List, Optional, Pattern
 
 
 class MentionType(str, Enum):
@@ -289,7 +287,6 @@ class MentionNotifier:
         Returns:
             Dict mapping agent names to whether notification was sent
         """
-        from clawteam.notification.types import NotificationType, NotificationPriority
 
         results = {}
         targets = MentionParser.extract_mention_targets(mentions)
@@ -303,9 +300,7 @@ class MentionNotifier:
                 self._notifications.on_info(
                     session_id=f"mention-{agent_name}",
                     title=f"@{from_agent} mentioned you",
-                    body=message_preview[:100]
-                    if message_preview
-                    else "You were mentioned in a message",
+                    body=message_preview[:100] if message_preview else "You were mentioned in a message",
                     session_name=agent_name,
                 )
                 results[agent_name] = True
@@ -361,8 +356,6 @@ class MentionNotifier:
                 description=message_preview[:200] if message_preview else None,
                 message_id=message_id,
                 metadata={
-                    "mention_type": "team"
-                    if targets.get("team")
-                    else ("all" if targets.get("all") else "here"),
+                    "mention_type": "team" if targets.get("team") else ("all" if targets.get("all") else "here"),
                 },
             )

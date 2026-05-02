@@ -18,7 +18,6 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-
 # Default TTL: 24 hours (86400 seconds)
 DEFAULT_TTL_SECONDS = 86400
 

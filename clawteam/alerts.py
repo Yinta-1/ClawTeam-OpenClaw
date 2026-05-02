@@ -8,11 +8,11 @@ from __future__ import annotations
 
 import json
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from clawteam.fileutil import atomic_write_text
 from clawteam.paths import ensure_within_root, validate_identifier
@@ -26,9 +26,7 @@ def _alerts_root(team_name: str) -> Path:
     """Get the alerts directory path for a team."""
     from clawteam.team.models import get_data_dir
 
-    root = ensure_within_root(
-        get_data_dir() / "alerts", validate_identifier(team_name, "team name")
-    )
+    root = ensure_within_root(get_data_dir() / "alerts", validate_identifier(team_name, "team name"))
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -135,17 +133,13 @@ def create_alert(
 
     # Store alert as a separate JSON file (append-only, never modify existing)
     alerts_dir = _alerts_root(team)
-    alert_file = (
-        alerts_dir / f"alert-{alert.timestamp.split('.')[0].replace(':', '-')}-{alert_id}.json"
-    )
+    alert_file = alerts_dir / f"alert-{alert.timestamp.split('.')[0].replace(':', '-')}-{alert_id}.json"
     atomic_write_text(alert_file, alert.to_json())
 
     return alert_id
 
 
-def list_alerts(
-    team: str, acknowledged: bool | None = None, limit: int | None = None
-) -> list[Alert]:
+def list_alerts(team: str, acknowledged: bool | None = None, limit: int | None = None) -> list[Alert]:
     """List alerts for a team.
 
     Args:
@@ -259,9 +253,7 @@ def acknowledge_alert(team: str, alert_id: str, by: str) -> bool:
             alert_data["acknowledged_at"] = _now_iso()
 
             # Write back the updated alert (this is the only case where we modify an existing file)
-            atomic_write_text(
-                alert_file, json.dumps(alert_data, ensure_ascii=False, separators=(",", ":"))
-            )
+            atomic_write_text(alert_file, json.dumps(alert_data, ensure_ascii=False, separators=(",", ":")))
             return True
 
         except (json.JSONDecodeError, KeyError, ValueError):
@@ -281,7 +273,7 @@ def check_task_timeouts(team: str, timeout_threshold_minutes: int = 60) -> list[
     Returns:
         List of alert IDs created for timed out tasks
     """
-    from clawteam.team.models import TaskItem, TaskStatus, TaskStore
+    from clawteam.team.models import TaskStatus, TaskStore
 
     store = TaskStore(team)
     tasks = store.list_all()
@@ -319,9 +311,7 @@ def check_task_timeouts(team: str, timeout_threshold_minutes: int = 60) -> list[
     return alert_ids
 
 
-def check_agent_failure_rates(
-    team: str, failure_rate_threshold: float = 0.3, min_tasks: int = 5
-) -> list[str]:
+def check_agent_failure_rates(team: str, failure_rate_threshold: float = 0.3, min_tasks: int = 5) -> list[str]:
     """Check for agents with high failure rates.
 
     Args:
@@ -332,7 +322,7 @@ def check_agent_failure_rates(
     Returns:
         List of alert IDs created for high failure rate agents
     """
-    from clawteam.team.models import TaskItem, TaskStatus, TaskStore
+    from clawteam.team.models import TaskStatus, TaskStore
 
     store = TaskStore(team)
     tasks = store.list_all()
@@ -359,9 +349,7 @@ def check_agent_failure_rates(
         if total_completed_or_failed < min_tasks:
             continue
 
-        failure_rate = (
-            len(failed_tasks) / total_completed_or_failed if total_completed_or_failed > 0 else 0.0
-        )
+        failure_rate = len(failed_tasks) / total_completed_or_failed if total_completed_or_failed > 0 else 0.0
 
         if failure_rate >= failure_rate_threshold:
             # Determine severity based on failure rate

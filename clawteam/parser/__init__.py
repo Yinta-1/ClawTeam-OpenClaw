@@ -6,29 +6,29 @@ and supports multiple provider formats (Claude Code, Codex, Gemini, etc.).
 Inspired by SpectrAI's OutputParser.ts.
 """
 
-from clawteam.parser.output_parser import OutputParser, get_parser, parse_output
-from clawteam.parser.types import (
-    ActivityEvent,
-    ActivityEventType,
-    ParserState,
-    ParserRule,
-    ConfirmationDetection,
-    UsageSummary,
-)
-from clawteam.parser.rules import PARSER_RULES
 from clawteam.parser.confirmation_detector import (
     ConfirmationDetector,
     ProviderConfirmationConfig,
     detect_confirmation,
     get_default_detector,
 )
-from clawteam.parser.usage_estimator import UsageEstimator
 from clawteam.parser.integration import (
     ClawTeamIntegration,
     get_integration,
     parse_and_notify,
     remove_integration,
 )
+from clawteam.parser.output_parser import OutputParser, get_parser, parse_output
+from clawteam.parser.rules import PARSER_RULES
+from clawteam.parser.types import (
+    ActivityEvent,
+    ActivityEventType,
+    ConfirmationDetection,
+    ParserRule,
+    ParserState,
+    UsageSummary,
+)
+from clawteam.parser.usage_estimator import UsageEstimator
 
 __all__ = [
     # Core parser

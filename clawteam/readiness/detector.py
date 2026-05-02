@@ -17,14 +17,13 @@ import asyncio
 import logging
 import re
 import time
-from typing import Callable, Optional, List, Tuple
 from dataclasses import dataclass
 from threading import Timer
+from typing import List, Optional
 
 from clawteam.readiness.config import (
-    DetectorConfig,
-    PROVIDER_PROMPT_MARKERS,
     DEFAULT_PROMPT_MARKERS,
+    DetectorConfig,
 )
 
 logger = logging.getLogger(__name__)
@@ -173,9 +172,7 @@ class AgentReadinessDetector:
 
         def fallback_handler():
             if self.prompt_detected and not self.destroyed:
-                logger.debug(
-                    "[%s] Fast Path fallback: no subsequent writes, resolve ready", self.agent_id
-                )
+                logger.debug("[%s] Fast Path fallback: no subsequent writes, resolve ready", self.agent_id)
                 self._resolve_ready(True)
 
         self.fast_path_fallback_timer = Timer(FAST_PATH_FALLBACK_MS / 1000, fallback_handler)
@@ -224,9 +221,7 @@ class AgentReadinessDetector:
 
         def timeout_handler():
             if not self.destroyed and self._ready_future and not self._ready_future.done():
-                logger.warning(
-                    "[%s] Wait ready timeout after %d ms", self.agent_id, self.max_wait_ms
-                )
+                logger.warning("[%s] Wait ready timeout after %d ms", self.agent_id, self.max_wait_ms)
                 self._resolve_ready(False)
 
         self.timeout_timer = Timer(self.max_wait_ms / 1000, timeout_handler)

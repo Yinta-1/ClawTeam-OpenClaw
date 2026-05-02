@@ -13,9 +13,9 @@ ClawTeam .learnings 自动闭环系统
 """
 
 from clawteam.learnings.auto_capture import (
-    LearningType,
-    ExperienceEntry,
     AutoCaptureEngine,
+    ExperienceEntry,
+    LearningType,
     PatternDetector,
 )
 from clawteam.learnings.integration import (

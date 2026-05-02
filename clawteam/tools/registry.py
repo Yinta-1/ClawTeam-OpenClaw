@@ -5,10 +5,8 @@ Security: All credentials are loaded from environment variables or OpenClaw conf
 NEVER hardcode sensitive information!
 """
 
-import os
 import json
-from typing import Dict, Any, Optional, Callable
-from pathlib import Path
+from typing import Any, Callable, Dict, Optional
 
 
 class ToolRegistry:
@@ -110,12 +108,10 @@ class ToolRegistry:
         # This is a placeholder - actual implementation depends on skill structure
         raise NotImplementedError("Skill execution not yet implemented")
 
-    def _http_tool(
-        self, url: str, method: str = "GET", headers: Dict = None, body: Any = None
-    ) -> Dict[str, Any]:
+    def _http_tool(self, url: str, method: str = "GET", headers: Dict = None, body: Any = None) -> Dict[str, Any]:
         """Built-in HTTP request tool"""
-        import urllib.request
         import urllib.parse
+        import urllib.request
 
         data = None
         if body:

@@ -110,10 +110,7 @@ def agent_diff(team_name: str, agent_name: str, repo: str | None = None) -> dict
     except Exception:
         commit_count = 0
 
-    summary = (
-        f"{agent_name}: {len(files_changed)} file(s), "
-        f"+{insertions}/-{deletions}, {commit_count} commit(s)"
-    )
+    summary = f"{agent_name}: {len(files_changed)} file(s), +{insertions}/-{deletions}, {commit_count} commit(s)"
     return {
         "files_changed": files_changed,
         "insertions": insertions,
@@ -279,10 +276,7 @@ def inject_context(
             continue
         common = target_files & set(entry["files"])
         if common:
-            related.append(
-                f"- [{entry['agent']}] {entry['hash'][:8]} {entry['message']} "
-                f"(files: {', '.join(common)})"
-            )
+            related.append(f"- [{entry['agent']}] {entry['hash'][:8]} {entry['message']} (files: {', '.join(common)})")
     if related:
         sections.append("## Recent Related Changes\n" + "\n".join(related))
 

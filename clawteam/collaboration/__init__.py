@@ -7,10 +7,10 @@ This module provides enhanced collaboration features:
 - @mention support
 """
 
-from clawteam.collaboration.presence import PresenceStatus, PresenceManager
-from clawteam.collaboration.context_board import ContextBoard, ContextEntry, ContextCategory
-from clawteam.collaboration.activity_feed import ActivityFeed, ActivityEntry, ActivityType
-from clawteam.collaboration.mentions import MentionParser, Mention
+from clawteam.collaboration.activity_feed import ActivityEntry, ActivityFeed, ActivityType
+from clawteam.collaboration.context_board import ContextBoard, ContextCategory, ContextEntry
+from clawteam.collaboration.mentions import Mention, MentionParser
+from clawteam.collaboration.presence import PresenceManager, PresenceStatus
 
 __all__ = [
     "PresenceStatus",

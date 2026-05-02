@@ -26,30 +26,28 @@ Usage:
     events = tracker.query(team_name="my-team", limit=50)
 """
 
-from clawteam.events.models import (
-    EventType,
-    EventSeverity,
-    EventCategory,
-    ClawTeamEvent,
-    create_team_event,
-    create_task_event,
-    create_agent_event,
-    create_session_event,
-    create_message_event,
-    create_alert_event,
-    create_usage_event,
-)
-
-from clawteam.events.tracker import (
-    EventTracker,
-    get_tracker,
-    track_event,
-    track_batch,
-)
-
 from clawteam.events.api import (
     EventAPI,
     get_event_api,
+)
+from clawteam.events.models import (
+    ClawTeamEvent,
+    EventCategory,
+    EventSeverity,
+    EventType,
+    create_agent_event,
+    create_alert_event,
+    create_message_event,
+    create_session_event,
+    create_task_event,
+    create_team_event,
+    create_usage_event,
+)
+from clawteam.events.tracker import (
+    EventTracker,
+    get_tracker,
+    track_batch,
+    track_event,
 )
 
 __all__ = [

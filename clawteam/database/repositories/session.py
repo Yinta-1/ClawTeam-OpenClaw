@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .base import BaseRepository
 from ..types import DatabaseSession
+from .base import BaseRepository
 
 
 class SessionRepository(BaseRepository[DatabaseSession]):
@@ -53,9 +53,7 @@ class SessionRepository(BaseRepository[DatabaseSession]):
             "terminated_at": self._serialize_datetime(model.terminated_at),
         }
 
-    def list(
-        self, team_id: Optional[str] = None, status: Optional[str] = None
-    ) -> List[DatabaseSession]:
+    def list(self, team_id: Optional[str] = None, status: Optional[str] = None) -> List[DatabaseSession]:
         """Get sessions with optional filters."""
         filters = {}
         if team_id is not None:

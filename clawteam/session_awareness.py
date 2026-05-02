@@ -8,18 +8,13 @@ This module provides real-time awareness of:
 - Cross-session coordination primitives
 """
 
-import time
-import threading
 import json
-import uuid
+import threading
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
-from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Dict, List, Optional, Set, Tuple, Any
 from pathlib import Path
-
-from .tracker.diff_tracker import DiffTracker
-from .tracker.file_tracker import FileChangeTracker
+from typing import Any, Dict, List, Optional, Set
 
 
 class SessionStatus(Enum):
@@ -229,12 +224,8 @@ class AgentSessionTracker:
                 "current_task": self.context.current_task,
                 "current_file": self.context.current_file,
                 "tags": list(self.context.tags),
-                "active_minutes": int(
-                    (datetime.now() - self.context.created_at).total_seconds() / 60
-                ),
-                "minutes_inactive": int(
-                    (datetime.now() - self.context.last_activity).total_seconds() / 60
-                ),
+                "active_minutes": int((datetime.now() - self.context.created_at).total_seconds() / 60),
+                "minutes_inactive": int((datetime.now() - self.context.last_activity).total_seconds() / 60),
             }
 
     def to_json(self) -> str:
@@ -306,9 +297,7 @@ class SessionAwarenessManager:
         """Get all active (non-terminated) sessions."""
         with self._lock:
             return [
-                tracker
-                for tracker in self._sessions.values()
-                if tracker.context.status != SessionStatus.TERMINATED
+                tracker for tracker in self._sessions.values() if tracker.context.status != SessionStatus.TERMINATED
             ]
 
     def get_sessions_by_agent(self, agent_name: str) -> List[AgentSessionTracker]:
@@ -317,13 +306,10 @@ class SessionAwarenessManager:
             return [
                 tracker
                 for tracker in self._sessions.values()
-                if tracker.agent_name == agent_name
-                and tracker.context.status != SessionStatus.TERMINATED
+                if tracker.agent_name == agent_name and tracker.context.status != SessionStatus.TERMINATED
             ]
 
-    def get_sessions_by_activity(
-        self, min_level: SessionActivityLevel
-    ) -> List[AgentSessionTracker]:
+    def get_sessions_by_activity(self, min_level: SessionActivityLevel) -> List[AgentSessionTracker]:
         """Get sessions with at least specified activity level."""
         with self._lock:
             return [
@@ -338,11 +324,7 @@ class SessionAwarenessManager:
         with self._lock:
             sessions = list(self._sessions.values())
 
-            active = [
-                s
-                for s in sessions
-                if s.context.status in [SessionStatus.ACTIVE, SessionStatus.CREATED]
-            ]
+            active = [s for s in sessions if s.context.status in [SessionStatus.ACTIVE, SessionStatus.CREATED]]
             idle = [s for s in sessions if s.context.status == SessionStatus.IDLE]
 
             return {
@@ -390,10 +372,7 @@ class SessionAwarenessManager:
 
                 # File similarity
                 if current_context.current_file and context.current_file:
-                    if (
-                        Path(current_context.current_file).parent
-                        == Path(context.current_file).parent
-                    ):
+                    if Path(current_context.current_file).parent == Path(context.current_file).parent:
                         score += 2
                     elif current_context.current_file == context.current_file:
                         score += 5
@@ -484,9 +463,7 @@ class SessionAwarenessManager:
         with self._lock:
             state = {
                 "team_name": self.team_name,
-                "sessions": {
-                    session_id: tracker.to_json() for session_id, tracker in self._sessions.items()
-                },
+                "sessions": {session_id: tracker.to_json() for session_id, tracker in self._sessions.items()},
             }
 
             Path(filepath).parent.mkdir(parents=True, exist_ok=True)

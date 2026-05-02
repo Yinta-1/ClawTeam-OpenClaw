@@ -11,21 +11,18 @@ from __future__ import annotations
 import json
 import logging
 import threading
-import time
 from collections import defaultdict
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from clawteam.notification.types import (
     Notification,
-    NotificationType,
-    NotificationPriority,
-    NotificationEvent,
     NotificationConfig,
+    NotificationEvent,
+    NotificationPriority,
+    NotificationType,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -124,9 +121,7 @@ class NotificationManager:
         with self._lock:
             return notification_type in self._active_notifications[session_id]
 
-    def _mark_notification_active(
-        self, session_id: str, notification_type: NotificationType
-    ) -> None:
+    def _mark_notification_active(self, session_id: str, notification_type: NotificationType) -> None:
         """Mark a notification as active (unacknowledged)."""
         with self._lock:
             self._active_notifications[session_id].add(notification_type)
@@ -194,9 +189,7 @@ class NotificationManager:
 
         # Check for duplicate active notification
         if self._is_notification_active(session_id, notification_type):
-            logger.debug(
-                f"Notification already active for session {session_id}: {notification_type}"
-            )
+            logger.debug(f"Notification already active for session {session_id}: {notification_type}")
             return None
 
         # Create notification
@@ -489,9 +482,7 @@ def notify_task_complete(session_id: str, session_name: str | None = None) -> No
     return get_notification_manager().on_task_completed(session_id, session_name)
 
 
-def notify_error(
-    session_id: str, error_msg: str, session_name: str | None = None
-) -> Notification | None:
+def notify_error(session_id: str, error_msg: str, session_name: str | None = None) -> Notification | None:
     """Send error notification using global manager."""
     return get_notification_manager().on_error(session_id, session_name, error_msg)
 

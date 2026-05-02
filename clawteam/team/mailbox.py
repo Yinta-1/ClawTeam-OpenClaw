@@ -160,9 +160,7 @@ class MailboxManager:
                     content=content,
                     key=key,
                 )
-                data = msg.model_dump_json(indent=2, by_alias=True, exclude_none=True).encode(
-                    "utf-8"
-                )
+                data = msg.model_dump_json(indent=2, by_alias=True, exclude_none=True).encode("utf-8")
                 self._transport.deliver(recipient, data)
                 self._log_event(msg)
                 messages.append(msg)

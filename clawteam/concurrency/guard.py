@@ -13,13 +13,13 @@ ConcurrencyGuard - 并发控制和资源检查
 @author ClawTeam
 """
 
+import logging
 import os
 import platform
 import subprocess
 import time
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any
-import logging
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -101,9 +101,7 @@ class ConcurrencyGuard:
         # macOS 使用 vm_stat 获取更精确的可用内存
         if platform.system() == "Darwin":
             try:
-                vm_stat_output = subprocess.run(
-                    ["/usr/bin/vm_stat"], capture_output=True, text=True, timeout=2
-                ).stdout
+                vm_stat_output = subprocess.run(["/usr/bin/vm_stat"], capture_output=True, text=True, timeout=2).stdout
 
                 available_mb = self._parse_darwin_vm_stat(vm_stat_output, total_mem_mb)
                 if available_mb > 0:
@@ -111,9 +109,7 @@ class ConcurrencyGuard:
             except Exception as e:
                 logger.debug(f"vm_stat 解析失败: {e}")
 
-        memory_usage_percent = (
-            ((total_mem_mb - free_mem_mb) / total_mem_mb) * 100 if total_mem_mb > 0 else 0
-        )
+        memory_usage_percent = ((total_mem_mb - free_mem_mb) / total_mem_mb) * 100 if total_mem_mb > 0 else 0
 
         return {
             "total_mem_mb": total_mem_mb,
@@ -381,9 +377,7 @@ class ConcurrencyGuard:
             del self._session_registry[session_id]
             if self._active_sessions > 0:
                 self._active_sessions -= 1
-            logger.info(
-                f"Session unregistered: {session_id}, active sessions: {self._active_sessions}"
-            )
+            logger.info(f"Session unregistered: {session_id}, active sessions: {self._active_sessions}")
             return True
         return False
 

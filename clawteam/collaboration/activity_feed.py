@@ -9,11 +9,11 @@ from __future__ import annotations
 import json
 import threading
 import uuid
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone, timedelta
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class ActivityType(str, Enum):
@@ -273,11 +273,7 @@ class ActivityFeed:
                 entry
                 for entry in reversed(self._feed)
                 if entry.task_id == task_id
-                and (
-                    not entry.is_private
-                    or entry.agent_name == viewer_name
-                    or entry.target_agent == viewer_name
-                )
+                and (not entry.is_private or entry.agent_name == viewer_name or entry.target_agent == viewer_name)
             ]
 
     def get_by_agent(
@@ -293,16 +289,13 @@ class ActivityFeed:
             viewer_name=viewer_name,
         )
 
-    def get_mentions(
-        self, agent_name: str, viewer_name: Optional[str] = None
-    ) -> List[ActivityEntry]:
+    def get_mentions(self, agent_name: str, viewer_name: Optional[str] = None) -> List[ActivityEntry]:
         """Get all activities that mention an agent (as target_agent)."""
         with self._lock:
             return [
                 entry
                 for entry in reversed(self._feed)
-                if entry.target_agent == agent_name
-                and (not entry.is_private or entry.agent_name == viewer_name)
+                if entry.target_agent == agent_name and (not entry.is_private or entry.agent_name == viewer_name)
             ]
 
     def subscribe(
@@ -352,9 +345,7 @@ class ActivityFeed:
 
             original_len = len(self._feed)
 
-            self._feed = [
-                entry for entry in self._feed if datetime.fromisoformat(entry.timestamp) >= cutoff
-            ]
+            self._feed = [entry for entry in self._feed if datetime.fromisoformat(entry.timestamp) >= cutoff]
 
             # Also clean up persisted files
             if self._persist_dir:

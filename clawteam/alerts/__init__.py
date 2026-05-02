@@ -155,9 +155,7 @@ class WebhookAlertChannel(AlertChannel):
             "state": alert.state.value,
             "tags": alert.tags,
             "created_at": datetime.fromtimestamp(alert.created_at).isoformat(),
-            "triggered_at": datetime.fromtimestamp(alert.triggered_at).isoformat()
-            if alert.triggered_at
-            else None,
+            "triggered_at": datetime.fromtimestamp(alert.triggered_at).isoformat() if alert.triggered_at else None,
         }
 
         try:
@@ -323,9 +321,7 @@ class AlertManager:
         """Remove all resolved alerts"""
         count = 0
         with self._alerts_lock:
-            resolved_ids = [
-                aid for aid, a in self._alerts.items() if a.state == AlertState.RESOLVED
-            ]
+            resolved_ids = [aid for aid, a in self._alerts.items() if a.state == AlertState.RESOLVED]
             for aid in resolved_ids:
                 del self._alerts[aid]
                 count += 1

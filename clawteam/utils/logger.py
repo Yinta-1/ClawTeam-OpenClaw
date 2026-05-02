@@ -12,7 +12,6 @@ import os
 import sys
 from contextvars import ContextVar
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 from typing import Any
 
 # Trace ID context variable for request tracking

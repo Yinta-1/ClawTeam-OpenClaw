@@ -28,9 +28,7 @@ def get_backend(name: str = "auto") -> SpawnBackend:
             try:
                 import subprocess
 
-                result = subprocess.run(
-                    ["cmd", "/c", "openclaw", "gateway", "health"], capture_output=True, timeout=5
-                )
+                result = subprocess.run(["cmd", "/c", "openclaw", "gateway", "health"], capture_output=True, timeout=5)
                 if result.returncode == 0:
                     name = "openclaw_sdk"
                 else:

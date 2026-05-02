@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
-from datetime import datetime, timedelta
 
-from .base import BaseRepository
 from ..types import DatabaseUsage
+from .base import BaseRepository
 
 
 class UsageRepository(BaseRepository[DatabaseUsage]):

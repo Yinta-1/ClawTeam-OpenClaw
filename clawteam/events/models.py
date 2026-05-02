@@ -9,6 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -98,11 +99,7 @@ class ClawTeamEvent(BaseModel):
     """
 
     # Event identity
-    id: str = Field(
-        default_factory=lambda: (
-            f"evt-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid_short()}"
-        )
-    )
+    id: str = Field(default_factory=lambda: f"evt-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid_short()}")
     event_type: EventType
     category: EventCategory
 

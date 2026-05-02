@@ -20,8 +20,8 @@ from clawteam.paths import ensure_within_root, validate_identifier
 from clawteam.team.models import get_data_dir
 from clawteam.transport.base import Transport
 from clawteam.transport.claimed import ClaimedMessage
-from clawteam.utils.retry import retry, RetryConfig
-from clawteam.utils.ttl import get_message_ttl, is_ttl_enabled, is_message_expired
+from clawteam.utils.retry import RetryConfig, retry
+from clawteam.utils.ttl import get_message_ttl, is_message_expired
 
 # Default retry config for transport operations
 _TRANSPORT_RETRY_CONFIG = RetryConfig(
@@ -267,22 +267,14 @@ class FileTransport(Transport):
 
     def count(self, agent_name: str) -> int:
         inbox = _inbox_dir(self.team_name, agent_name)
-        return sum(
-            1
-            for path in _claimable_paths(inbox)
-            if path.suffix != ".consumed" or not _is_locked(path)
-        )
+        return sum(1 for path in _claimable_paths(inbox) if path.suffix != ".consumed" or not _is_locked(path))
 
     def list_recipients(self) -> list[str]:
         inboxes_dir = _teams_root() / self.team_name / "inboxes"
         if not inboxes_dir.exists():
             return []
         # Filter out _pending_* temp directories used during join handshake
-        return [
-            d.name
-            for d in inboxes_dir.iterdir()
-            if d.is_dir() and not d.name.startswith("_pending_")
-        ]
+        return [d.name for d in inboxes_dir.iterdir() if d.is_dir() and not d.name.startswith("_pending_")]
 
     def cleanup_expired_messages(self, agent_name: str) -> int:
         """Clean up expired messages from an agent's inbox.

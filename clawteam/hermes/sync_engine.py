@@ -11,7 +11,6 @@ Phase 1: .learnings 自动闭环引擎
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from datetime import datetime, timedelta
@@ -310,9 +309,7 @@ class HermesSyncEngine:
                 entries.append(entry)
 
         if result.has_better_method:
-            entry = self._write_learning_entry(
-                result.better_method_summary, task_result, "best_practice"
-            )
+            entry = self._write_learning_entry(result.better_method_summary, task_result, "best_practice")
             if entry:
                 entries.append(entry)
 
@@ -408,9 +405,7 @@ class HermesSyncEngine:
         end = min(len(text), idx + 180)
         return text[start:end].strip()
 
-    def _write_error_entry(
-        self, summary: str, task_result: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
+    def _write_error_entry(self, summary: str, task_result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """写入 ERRORS.md"""
         errors_file = self.learnings_dir / "ERRORS.md"
         entry = {
@@ -453,8 +448,7 @@ class HermesSyncEngine:
             with open(learnings_file, "a", encoding="utf-8") as f:
                 prefix = "💡" if entry_type == "best_practice" else "🔧"
                 f.write(
-                    f"- [{entry['timestamp']}] {prefix} [{entry_type}] {entry['summary']}"
-                    f" (task: {entry['task_id']})\n"
+                    f"- [{entry['timestamp']}] {prefix} [{entry_type}] {entry['summary']} (task: {entry['task_id']})\n"
                 )
             return entry
         except Exception as e:
@@ -534,16 +528,12 @@ class HermesSyncEngine:
         # 1. 回顾最近 2 天的 memory 文件
         recent_memories = self._review_recent_memories(days=2)
         if recent_memories:
-            reflection["actions_taken"].append(
-                f"Reviewed {len(recent_memories)} recent memory files"
-            )
+            reflection["actions_taken"].append(f"Reviewed {len(recent_memories)} recent memory files")
 
         # 2. 检查 .learnings 晋升
         promoted = self._check_and_promote()
         if promoted:
-            reflection["actions_taken"].append(
-                f"Found {len(promoted)} patterns eligible for promotion"
-            )
+            reflection["actions_taken"].append(f"Found {len(promoted)} patterns eligible for promotion")
 
         # 3. 清理过期条目（简单实现）
         cleaned = self._cleanup_old_entries()

@@ -177,9 +177,7 @@ class MetricsCollector:
         return name
 
     # Counter operations
-    def inc_counter(
-        self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None
-    ) -> None:
+    def inc_counter(self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None) -> None:
         """Increment a counter metric"""
         tags = tags or {}
         key = self._make_key(name, tags)
@@ -212,9 +210,7 @@ class MetricsCollector:
             else:
                 self._gauges[key].set(value)
 
-    def inc_gauge(
-        self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None
-    ) -> None:
+    def inc_gauge(self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None) -> None:
         """Increment a gauge"""
         tags = tags or {}
         key = self._make_key(name, tags)
@@ -225,9 +221,7 @@ class MetricsCollector:
             else:
                 self._gauges[key].inc(value)
 
-    def dec_gauge(
-        self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None
-    ) -> None:
+    def dec_gauge(self, name: str, value: float = 1.0, tags: Optional[dict[str, str]] = None) -> None:
         """Decrement a gauge"""
         tags = tags or {}
         key = self._make_key(name, tags)
@@ -249,9 +243,7 @@ class MetricsCollector:
         return 0.0
 
     # Histogram operations
-    def observe_histogram(
-        self, name: str, value: float, tags: Optional[dict[str, str]] = None
-    ) -> None:
+    def observe_histogram(self, name: str, value: float, tags: Optional[dict[str, str]] = None) -> None:
         """Observe a value for histogram"""
         tags = tags or {}
         key = self._make_key(name, tags)
@@ -261,9 +253,7 @@ class MetricsCollector:
                 self._histograms[key] = Histogram(name=name, tags=tags)
             self._histograms[key].observe(value)
 
-    def get_histogram_stats(
-        self, name: str, tags: Optional[dict[str, str]] = None
-    ) -> dict[str, Any]:
+    def get_histogram_stats(self, name: str, tags: Optional[dict[str, str]] = None) -> dict[str, Any]:
         """Get histogram statistics"""
         tags = tags or {}
         key = self._make_key(name, tags)
@@ -312,21 +302,13 @@ class MetricsCollector:
                 for bucket, count in stats["buckets"].items():
                     bucket_tags = dict(histogram.tags)
                     bucket_tags["le"] = str(bucket)
-                    lines.append(
-                        f"{histogram.name}_bucket{{{self._format_tags(bucket_tags)}}} {count}"
-                    )
+                    lines.append(f"{histogram.name}_bucket{{{self._format_tags(bucket_tags)}}} {count}")
                 # +Inf bucket
                 inf_tags = dict(histogram.tags)
                 inf_tags["le"] = "+Inf"
-                lines.append(
-                    f"{histogram.name}_bucket{{{self._format_tags(inf_tags)}}} {stats['count']}"
-                )
-                lines.append(
-                    f"{histogram.name}_sum{{{self._format_tags(histogram.tags)}}} {stats['sum']}"
-                )
-                lines.append(
-                    f"{histogram.name}_count{{{self._format_tags(histogram.tags)}}} {stats['count']}"
-                )
+                lines.append(f"{histogram.name}_bucket{{{self._format_tags(inf_tags)}}} {stats['count']}")
+                lines.append(f"{histogram.name}_sum{{{self._format_tags(histogram.tags)}}} {stats['sum']}")
+                lines.append(f"{histogram.name}_count{{{self._format_tags(histogram.tags)}}} {stats['count']}")
 
         return "\n".join(lines)
 
@@ -339,15 +321,9 @@ class MetricsCollector:
         with self._export_lock:
             return {
                 "timestamp": datetime.now().isoformat(),
-                "counters": {
-                    c.name: {"value": c.value, "tags": c.tags} for c in self._counters.values()
-                },
-                "gauges": {
-                    g.name: {"value": g.value, "tags": g.tags} for g in self._gauges.values()
-                },
-                "histograms": {
-                    h.name: {**h.get_stats(), "tags": h.tags} for h in self._histograms.values()
-                },
+                "counters": {c.name: {"value": c.value, "tags": c.tags} for c in self._counters.values()},
+                "gauges": {g.name: {"value": g.value, "tags": g.tags} for g in self._gauges.values()},
+                "histograms": {h.name: {**h.get_stats(), "tags": h.tags} for h in self._histograms.values()},
             }
 
     def get_all_metrics(self) -> list[Metric]:

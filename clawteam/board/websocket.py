@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import asyncio
-import json
+import logging
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Callable, Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -135,9 +133,7 @@ async def message_loop(ws, team_name: str, collector, team_cache):
                     pass
                 elif data.get("type") == "refresh":
                     team_data = team_cache.get(team_name, lambda: collector.collect_team(team_name))
-                    await ws.send_json(
-                        {"type": "update", "data": team_data, "timestamp": time.time()}
-                    )
+                    await ws.send_json({"type": "update", "data": team_data, "timestamp": time.time()})
             elif msg.type == "close":
                 break
         except Exception:

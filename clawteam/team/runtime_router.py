@@ -62,8 +62,7 @@ class RuntimeRouter:
             evidence=evidence,
             recommended_next_action=self._recommended_next_action(message),
             payload=payload,
-            dedupe_key=message.request_id
-            or f"{source}:{target}:{message.type.value}:{message.timestamp}",
+            dedupe_key=message.request_id or f"{source}:{target}:{message.type.value}:{message.timestamp}",
             created_at=message.timestamp,
         )
 

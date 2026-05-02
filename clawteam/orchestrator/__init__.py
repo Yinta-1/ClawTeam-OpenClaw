@@ -8,12 +8,12 @@ This module provides:
 """
 
 from clawteam.orchestrator.provider_selector import (
-    ProviderSelector,
+    FallbackChain,
     ProviderInfo,
+    ProviderSelector,
     ProviderStatus,
     QuotaInfo,
     SelectionResult,
-    FallbackChain,
 )
 
 __all__ = [

@@ -123,9 +123,7 @@ class MigrationManager:
             import sqlite3
 
             with sqlite3.connect(db_path) as conn:
-                cursor = conn.execute(
-                    "SELECT version FROM schema_version ORDER BY version DESC LIMIT 1"
-                )
+                cursor = conn.execute("SELECT version FROM schema_version ORDER BY version DESC LIMIT 1")
                 row = cursor.fetchone()
                 return row[0] if row else 0
         except Exception as e:
@@ -262,9 +260,7 @@ class MigrationManager:
                     conn.executescript(migration_to_rollback.down_sql)
 
                 # Remove from schema_version
-                conn.execute(
-                    "DELETE FROM schema_version WHERE version = ?", (migration_to_rollback.version,)
-                )
+                conn.execute("DELETE FROM schema_version WHERE version = ?", (migration_to_rollback.version,))
 
                 conn.commit()
 

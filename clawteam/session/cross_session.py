@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -53,9 +53,7 @@ class CrossSessionMessage(BaseModel):
     from_agent: str = Field(default="", alias="fromAgent")
     to_session: str | None = Field(default=None, alias="toSession")  # None = broadcast
     to_agent: str | None = Field(default=None, alias="toAgent")
-    notification_type: NotificationType = Field(
-        default=NotificationType.broadcast, alias="notificationType"
-    )
+    notification_type: NotificationType = Field(default=NotificationType.broadcast, alias="notificationType")
     content: str = ""
     payload: dict[str, Any] = Field(default_factory=dict)
     timestamp: str = Field(default_factory=_now_iso)

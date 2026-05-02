@@ -16,19 +16,20 @@
 """
 
 from __future__ import annotations
+
 import logging
 import threading
 import time
-from typing import Any, Dict, List, Optional, Set, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from clawteam.tracker.change_attribution import ChangeRecord, ChangeAttributor, ActiveSession
-from clawteam.tracker.diff_tracker import DiffTracker, DiffEntry
-from clawteam.tracker.file_watcher import FileWatcher, WatchEvent, ChangeType, watch_directory
+from clawteam.tracker.change_attribution import ActiveSession, ChangeAttributor, ChangeRecord
+from clawteam.tracker.diff_tracker import DiffEntry, DiffTracker
+from clawteam.tracker.file_watcher import ChangeType, FileWatcher, WatchEvent
 
 logger = logging.getLogger(__name__)
 
@@ -271,9 +272,7 @@ class FileChangeTracker:
                 )
 
             # 创建 FileChange 记录
-            file_change = FileChange.from_change_record(
-                record, diff=diff_entry.diff if diff_entry else ""
-            )
+            file_change = FileChange.from_change_record(record, diff=diff_entry.diff if diff_entry else "")
             file_change.agent_name = attribution.agent_name or ""
             file_change.session_id = attribution.session_id or ""
             file_change.team_name = self.config.team_name
@@ -333,9 +332,7 @@ class FileChangeTracker:
             )
 
         # 创建 FileChange
-        file_change = FileChange.from_change_record(
-            record, diff=diff_entry.diff if diff_entry else ""
-        )
+        file_change = FileChange.from_change_record(record, diff=diff_entry.diff if diff_entry else "")
 
         # 添加到历史
         with self._lock:

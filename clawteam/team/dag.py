@@ -7,7 +7,6 @@ and blocking-task analysis for task dependency graphs.
 from __future__ import annotations
 
 from collections import deque
-from typing import Any
 
 from clawteam.team.models import TaskItem, TaskStatus
 
@@ -70,8 +69,7 @@ def topological_sort(tasks: list[TaskItem]) -> list[TaskItem]:
 
     if len(result) != len(tasks):
         raise CycleDetectedError(
-            f"Cycle detected in task dependencies. "
-            f"Only {len(result)}/{len(tasks)} tasks could be ordered."
+            f"Cycle detected in task dependencies. Only {len(result)}/{len(tasks)} tasks could be ordered."
         )
 
     return result

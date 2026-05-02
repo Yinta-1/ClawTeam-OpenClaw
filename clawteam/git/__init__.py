@@ -1,5 +1,5 @@
 """Git utilities for ClawTeam."""
 
-from .worktree import WorktreeManager, WorktreeInfo, WorktreeStatus, GitCommandError
+from .worktree import GitCommandError, WorktreeInfo, WorktreeManager, WorktreeStatus
 
 __all__ = ["WorktreeManager", "WorktreeInfo", "WorktreeStatus", "GitCommandError"]

@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import re
@@ -20,7 +19,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -347,9 +345,7 @@ class GitWorktreeService:
                 self._run_git(["worktree", "add", str(worktree_dir), branch_name])
             else:
                 # 创建新分支
-                self._run_git(
-                    ["worktree", "add", "-b", branch_name, str(worktree_dir), base_branch]
-                )
+                self._run_git(["worktree", "add", "-b", branch_name, str(worktree_dir), base_branch])
 
             # 获取创建的 worktree 信息
             head = self.get_head_commit(worktree_dir)
@@ -441,9 +437,7 @@ class GitWorktreeService:
             try:
                 # 使用 --no-commit 模拟合并
                 self._run_git(["checkout", target_branch])
-                output = self._run_git(
-                    ["merge", "--no-commit", "--no-ff", worktree_branch], check=False
-                )
+                output = self._run_git(["merge", "--no-commit", "--no-ff", worktree_branch], check=False)
 
                 # 检查是否有冲突
                 status = self._run_git(["status", "--porcelain"])

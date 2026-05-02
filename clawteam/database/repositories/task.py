@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
-from datetime import datetime
 import json
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .base import BaseRepository
 from ..types import DatabaseTask
+from .base import BaseRepository
 
 
 class TaskRepository(BaseRepository[DatabaseTask]):
@@ -64,9 +64,7 @@ class TaskRepository(BaseRepository[DatabaseTask]):
             "completed_at": self._serialize_datetime(model.completed_at),
         }
 
-    def list(
-        self, team_id: Optional[str] = None, status: Optional[str] = None, limit: int = 100
-    ) -> List[DatabaseTask]:
+    def list(self, team_id: Optional[str] = None, status: Optional[str] = None, limit: int = 100) -> List[DatabaseTask]:
         """Get tasks with optional filters."""
         filters = {}
         if team_id is not None:

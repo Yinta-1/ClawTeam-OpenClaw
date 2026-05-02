@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 
 from clawteam.fileutil import atomic_write_text
 from clawteam.paths import ensure_within_root, validate_identifier
-from clawteam.team.models import TaskItem, TaskStatus, get_data_dir
+from clawteam.team.models import TaskItem, get_data_dir
 
 
 def _now_iso() -> str:

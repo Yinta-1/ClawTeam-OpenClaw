@@ -9,11 +9,11 @@ from __future__ import annotations
 import json
 import threading
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class ContextCategory(str, Enum):
@@ -50,9 +50,7 @@ class ContextEntry:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         data = asdict(self)
-        data["category"] = (
-            self.category.value if isinstance(self.category, ContextCategory) else self.category
-        )
+        data["category"] = self.category.value if isinstance(self.category, ContextCategory) else self.category
         return data
 
     @classmethod
@@ -321,9 +319,7 @@ class ContextBoard:
 
             return result
 
-    def get_by_agent(
-        self, agent_name: str, viewer_name: Optional[str] = None
-    ) -> List[ContextEntry]:
+    def get_by_agent(self, agent_name: str, viewer_name: Optional[str] = None) -> List[ContextEntry]:
         """Get all entries for a specific agent."""
         return self.get_all(agent_name_filter=agent_name, viewer_name=viewer_name)
 
@@ -356,11 +352,7 @@ class ContextBoard:
         Returns number of entries cleared.
         """
         with self._lock:
-            to_remove = [
-                entry_id
-                for entry_id, entry in self._entries.items()
-                if entry.agent_name == agent_name
-            ]
+            to_remove = [entry_id for entry_id, entry in self._entries.items() if entry.agent_name == agent_name]
 
             for entry_id in to_remove:
                 entry = self._entries[entry_id]
@@ -399,9 +391,7 @@ class ContextBoard:
             return
         try:
             file_path = self._persist_dir / f"entry-{entry.id}.json"
-            file_path.write_text(
-                json.dumps(entry.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8"
-            )
+            file_path.write_text(json.dumps(entry.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
         except Exception:
             import logging
 

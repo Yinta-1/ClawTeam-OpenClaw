@@ -12,26 +12,19 @@ Key features:
 
 from __future__ import annotations
 
-import json
 import logging
-import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-from pydantic import BaseModel, Field
-
 from clawteam.orchestrator.provider_selector import (
-    ProviderSelector,
-    ProviderStatus,
     TaskType,
     get_provider_selector,
 )
 from clawteam.team.dag import get_execution_order, topological_sort
-from clawteam.team.models import TaskItem, TaskStatus, TaskPriority
-from clawteam.team.roles import AgentRole, suggest_role
+from clawteam.team.models import TaskItem, TaskPriority, TaskStatus
 from clawteam.team.router import get_router
 
 logger = logging.getLogger(__name__)
@@ -398,9 +391,7 @@ class SupervisorEngine:
 
         return tasks
 
-    def _select_provider_for_task(
-        self, task: TaskItem, rule: DecompositionRule, all_tasks: List[TaskItem]
-    ) -> str:
+    def _select_provider_for_task(self, task: TaskItem, rule: DecompositionRule, all_tasks: List[TaskItem]) -> str:
         """Select the best provider for a task with fallback support."""
         task_idx = int(task.id.split("-")[-1])
         preferred = rule.provider_preferences.get(task_idx, "claude")

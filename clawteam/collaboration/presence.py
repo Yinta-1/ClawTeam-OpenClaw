@@ -8,12 +8,10 @@ from __future__ import annotations
 
 import json
 import threading
-import time
-from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Optional, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class PresenceStatus(str, Enum):
@@ -122,9 +120,7 @@ class PresenceManager:
                 expires_at = datetime.fromisoformat(data["expires_at"])
                 if datetime.now(timezone.utc) > expires_at:
                     # Auto-expire: set back to ONLINE
-                    data = self.set_status(
-                        agent_name, PresenceStatus.ONLINE, status_message="Returned (was away)"
-                    )
+                    data = self.set_status(agent_name, PresenceStatus.ONLINE, status_message="Returned (was away)")
 
             return data
 

@@ -6,11 +6,10 @@ integrating with the existing board server endpoints.
 
 from __future__ import annotations
 
-import json
 from typing import Any, Dict, List, Optional
 
+from clawteam.events.models import ClawTeamEvent, EventCategory, EventSeverity, EventType
 from clawteam.events.tracker import EventTracker, get_tracker
-from clawteam.events.models import ClawTeamEvent, EventType, EventSeverity, EventCategory
 
 
 class EventAPI:

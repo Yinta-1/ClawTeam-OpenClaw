@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -235,17 +235,13 @@ class CommandCenterDashboard:
             for session in all_sessions[:limit]:
                 sessions.append(
                     ActiveSession(
-                        session_id=session.session_id
-                        if hasattr(session, "session_id")
-                        else str(session),
+                        session_id=session.session_id if hasattr(session, "session_id") else str(session),
                         name=session.name if hasattr(session, "name") else "Unknown",
                         role=session.role if hasattr(session, "role") else "agent",
                         team=session.team if hasattr(session, "team") else "default",
                         status=session.status if hasattr(session, "status") else "unknown",
                         created_at=session.created_at if hasattr(session, "created_at") else "",
-                        last_activity=session.last_activity
-                        if hasattr(session, "last_activity")
-                        else "",
+                        last_activity=session.last_activity if hasattr(session, "last_activity") else "",
                         input_tokens=getattr(session, "input_tokens", 0) or 0,
                         output_tokens=getattr(session, "output_tokens", 0) or 0,
                     )

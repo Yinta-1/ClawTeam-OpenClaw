@@ -7,10 +7,8 @@ storing events in a SQLite database for efficient querying.
 from __future__ import annotations
 
 import json
-import os
 import sqlite3
 import threading
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional

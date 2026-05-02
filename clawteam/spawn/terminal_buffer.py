@@ -14,11 +14,10 @@ HeadlessTerminalBuffer - 虚拟终端缓冲区
 @author ClawTeam
 """
 
-import re
-from dataclasses import dataclass, field
-from typing import List, Optional, Callable, Dict, Any
-from enum import Enum
 import logging
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

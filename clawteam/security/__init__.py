@@ -318,7 +318,7 @@ def validate_input(
 
     if pattern:
         if not re.match(pattern, value):
-            return False, f"Input does not match required pattern"
+            return False, "Input does not match required pattern"
 
     return True, None
 

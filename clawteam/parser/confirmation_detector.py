@@ -8,10 +8,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Optional
 
 from clawteam.parser.types import ConfirmationDetection
-
 
 # Default high-confidence confirmation patterns
 DEFAULT_HIGH_PATTERNS = [

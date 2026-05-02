@@ -13,7 +13,6 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from clawteam.fileutil import atomic_write_text
 from clawteam.paths import ensure_within_root, validate_identifier
@@ -162,9 +161,7 @@ class TaskRouter:
 
         self.save_profiles()
 
-    def route(
-        self, subject: str, description: str, available_agents: list[str] | None = None
-    ) -> RouteCandidate | None:
+    def route(self, subject: str, description: str, available_agents: list[str] | None = None) -> RouteCandidate | None:
         """Find the best agent for a task.
 
         Args:

@@ -23,8 +23,7 @@ import uuid
 from typing import Any
 
 from clawteam.transport.base import Transport
-from clawteam.transport.claimed import ClaimedMessage
-from clawteam.utils.ttl import get_message_ttl, is_ttl_enabled
+from clawteam.utils.ttl import get_message_ttl
 
 
 def _get_redis_url() -> str:
@@ -134,10 +133,7 @@ class RedisTransport(Transport):
         try:
             import redis
         except ImportError:
-            raise ImportError(
-                "Redis transport requires 'redis' package. "
-                "Install with: pip install clawteam[redis]"
-            )
+            raise ImportError("Redis transport requires 'redis' package. Install with: pip install clawteam[redis]")
 
         self._pool = redis.ConnectionPool(
             host=self._parse_host(),
@@ -323,9 +319,7 @@ class RedisTransport(Transport):
         key = _peer_key(self.team_name, agent_name)
         self._client.hset(
             key,
-            mapping={
-                k: json.dumps(v) if not isinstance(v, str) else v for k, v in metadata.items()
-            },
+            mapping={k: json.dumps(v) if not isinstance(v, str) else v for k, v in metadata.items()},
         )
 
     def deregister_peer(self, agent_name: str) -> None:

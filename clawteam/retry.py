@@ -6,9 +6,8 @@ Provides retry logic, fallback strategies, and error recovery.
 
 import asyncio
 import random
-import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from functools import wraps
 from typing import Any, Callable, Optional, TypeVar
@@ -179,8 +178,7 @@ class ErrorRecoveryManager:
                 if attempt < config.max_attempts:
                     delay = config.get_delay(attempt)
                     logger.warning(
-                        f"Retry attempt {attempt}/{config.max_attempts} failed: {e}. "
-                        f"Retrying in {delay:.2f}s..."
+                        f"Retry attempt {attempt}/{config.max_attempts} failed: {e}. Retrying in {delay:.2f}s..."
                     )
                     await asyncio.sleep(delay)
                 else:

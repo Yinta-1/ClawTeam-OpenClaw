@@ -11,14 +11,15 @@ L1-L4 分层记忆系统 — P15 记忆增强实现
 """
 
 from __future__ import annotations
-from typing import List, Optional, Dict, Any, Set
+
+import json
+import logging
+import threading
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-import json
-import uuid
-import logging
-import threading
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -607,9 +608,7 @@ class LayeredMemoryProvider:
 
         return results[:limit]
 
-    def promote_to_l4(
-        self, content: str, pattern_name: str = None, tags: Set[str] = None
-    ) -> Optional[MemoryEntry]:
+    def promote_to_l4(self, content: str, pattern_name: str = None, tags: Set[str] = None) -> Optional[MemoryEntry]:
         """将重要内容晋升到 L4 知识库"""
         # 检查是否值得晋升（高频出现或高重要性）
         existing = self.l3.search(content, limit=3)
@@ -618,9 +617,7 @@ class LayeredMemoryProvider:
             entry = existing[0]
             if entry.importance < 0.9:
                 entry.importance = min(0.95, entry.importance + 0.1)
-            return self.l4.add_fact(
-                content, importance=0.9, tags=tags, metadata={"derived_from": entry.entry_id}
-            )
+            return self.l4.add_fact(content, importance=0.9, tags=tags, metadata={"derived_from": entry.entry_id})
 
         return self.l4.add_fact(content, importance=0.8, tags=tags)
 
