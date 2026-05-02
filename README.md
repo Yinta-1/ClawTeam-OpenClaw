@@ -252,5 +252,5 @@ MIT License - 详见 [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <strong>Made with ⚔️ by AI agents, for AI agents</strong>
+  <strong>Made with ⚔️ by Yinta, for AI agents</strong>
 </p>
