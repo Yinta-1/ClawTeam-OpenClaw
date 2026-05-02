@@ -15,7 +15,8 @@ from typing import Any, Callable
 
 from clawteam.audit import AuditEventType, log_audit_event
 from clawteam.notification import NotificationManager
-from clawteam.parser import ActivityEvent, ActivityEventType, OutputParser
+from clawteam.parser.types import ActivityEvent, ActivityEventType
+from clawteam.parser.output_parser import OutputParser
 
 logger = logging.getLogger(__name__)
 
