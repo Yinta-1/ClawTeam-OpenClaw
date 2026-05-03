@@ -84,6 +84,23 @@
   - "What is Python?" → FAST tier (score=3) → gpt-4o-mini
   - "设计分布式缓存系统" → POWERFUL tier (score=9) → o1
 
+#### P41: AuthManager 安全强制执行 ✅
+- **commit**: `72bb841` security(P41): enforce AuthManager on board API endpoints
+- **文件**: `clawteam/board/server.py`
+- **状态**: 已完成
+- **功能**: 在 board HTTP API endpoints 上强制执行 AuthManager 认证检查
+
+#### P42: 完整测试验证 ✅
+- **commit**: 由 arch-qa 在 worktree 内验证
+- **结果**: 629 测试通过（617 passed, 12 skipped, 0 failed）
+- **状态**: 已完成
+
+#### P43: P30-P33 多模态 Web UI 完善 ✅
+- **commit**: `6c06044` feat(multimodal): P30-P33 complete streaming and rich notification support
+- **文件**: `clawteam/board/static/index.html`, `clawteam/notification/types.py`, `clawteam/team/models.py`
+- **状态**: 已完成
+- **功能**: Web board 消息面板支持图片和附件渲染，Notification 支持富媒体
+
 #### P3: 数据库连接池 ✅
 - **commit**: `9464edd` perf(database): P3 database connection pooling + WAL mode
 - **文件**: `clawteam/database/manager.py`
@@ -158,6 +175,9 @@
 | arch-querycache | P4 查询预编译缓存 | perf-squad/arch-querycache | ✅ 已完成 | `dcfacb3` + LRU 驱逐 |
 | arch-async | P5 异步订阅者通知 | perf-squad/arch-async | ✅ 已完成 | `541c707` + 超时保护 |
 | arch-memconfig | P6 内存配置可调 | perf-squad/arch-memconfig | ✅ 已完成 | `e36ebc7` + 环境变量 |
+| arch-security | P41 AuthManager 强制执行 | perf-squad/arch-security | ✅ 已完成 | `72bb841` board server 认证 |
+| arch-qa | P42 测试验证 | perf-squad/arch-qa | ✅ 已完成 | 629 测试通过（617 passed） |
+| arch-p30web | P43 多模态 Web UI | perf-squad/arch-p30web | ✅ 已完成 | `6c06044` index.html + models |
 
 ---
 
