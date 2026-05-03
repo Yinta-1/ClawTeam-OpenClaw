@@ -2003,7 +2003,7 @@ class BoardHandler(BaseHTTPRequestHandler):
             active_heartbeat_interval = 10  # seconds when active
             idle_heartbeat_interval = 30  # seconds when idle (>3 cycles no events)
             current_timeout = active_heartbeat_interval
-            
+
             while True:
                 # Wait for event or timeout (adaptive based on activity)
                 acquired = subscriber_lock.acquire(timeout=current_timeout)
