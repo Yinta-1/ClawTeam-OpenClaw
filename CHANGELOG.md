@@ -1,5 +1,23 @@
 # ClawTeam 升级日志
 
+## v0.5.1（2026-05-04）— 文档完善 + P37 完成
+
+### 文档更新
+- **新增**: `CAPABILITIES.md` - 完整能力清单
+- **新增**: `TODO.md` - v0.5.1 待办事项跟踪
+- **更新**: `README.md` - 链接到 CAPABILITIES.md
+
+### P37 组件集成完成
+- **arch-integrator**: ✅ 已完成（由 p37-integrator 合并完成）
+- **Commit**: `14d1d74` - Board SSE → EventAPI 集成
+- **说明**: Windows subprocess 模式 parent_agent 参数修复
+
+### 测试状态
+- **测试数**: 595+ passed
+- **CI**: ruff format + pyright + pip-audit
+
+---
+
 ## v0.5.0（2026-05-03）— P26-P37 多 Agent 协作增强
 
 ### 新增模块
@@ -167,7 +185,7 @@
 | arch-dashboard | Dashboard 监控 | `monitor-squad/arch-dashboard` | ✅ 已完成 | dashboard.py (13KB) + collector + renderer |
 | arch-events | 事件追踪 | `monitor-squad/arch-events` | ✅ 已完成 | tracker.py (14KB) + api + models |
 | arch-realtime | SSE 实时推送 | `monitor-squad/arch-realtime` | ✅ 已完成 | index.html (366KB) + 7 个 JS 文件 |
-| arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | 🔄 进行中 | 待开始 |
+| arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | ✅ 已完成 | p37-integrator 合并 (`14d1d74`) |
 | p37-integrator | 组件集成（P37） | SDK backend（Windows） | ✅ 已完成 | `14d1d74` Board SSE → EventAPI |
 | p30-multimodal | 多模态代码（P30-P33） | subprocess（Windows） | ✅ 部分完成 | `bd32e9c` models.py + types.py |
 | p38-model-router | 智能模型路由 | 本地 | ✅ 已完成 | `2f102db` model_router.py |
