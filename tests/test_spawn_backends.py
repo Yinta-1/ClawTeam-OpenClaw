@@ -125,6 +125,7 @@ def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry
         "backend": "subprocess",
         "pid": 9876,
         "command": ["codex", "--dangerously-bypass-approvals-and-sandbox", "do work"],
+        "parent_agent": "",
     }
 
 

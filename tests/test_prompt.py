@@ -158,7 +158,7 @@ class TestBuildAgentPrompt:
         )
         assert "## Self-Evaluation" in prompt
         assert "[confidence: 0.X]" in prompt
-        assert "confidence < 0.6" in prompt
+        assert "confidence is below 0.6" in prompt
 
     def test_metacognition_after_coordination(self):
         prompt = build_agent_prompt(
