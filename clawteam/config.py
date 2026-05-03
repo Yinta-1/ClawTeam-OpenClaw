@@ -295,6 +295,16 @@ class AppConfig(BaseConfig):
     transport: str = "file"  # Transport backend: file, redis, etc.
     debug: bool = False
 
+    # Task store (for backward compatibility with task store abstraction)
+    task_store: str = ""  # "file" (default) — extensible for redis/sql later
+
+    # Spawn settings
+    spawn_ready_timeout: float = 30.0  # max seconds to poll for TUI readiness before fallback
+
+    # Model resolution (per-agent model selection)
+    default_model: str = ""  # Fallback model when no other config applies
+    model_tiers: dict = {}  # Model tier aliases, e.g. {"strong": "claude-opus"}
+
     # Nested configs
     database: Optional[DatabaseConfig] = None
     agents: Optional[AgentConfig] = None
