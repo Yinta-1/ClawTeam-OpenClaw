@@ -11,9 +11,14 @@ import sqlite3
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from clawteam.team.models import get_data_dir
+
+
+# Global event subscribers for SSE streaming
+_event_subscribers: list[Callable[["ClawTeamEvent"], None]] = []
+_subscriber_lock = threading.Lock()
 
 
 class EventTracker:
@@ -118,6 +123,8 @@ class EventTracker:
                 ),
             )
             conn.commit()
+        # Notify subscribers (outside the lock to avoid deadlock)
+        _notify_event_subscribers(event)
 
     def track_batch(self, events: List["ClawTeamEvent"]) -> None:
         """Track multiple events in a batch.
@@ -162,6 +169,9 @@ class EventTracker:
                 rows,
             )
             conn.commit()
+        # Notify subscribers for all events (outside the lock)
+        for event in events:
+            _notify_event_subscribers(event)
 
     def query(
         self,
@@ -453,9 +463,51 @@ def track_batch(events: List["ClawTeamEvent"]) -> None:
     get_tracker().track_batch(events)
 
 
+def _notify_event_subscribers(event: "ClawTeamEvent") -> None:
+    """Notify all subscribers of a new event (called after track/track_batch)."""
+    with _subscriber_lock:
+        for callback in _event_subscribers[:]:
+            try:
+                callback(event)
+            except Exception:
+                pass  # Don't let subscriber errors break event tracking
+
+
+def add_event_subscriber(callback: Callable[["ClawTeamEvent"], None]) -> None:
+    """Add an event subscriber callback.
+
+    Args:
+        callback: Function to call when a new event is tracked.
+                  Will be called with the ClawTeamEvent as argument.
+    """
+    with _subscriber_lock:
+        if callback not in _event_subscribers:
+            _event_subscribers.append(callback)
+
+
+def remove_event_subscriber(callback: Callable[["ClawTeamEvent"], None]) -> None:
+    """Remove an event subscriber callback.
+
+    Args:
+        callback: The callback to remove.
+    """
+    with _subscriber_lock:
+        if callback in _event_subscribers:
+            _event_subscribers.remove(callback)
+
+
+def get_event_subscriber_count() -> int:
+    """Get the number of registered event subscribers."""
+    with _subscriber_lock:
+        return len(_event_subscribers)
+
+
 __all__ = [
     "EventTracker",
     "get_tracker",
     "track_event",
     "track_batch",
+    "add_event_subscriber",
+    "remove_event_subscriber",
+    "get_event_subscriber_count",
 ]

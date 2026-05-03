@@ -23,6 +23,11 @@ _chat_event_queue = deque(maxlen=100)  # Last 100 events
 _chat_subscribers = []  # List of lock objects for SSE connections
 _subscriber_lock = threading.Lock()
 
+# Thread-safe event broadcaster for SSE (P37: EventAPI integration)
+_event_queue = deque(maxlen=500)  # Last 500 events
+_event_subscribers = []  # List of queue indices for SSE connections
+_event_broadcaster_lock = threading.Lock()
+
 _STATIC_DIR = Path(__file__).parent / "static"
 _ALLOWED_PROXY_HOSTS = {
     "api.github.com",
@@ -43,6 +48,31 @@ def _get_collector():
         _collector = BoardCollector()
         BoardHandler.collector = _collector
     return _collector
+
+
+# P37: EventAPI integration - register board as event subscriber
+_event_subscriber_registered = False
+
+
+def _register_event_subscriber():
+    """Register the board's event broadcaster with EventTracker (P37)."""
+    global _event_subscriber_registered
+    if _event_subscriber_registered:
+        return
+
+    try:
+        from clawteam.events.tracker import add_event_subscriber
+
+        def board_event_callback(event):
+            """Callback to broadcast events to board SSE subscribers."""
+            # Convert event to dict for JSON serialization
+            event_dict = event.to_dict() if hasattr(event, "to_dict") else dict(event)
+            BoardHandler._broadcast_event(event_dict)
+
+        add_event_subscriber(board_event_callback)
+        _event_subscriber_registered = True
+    except Exception as e:
+        print(f"Failed to register event subscriber: {e}")
 
 
 def _now_iso() -> str:
@@ -1918,21 +1948,113 @@ class BoardHandler(BaseHTTPRequestHandler):
             self._serve_json({"success": False, "error": str(e)})
 
     def _serve_events(self):
-        """Serve events from the EventTracker (P37: wired to EventAPI)."""
+        """Serve events from the EventTracker via SSE (P37: wired to EventAPI for real-time streaming)."""
+        global _event_queue, _event_subscribers, _event_broadcaster_lock
+
+        # P37: Register event subscriber on first SSE connection
+        _register_event_subscriber()
+
+        params = parse_qs(urlparse(self.path).query)
+        team = params.get("team", [None])[0]
+        agent = params.get("agent", [None])[0]
+        limit = int(params.get("limit", ["100"])[0])
+
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+
+        # Register as subscriber - start from current queue size (only send new events)
+        last_event_idx = len(_event_queue)
+        subscriber_lock = threading.Lock()
+        subscriber_lock.acquire()
+
+        with _event_broadcaster_lock:
+            _event_subscribers.append(subscriber_lock)
+
         try:
-            from clawteam.events.api import EventAPI
+            # Send initial connection message
+            self.wfile.write(
+                f"data: {json.dumps({'type': 'connected', 'timestamp': _now_iso()}, ensure_ascii=False)}\n\n".encode(
+                    "utf-8"
+                )
+            )
+            self.wfile.flush()
 
-            api = EventAPI()
-            # Support query params: team, agent, limit
-            params = parse_qs(urlparse(self.path).query)
-            team = params.get("team", [None])[0]
-            agent = params.get("agent", [None])[0]
-            limit = int(params.get("limit", ["100"])[0])
+            # Send any missed events since connection started (initial snapshot from EventAPI)
+            try:
+                from clawteam.events.api import EventAPI
 
-            result = api.get_events(team_name=team, agent_name=agent, limit=limit)
-            self._serve_json(result)
-        except Exception as e:
-            self._serve_json({"events": [], "error": str(e)})
+                api = EventAPI()
+                initial_result = api.get_events(team_name=team, agent_name=agent, limit=limit)
+                for event in initial_result.get("events", []):
+                    self.wfile.write(
+                        f"data: {json.dumps({'type': 'event', 'data': event}, ensure_ascii=False)}\n\n".encode(
+                            "utf-8"
+                        )
+                    )
+                    self.wfile.flush()
+            except Exception as e:
+                pass  # Don't fail SSE connection if initial load fails
+
+            # Stream events as they come in
+            heartbeat_count = 0
+            while True:
+                # Wait for event or timeout (10 seconds)
+                acquired = subscriber_lock.acquire(timeout=10)
+                if acquired:
+                    subscriber_lock.release()
+
+                # Send any new events
+                with _event_broadcaster_lock:
+                    while len(_event_queue) > last_event_idx:
+                        event_data = _event_queue[last_event_idx]
+                        # Filter by team/agent if specified
+                        if team is None or event_data.get("team_name") == team:
+                            if agent is None or event_data.get("agent_name") == agent:
+                                self.wfile.write(
+                                    f"data: {json.dumps({'type': 'event', 'data': event_data}, ensure_ascii=False)}\n\n".encode(
+                                        "utf-8"
+                                    )
+                                )
+                                self.wfile.flush()
+                        last_event_idx += 1
+
+                # Send heartbeat
+                heartbeat_count += 1
+                self.wfile.write(
+                    f"data: {json.dumps({'type': 'heartbeat', 'count': heartbeat_count, 'timestamp': _now_iso()}, ensure_ascii=False)}\n\n".encode(
+                        "utf-8"
+                    )
+                )
+                self.wfile.flush()
+
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
+        finally:
+            # Unregister subscriber
+            with _event_broadcaster_lock:
+                if subscriber_lock in _event_subscribers:
+                    _event_subscribers.remove(subscriber_lock)
+
+    @staticmethod
+    def _broadcast_event(event_data: dict):
+        """Broadcast an event to all SSE subscribers (P37: EventAPI integration)."""
+        global _event_queue, _event_subscribers, _event_broadcaster_lock
+
+        # Add to queue
+        _event_queue.append(event_data)
+
+        # Notify all subscribers
+        with _event_broadcaster_lock:
+            for lock in _event_subscribers[:]:
+                try:
+                    lock.release()
+                except RuntimeError:
+                    # Lock not held by this thread, ignore
+                    pass
 
     def _serve_concurrency_limits(self):
         """Serve concurrency limits configuration."""
