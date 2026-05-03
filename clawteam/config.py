@@ -300,6 +300,7 @@ class AppConfig(BaseConfig):
 
     # Spawn settings
     spawn_ready_timeout: float = 30.0  # max seconds to poll for TUI readiness before fallback
+    spawn_prompt_delay: float = 2.0  # seconds to wait before injecting prompt via buffer
 
     # Model resolution (per-agent model selection)
     default_model: str = ""  # Fallback model when no other config applies
