@@ -200,8 +200,9 @@ class BoardHandler(BaseHTTPRequestHandler):
                 return
             self._serve_team(team_name)
         elif path.startswith("/api/events/"):
-            # SSE disabled for stability - can be re-enabled later with proper resource management
-            self.send_error(503, "SSE disabled for stability")
+            # P37: Wire up EventTracker to board API
+            # Supports GET /api/events/ and /api/events/?team=<team>&limit=100
+            self._serve_events()
         elif path.startswith("/api/proxy"):
             # Proxy disabled for stability - security and resource concerns
             self.send_error(503, "Proxy disabled for stability")
@@ -1866,49 +1867,70 @@ class BoardHandler(BaseHTTPRequestHandler):
         self._serve_json({"skills": skills_data})
 
     def _serve_notifications(self):
-        """Serve notifications list."""
-        notifications = [
-            {
-                "id": "sys-1",
-                "title": "系统通知",
-                "message": "ClawTeam Nexus 已启动，所有服务正常运行",
-                "time": "刚刚",
-                "unread": True,
-                "icon": "🚀",
-            },
-            {
-                "id": "sys-2",
-                "title": "技能更新",
-                "message": "检测到 3 个技能有新版本可用，请在技能中心查看",
-                "time": "5 分钟前",
-                "unread": True,
-                "icon": "🔄",
-            },
-            {
-                "id": "sys-3",
-                "title": "会话完成",
-                "message": "代码审查任务已完成，耗时 2m 34s",
-                "time": "1 小时前",
-                "unread": False,
-                "icon": "✅",
-            },
-            {
-                "id": "sys-4",
-                "title": "安全提醒",
-                "message": "检测到新的安全更新，建议及时升级",
-                "time": "2 小时前",
-                "unread": False,
-                "icon": "🔒",
-            },
-        ]
-        self._serve_json({"notifications": notifications})
+        """Serve notifications list (P37: wired to real NotificationManager)."""
+        try:
+            from clawteam.notification.manager import get_notification_manager
+            from clawteam.notification.types import NotificationType
+
+            mgr = get_notification_manager()
+            history = mgr.get_history(limit=50)
+
+            # Map notification types to icons
+            icon_map = {
+                NotificationType.CONFIRMATION: "🤝",
+                NotificationType.TASK_COMPLETE: "✅",
+                NotificationType.ERROR: "❌",
+                NotificationType.STUCK: "⚠️",
+                NotificationType.INFO: "ℹ️",
+                NotificationType.WARNING: "⚡",
+            }
+
+            notifications = []
+            for n in history:
+                notifications.append({
+                    "id": n.notification_id,
+                    "title": n.title,
+                    "message": n.body,
+                    "time": n.timestamp[:19] if n.timestamp else "",
+                    "unread": not n.acknowledged,
+                    "icon": icon_map.get(n.notification_type, "ℹ️"),
+                    # P30-P33: Include image_url for rich media display
+                    "image_url": n.image_url,
+                })
+
+            self._serve_json({"notifications": notifications})
+        except Exception as e:
+            # Fallback: return empty list on any error
+            self._serve_json({"notifications": []})
 
     def _mark_notifications_read(self):
-        """Mark all notifications as read (in-memory, resets on restart)."""
-        # Since notifications are hardcoded and in-memory,
-        # we just acknowledge the request. In production, this would
-        # update a database or persistent storage.
-        self._serve_json({"success": True, "message": "All notifications marked as read"})
+        """Mark all notifications as read (P37: wired to NotificationManager)."""
+        try:
+            from clawteam.notification.manager import get_notification_manager
+
+            mgr = get_notification_manager()
+            # Acknowledge all session notifications (empty session_id acknowledges all)
+            mgr.acknowledge(session_id=None)
+            self._serve_json({"success": True})
+        except Exception as e:
+            self._serve_json({"success": False, "error": str(e)})
+
+    def _serve_events(self):
+        """Serve events from the EventTracker (P37: wired to EventAPI)."""
+        try:
+            from clawteam.events.api import EventAPI
+
+            api = EventAPI()
+            # Support query params: team, agent, limit
+            params = parse_qs(urlparse(self.path).query)
+            team = params.get("team", [None])[0]
+            agent = params.get("agent", [None])[0]
+            limit = int(params.get("limit", ["100"])[0])
+
+            result = api.get_events(team_name=team, agent_name=agent, limit=limit)
+            self._serve_json(result)
+        except Exception as e:
+            self._serve_json({"events": [], "error": str(e)})
 
     def _serve_concurrency_limits(self):
         """Serve concurrency limits configuration."""

@@ -1188,6 +1188,7 @@
         .notification-item .notif-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
         .notification-item .notif-text { font-size: 12px; color: var(--text-secondary); }
         .notification-item .notif-time { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+            .notification-item img.notif-image { max-width: 100%; max-height: 200px; border-radius: 6px; margin-top: 8px; cursor: pointer; }
         
         /* ===== Settings Page Styles ===== */
         .settings-tabs {
@@ -6119,6 +6120,7 @@
                         <div class="notification-item ${n.unread ? 'unread' : ''}">
                             <div class="notif-title">${n.icon || '📢'} ${n.title || '通知'}</div>
                             <div class="notif-text">${n.message || ''}</div>
+                            ${n.image_url ? `<img src="${n.image_url}" alt="attachment" style="max-width:100%;max-height:200px;border-radius:6px;margin-top:8px;cursor:pointer;" onclick="window.open(this.src)" loading="lazy" />` : ''}
                             <div class="notif-time">${n.time || ''}</div>
                         </div>
                     `).join('');
