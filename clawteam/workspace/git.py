@@ -38,11 +38,47 @@ def repo_root(path: Path) -> Path:
 
 
 def current_branch(repo: Path) -> str:
-    """Return the current branch name (or HEAD for detached)."""
+    """Return the current branch name (or HEAD for detached).
+    
+    Uses multiple fallback methods for robustness across different git states
+    and to correctly detect the default branch even in worktrees.
+    """
+    # Try: symbolic-ref (most reliable for attached HEAD)
     try:
         return _run(["symbolic-ref", "--short", "HEAD"], cwd=repo)
     except GitError:
+        pass
+    
+    # Try: branch --show-current (simpler, newer git versions)
+    try:
+        branch = _run(["branch", "--show-current"], cwd=repo)
+        if branch:
+            return branch
+    except GitError:
+        pass
+    
+    # Try: rev-parse --abbrev-ref origin/HEAD (gives default branch like 'origin/main')
+    try:
+        ref = _run(["rev-parse", "--abbrev-ref", "origin/HEAD"], cwd=repo)
+        if ref and '/' in ref:
+            return ref.split('/', 1)[1]  # Extract 'main' from 'origin/main'
+    except GitError:
+        pass
+    
+    # Fallback: rev-parse (returns commit hash - detached HEAD state)
+    try:
         return _run(["rev-parse", "--short", "HEAD"], cwd=repo)
+    except GitError:
+        return "HEAD"  # Last resort
+
+
+def _is_valid_ref(repo: Path, ref: str) -> bool:
+    """Check if *ref* is a valid git reference (branch, tag, or commit)."""
+    try:
+        _run(["rev-parse", "--verify", "--quiet", ref], cwd=repo)
+        return True
+    except GitError:
+        return False
 
 
 def create_worktree(
@@ -51,7 +87,26 @@ def create_worktree(
     branch: str,
     base_ref: str = "HEAD",
 ) -> None:
-    """Create a new worktree with a new branch based on *base_ref*."""
+    """Create a new worktree with a new branch based on *base_ref*.
+    
+    If base_ref is not a valid reference, falls back to HEAD.
+    """
+    # Validate base_ref - if invalid, fall back to HEAD
+    if base_ref and base_ref not in ("HEAD", "main", "master") and not _is_valid_ref(repo, base_ref):
+        # Try to find the default branch from origin/HEAD
+        try:
+            origin_head = _run(["rev-parse", "--abbrev-ref", "origin/HEAD"], cwd=repo)
+            if origin_head and '/' in origin_head:
+                default_branch = origin_head.split('/', 1)[1]
+                if _is_valid_ref(repo, default_branch):
+                    base_ref = default_branch
+                else:
+                    base_ref = "HEAD"
+            else:
+                base_ref = "HEAD"
+        except GitError:
+            base_ref = "HEAD"
+    
     _run(
         ["worktree", "add", "-b", branch, str(worktree_path), base_ref],
         cwd=repo,

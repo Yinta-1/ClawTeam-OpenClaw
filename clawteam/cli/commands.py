@@ -421,7 +421,7 @@ def team_create(
     else:
         leader_name = identity.agent_name or "leader"
         desc = description
-        backend = "tmux"
+        backend = "auto"  # Auto-detect best backend (tmux on Unix, subprocess/OpenClaw SDK on Windows)
         command = ["openclaw"]
 
     try:
