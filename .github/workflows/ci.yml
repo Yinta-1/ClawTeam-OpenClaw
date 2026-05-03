@@ -34,7 +34,7 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          pip install pytest pytest-asyncio
+          poetry run pip install pytest pytest-asyncio
 
       - name: Run linter
         run: |
