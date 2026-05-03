@@ -17,6 +17,7 @@
 
 ### 文档更新
 - [x] `CAPABILITIES.md` - 完整能力清单
+- [x] `PLATFORM_COMPATIBILITY.md` - 平台兼容性报告
 - [ ] `API.md` - 更新 API 文档
 - [ ] `CLI.md` - 更新 CLI 参考
 - [ ] 更新多语言 README
