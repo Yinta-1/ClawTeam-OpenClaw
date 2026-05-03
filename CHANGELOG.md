@@ -33,14 +33,14 @@
   - Mentions（@提及）
   - Context Board（上下文面板）
 
-#### P30-P33: 多模态支持 🔄
-- **文档**: `docs/superpowers/specs/P30-P33-multimodal-support-design.md`
-- **状态**: 设计中
-- **目标**:
-  - 音频输入/输出
-  - 视觉理解
-  - 文件处理
-  - 截图/屏幕捕获
+#### P30-P33: 多模态支持 🔄→✅（部分代码）
+- **文档**: `docs/superpowers/specs/P30-P33-multimodal-support-design.md` ✅
+- **commit**: `bd32e9c` feat(models): P30-P33 multimodal support - image fields and FileAttachment class
+- **已实现** (`clawteam/team/models.py` + `clawteam/notification/types.py`):
+  - `TeamMessage` 新增: `image_url`, `image_data`, `image_mime_type`, `image_width`, `image_height`, `attachments: list[FileAttachment]`
+  - `Notification` 新增: `image_url`
+  - 新增 `FileAttachment` 模型类
+- **待完成**: CLI inbox 图片渲染、Web board 富媒体展示、Streaming 消息支持
 
 #### P34: Dashboard 监控面板 🔄
 - **新增文件**:
@@ -60,6 +60,11 @@
   - `clawteam/board/static/index.html`
 - **状态**: 修改中
 - **目标**: Server-Sent Events、实时日志推送
+
+#### P37: 组件集成 🔄
+- **状态**: 未开始（p37-integrator specialist 因 Windows subprocess 环境限制未能执行）
+- **目标**: 连接 lifecycle/collaboration/events/dashboard 模块，修复 Dashboard 侧边栏导航 bug
+- **TODO**: 需在 Linux/macOS 环境或使用 tmux backend 重新派发 specialist
 
 ### 已实现的核心功能（v0.4.0 确认）
 
@@ -87,6 +92,8 @@
 | arch-events | 事件追踪 | `monitor-squad/arch-events` | ✅ 已完成 | tracker.py (14KB) + api + models |
 | arch-realtime | SSE 实时推送 | `monitor-squad/arch-realtime` | ✅ 已完成 | index.html (366KB) + 7 个 JS 文件 |
 | arch-integrator | 组件集成 | `monitor-squad/arch-integrator` | 🔄 进行中 | 待开始 |
+| p37-integrator | 组件集成（P37） | subprocess（Windows） | ⚠️ 环境限制 | 未执行 |
+| p30-multimodal | 多模态代码（P30-P33） | subprocess（Windows） | ✅ 部分完成 | `bd32e9c` models.py + types.py |
 
 ---
 
