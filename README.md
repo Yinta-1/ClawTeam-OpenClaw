@@ -150,7 +150,7 @@ clawteam board serve --port 8080
 
 ## 📊 版本对比
 
-| 功能 | 上游 v0.3.0 | **ClawTeam-OpenClaw v0.5.0** |
+| 功能 | 上游 v0.3.0 | **ClawTeam-OpenClaw v0.5.1** |
 |------|-------------|-------------------------------|
 | Web UI 看板 | ❌ | ✅ |
 | API 认证 | ❌ | ✅ |
@@ -190,6 +190,7 @@ clawteam board serve --port 8080
 | 文档 | 说明 |
 |------|------|
 | [README.md](README.md) | 本文档 |
+| [CAPABILITIES.md](CAPABILITIES.md) | 完整功能清单 |
 | [API.md](API.md) | REST API 完整参考 |
 | [CLI.md](CLI.md) | CLI 命令详解 |
 | [DEPLOY.md](DEPLOY.md) | Docker / 裸机部署指南 |
