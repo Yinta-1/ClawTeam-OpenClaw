@@ -1,6 +1,6 @@
 # ClawTeam-OpenClaw 完整能力清单
 
-> **版本**: v0.5.7 | **测试**: 679+ | **状态**: 生产就绪
+> **版本**: v0.7.0 | **测试**: 675 passed, 14 skipped | **状态**: 生产就绪
 
 本文档详细记录 ClawTeam-OpenClaw 的所有功能模块和实现状态。
 
@@ -513,6 +513,15 @@ send_command("send_task", {
 
 | 版本 | 日期 | 变化 |
 |------|------|------|
+| v0.7.0 | 2026-05-04 | **极致测试质量**: 49 个测试文件、18070 行代码、675 测试通过 |
+| v0.6.3 | 2026-05-04 | Bug Fix: 修复多项问题 |
+| v0.6.2 | 2026-05-04 | **Agent Registry**: golutra 风格配置、agent_config.py |
+| v0.6.1 | 2026-05-04 | **Post-Ready Hook**: `on_ready` 回调支持 |
+| v0.6.0 | 2026-05-04 | **Rich CLI**: Rich Table 表格、config init 命令 |
+| v0.5.9 | 2026-05-04 | **Gateway 超时改进**: sessions.create/send 30秒超时 |
+| v0.5.8 | 2026-05-04 | 文档更新 |
+| v0.5.7 | 2026-05-04 | **Agent 生命周期管理**: terminate/list/top 命令 |
+| v0.5.6 | 2026-05-04 | SDK Agent 测试框架、Board Monitor 增强 |
 | v0.5.5 | 2026-05-04 | **SDK Agent 消息路由修复**: Smart Routing、Activity 广播、Board Monitor、Agent Shutdown 检测 |
 | v0.5.4 | 2026-05-04 | Agent Daemon 完整文档化、Daemon API、CLI daemon 命令、**Windows Signal Fix** |
 | v0.5.1 | 2026-05-04 | Agent Daemon 持久运行、Continuous Mode、mentions/pinned 修复 |
@@ -522,4 +531,4 @@ send_command("send_task", {
 
 ---
 
-*本文档最后更新: 2026-05-04 | v0.5.5*
+*本文档最后更新: 2026-05-04 | v0.7.0*
