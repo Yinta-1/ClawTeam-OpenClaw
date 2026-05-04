@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import queue
 import subprocess
 import threading
 import time
@@ -29,6 +30,38 @@ GATEWAY_TOKEN = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
 DATA_DIR = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.clawteam")).expanduser()
 
 
+# 持续运行 Block - 用于 specialist agents
+_CONTINUOUS_RUN_BLOCK = """
+## Continuous Running Mode
+
+**IMPORTANT: Do NOT exit after completing a task. Stay alive and await new tasks.**
+
+**Startup:**
+1. Check your inbox for any pending tasks:
+   `clawteam inbox peek {team_name} --agent {agent_name}`
+2. If tasks exist, process them. If not, proceed to standby.
+
+**Main Loop:**
+- Every 30 seconds, check your inbox for new messages:
+  `clawteam inbox peek {team_name} --agent {agent_name}`
+- If you receive a new task:
+  1. Execute the task
+  2. Report completion to leader: `clawteam inbox send {team_name} {leader_name} "Task completed: [BRIEF_SUMMARY]"`
+  3. Return to standby loop
+
+**Shutdown Protocol:**
+- ONLY exit when the leader sends the exact message "shutdown"
+- After completing a task, ALWAYS ask the leader:
+  `clawteam inbox send {team_name} {leader_name} "Task done. Should I exit or await new tasks?"`
+- Wait for leader's response before deciding to exit or continue
+
+**Task Completion:**
+- After completing any task, do NOT auto-exit
+- Send completion message to leader
+- Ask if should exit or await new tasks
+"""
+
+
 @dataclass
 class OCAProcess:
     """追踪 OpenClaw SDK Agent 会话"""
@@ -37,12 +70,19 @@ class OCAProcess:
     session_key: str
     session_id: str
     team_name: str
+    agent_id: str = ""
+    agent_type: str = "specialist"
     task_id: Optional[str] = None
     run_id: Optional[str] = None
     result: Optional[str] = None
     error: Optional[str] = None
     done: bool = False
     started_at: float = field(default_factory=time.time)
+    # 新增：任务队列和生命周期管理
+    task_queue: queue.Queue = field(default_factory=queue.Queue)
+    shutdown_event: threading.Event = field(default_factory=threading.Event)
+    keeper_thread: Optional[threading.Thread] = None
+    cwd: Optional[str] = None
 
 
 class OpenClawSDKBackend(SpawnBackend):
@@ -82,6 +122,7 @@ class OpenClawSDKBackend(SpawnBackend):
         self._processes: dict[str, OCAProcess] = {}
         self._gateway_cmd = self._detect_gateway_cmd()
         self._lock = threading.Lock()
+        self._session_keepers: dict[str, threading.Thread] = {}  # 守护线程
 
     def _detect_gateway_cmd(self) -> str:
         """检测 openclaw gateway 命令"""
@@ -197,12 +238,24 @@ class OpenClawSDKBackend(SpawnBackend):
                     session_key=session_key,
                     session_id=session_id,
                     team_name=team_name,
+                    agent_id=agent_id,
+                    agent_type=agent_type,
                     run_id=run_id,
+                    cwd=cwd,
                 )
                 self._processes[agent_name] = proc
 
                 # 写入团队注册表
                 self._register_agent(team_name, agent_name, session_key)
+
+                # Step 5: 启动 Session Keeper（守护线程）
+                keeper = threading.Thread(
+                    target=self._session_keeper_loop,
+                    args=(agent_name,),
+                    daemon=True,
+                )
+                keeper.start()
+                self._session_keepers[agent_name] = keeper
 
                 return f"Agent '{agent_name}' started via OpenClaw SDK (session={session_key})"
 
@@ -260,6 +313,14 @@ class OpenClawSDKBackend(SpawnBackend):
 
         if cwd:
             lines.insert(-2, f"**Working directory:** `{cwd}`\n")
+
+        # 构建持续运行指令（针对 specialist 类型的 agent）
+        if agent_type != "leader":
+            lines.insert(-1, _CONTINUOUS_RUN_BLOCK.format(
+                team_name=team_name,
+                agent_name=agent_name,
+                leader_name="leader" if agent_type != "leader" else "",
+            ))
 
         lines.append("Begin your task now.\n")
 
@@ -330,9 +391,142 @@ class OpenClawSDKBackend(SpawnBackend):
             return False
 
         try:
-            # 通过 gateway 关闭 session
+            # 1. 发送 shutdown 信号
+            proc.shutdown_event.set()
+
+            # 2. 通过 gateway 关闭 session
             self._gateway_call("sessions.abort", params={"key": proc.session_key}, timeout=10)
             proc.done = True
+
+            # 3. 清理 keeper 线程引用
+            self._session_keepers.pop(agent_name, None)
+
             return True
         except Exception:
             return False
+
+    def _session_keeper_loop(self, agent_name: str) -> None:
+        """
+        Session Keeper 线程 - 保持 Agent Session 活跃并处理新任务
+
+        职责：
+        1. 每 15 秒发送一次心跳保持 session 活跃
+        2. 检查任务队列，有新任务则 inject 到 session
+        3. 监听 shutdown 信号并清理
+        """
+        proc = self._processes.get(agent_name)
+        if not proc:
+            return
+
+        heartbeat_count = 0
+        while not proc.done and not proc.shutdown_event.is_set():
+            try:
+                # 1. 心跳保活（每 15 秒）
+                heartbeat_count += 1
+                if heartbeat_count % 4 == 0:  # 每 4 次循环（约 60 秒）
+                    self._send_heartbeat(proc)
+
+                # 2. 检查任务队列
+                try:
+                    new_task = proc.task_queue.get_nowait()
+                    self._inject_task(proc, new_task)
+                except queue.Empty:
+                    pass
+
+                # 3. 检查 shutdown 信号
+                if proc.shutdown_event.is_set():
+                    self._send_shutdown(proc)
+                    break
+
+            except Exception as e:
+                # 守护线程不抛出异常，只记录
+                pass
+
+            # 等待下次检查
+            proc.shutdown_event.wait(timeout=15)
+
+    def _send_heartbeat(self, proc: OCAProcess) -> None:
+        """发送心跳保持 session 活跃"""
+        try:
+            heartbeat_msg = (
+                f"[System] Session heartbeat. You are **{proc.name}** ({proc.agent_type}) on team **{proc.team_name}**. "
+                f"Continue monitoring your inbox for new tasks. Do NOT exit."
+            )
+            self._gateway_call(
+                "sessions.send",
+                params={"key": proc.session_key, "message": heartbeat_msg},
+                timeout=10,
+            )
+        except Exception:
+            pass
+
+    def _inject_task(self, proc: OCAProcess, task: str) -> None:
+        """Inject 新任务到 Agent Session"""
+        try:
+            task_msg = (
+                f"## New Task Assignment\n\n{task}\n\n"
+                f"Execute this task and report completion to your leader when done.\n"
+                f"Remember: Do NOT exit after completing. Await further instructions."
+            )
+            self._gateway_call(
+                "sessions.send",
+                params={"key": proc.session_key, "message": task_msg},
+                timeout=10,
+            )
+        except Exception:
+            pass
+
+    def _send_shutdown(self, proc: OCAProcess) -> None:
+        """发送 shutdown 命令"""
+        try:
+            shutdown_msg = "## Shutdown\n\nThe leader has sent the shutdown signal. Exit your session now."
+            self._gateway_call(
+                "sessions.send",
+                params={"key": proc.session_key, "message": shutdown_msg},
+                timeout=10,
+            )
+            # 等待一下让 agent 处理
+            time.sleep(2)
+            # 终止 session
+            self._gateway_call("sessions.abort", params={"key": proc.session_key}, timeout=10)
+            proc.done = True
+        except Exception:
+            pass
+
+    def send_task(self, agent_name: str, task: str) -> bool:
+        """
+        向运行中的 Agent 发送新任务
+
+        Args:
+            agent_name: Agent 名称
+            task: 任务描述
+
+        Returns:
+            True 如果任务已加入队列，False 如果 agent 不存在
+        """
+        proc = self._processes.get(agent_name)
+        if not proc or proc.done:
+            return False
+
+        try:
+            proc.task_queue.put_nowait(task)
+            return True
+        except queue.Full:
+            return False
+
+    def shutdown_agent(self, agent_name: str) -> bool:
+        """
+        发送 shutdown 信号给 Agent（优雅关闭）
+
+        Args:
+            agent_name: Agent 名称
+
+        Returns:
+            True 如果成功发送 shutdown 信号
+        """
+        proc = self._processes.get(agent_name)
+        if not proc:
+            return False
+
+        proc.shutdown_event.set()
+        return True
