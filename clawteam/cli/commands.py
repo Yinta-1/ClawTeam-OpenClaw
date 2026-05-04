@@ -5172,7 +5172,7 @@ def _format_duration(duration: datetime.timedelta) -> str:
 @agent_app.command("list-types")
 def agent_list_types():
     """List all known agent types (golutra-style registry)."""
-    from clawteam.spawn.registry import list_agent_types
+    from clawteam.spawn.agent_config import list_agent_types
 
     agents = list_agent_types()
 
@@ -5191,7 +5191,7 @@ def agent_list_types():
             )
         console.print(table)
 
-    _output([asdict(a) for a in agents], _human)
+    _output(agents, _human)
 
 
 @agent_app.command("info")

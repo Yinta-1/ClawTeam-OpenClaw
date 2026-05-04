@@ -1,178 +1,406 @@
-"""
-Agent Registry - golutra-style agent configuration registry.
-
-Inspired by golutra's TerminalDefaultMemberConfig, this module provides
-a registry of known agent types with their default commands and configurations.
-
-Usage:
-    from clawteam.spawn.registry import get_registry, resolve_agent_config
-    
-    # List all known agent types
-    agents = get_registry("my-team")
-    
-    # Get config for specific agent type
-    config = resolve_agent_config("claude-code")
-"""
+"""Spawn registry - persists agent process info for liveness checking."""
 
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, asdict
+import subprocess
+import time
+from enum import Enum
 from pathlib import Path
-from typing import Optional
 
-# golutra-style agent configuration
-@dataclass
-class AgentConfig:
-    """Configuration for a known agent type."""
-    id: str                          # Unique identifier (e.g., "claude-code")
-    name: str                        # Display name (e.g., "Claude Code")
-    terminal_type: str               # Terminal type (e.g., "claude")
-    default_command: str             # Default command to launch
-    unlimited_access_flag: Optional[str] = None  # Flag for unlimited access
-    resume_command_template: Optional[str] = None  # Template for resuming sessions
-    post_ready_steps: list[str] = None  # Steps to execute after ready
-    
-    def __post_init__(self):
-        if self.post_ready_steps is None:
-            self.post_ready_steps = []
+from pydantic import BaseModel, Field
+
+from clawteam.fileutil import atomic_write_text, file_locked
+from clawteam.paths import ensure_within_root, validate_identifier
+from clawteam.team.models import get_data_dir
+
+# ---------------------------------------------------------------------------
+# Circuit Breaker — agent health tracking
+# ---------------------------------------------------------------------------
 
 
-# Built-in agent configurations (golutra-style)
-BUILTIN_AGENTS: dict[str, AgentConfig] = {
-    "claude-code": AgentConfig(
-        id="claude-code",
-        name="Claude Code",
-        terminal_type="claude",
-        default_command="claude",
-        unlimited_access_flag="--dangerously-skip-permissions",
-        resume_command_template=None,
-        post_ready_steps=["AI_ONBOARDING"],
-    ),
-    "codex": AgentConfig(
-        id="codex",
-        name="Codex CLI",
-        terminal_type="codex",
-        default_command="codex",
-        unlimited_access_flag="--dangerously-skip-permissions",
-        resume_command_template="codex --resume {session_id}",
-        post_ready_steps=[],
-    ),
-    "gemini": AgentConfig(
-        id="gemini",
-        name="Gemini CLI",
-        terminal_type="gemini",
-        default_command="gemini",
-        unlimited_access_flag=None,
-        resume_command_template=None,
-        post_ready_steps=[],
-    ),
-    "opencode": AgentConfig(
-        id="opencode",
-        name="OpenCode",
-        terminal_type="opencode",
-        default_command="opencode",
-        unlimited_access_flag="--dangerously-skip-permissions",
-        resume_command_template=None,
-        post_ready_steps=[],
-    ),
-    "qwen": AgentConfig(
-        id="qwen",
-        name="Qwen Code",
-        terminal_type="qwen",
-        default_command="qwen",
-        unlimited_access_flag="--dangerously-skip-permissions",
-        resume_command_template=None,
-        post_ready_steps=[],
-    ),
-    "openclaw": AgentConfig(
-        id="openclaw",
-        name="OpenClaw",
-        terminal_type="openclaw",
-        default_command="openclaw",
-        unlimited_access_flag=None,
-        resume_command_template=None,
-        post_ready_steps=[],
-    ),
-}
+class HealthState(str, Enum):
+    healthy = "healthy"
+    degraded = "degraded"
+    open = "open"
 
 
-def resolve_agent_config(agent_id: str) -> Optional[AgentConfig]:
-    """Resolve agent configuration by ID.
-    
-    Args:
-        agent_id: Agent identifier (e.g., "claude-code", "openclaw")
-        
-    Returns:
-        AgentConfig if found, None otherwise
-    """
-    return BUILTIN_AGENTS.get(agent_id)
+class AgentHealth(BaseModel):
+    """Health status for a spawned agent (circuit breaker pattern)."""
+
+    model_config = {"populate_by_name": True}
+
+    agent_name: str = Field(alias="agentName")
+    state: HealthState = HealthState.healthy
+    quality_score: float = Field(default=1.0, alias="qualityScore")
+    consecutive_failures: int = Field(default=0, alias="consecutiveFailures")
+    total_successes: int = Field(default=0, alias="totalSuccesses")
+    total_failures: int = Field(default=0, alias="totalFailures")
+    last_failure_at: float = Field(default=0.0, alias="lastFailureAt")
+    cooldown_seconds: float = Field(default=60.0, alias="cooldownSeconds")
+
+    @property
+    def is_accepting_tasks(self) -> bool:
+        """Return True if the agent can accept new tasks."""
+        if self.state != HealthState.open:
+            return True
+        # Half-open: allow after cooldown
+        if self.last_failure_at and (time.time() - self.last_failure_at) >= self.cooldown_seconds:
+            return True
+        return False
 
 
-def list_agent_types() -> list[AgentConfig]:
-    """List all built-in agent configurations.
-    
-    Returns:
-        List of AgentConfig objects
-    """
-    return list(BUILTIN_AGENTS.values())
+DEFAULT_FAILURE_THRESHOLD = 3
+DEFAULT_COOLDOWN_SECONDS = 60.0
 
 
-def get_registry(team_name: str) -> dict[str, dict]:
-    """Get team agent registry.
-    
-    Args:
-        team_name: Team name
-        
-    Returns:
-        Dictionary of agent configurations for the team
-    """
-    from clawteam.config import DATA_DIR
-    
-    registry_path = DATA_DIR / "teams" / team_name / "agents.json"
-    if registry_path.exists():
+def _health_path(team_name: str) -> Path:
+    return ensure_within_root(
+        get_data_dir() / "teams",
+        validate_identifier(team_name, "team name"),
+        "agent_health.json",
+    )
+
+
+def _load_health(team_name: str) -> dict[str, dict]:
+    path = _health_path(team_name)
+    if path.exists():
         try:
-            return json.loads(registry_path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+            return json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError):
+            return {}
     return {}
 
 
-def register_agent(team_name: str, agent_name: str, config: dict) -> None:
-    """Register an agent in the team registry.
-    
-    Args:
-        team_name: Team name
-        agent_name: Agent name
-        config: Agent configuration dict
+def _save_health(team_name: str, data: dict[str, dict]) -> None:
+    atomic_write_text(_health_path(team_name), json.dumps(data, indent=2))
+
+
+def get_agent_health(team_name: str, agent_name: str) -> AgentHealth:
+    """Return health status for an agent (creates default if not tracked)."""
+    health_data = _load_health(team_name)
+    if agent_name in health_data:
+        return AgentHealth.model_validate(health_data[agent_name])
+    return AgentHealth(agent_name=agent_name)
+
+
+def get_all_health(team_name: str) -> dict[str, AgentHealth]:
+    """Return health for all tracked agents."""
+    health_data = _load_health(team_name)
+    return {name: AgentHealth.model_validate(data) for name, data in health_data.items()}
+
+
+def record_outcome(
+    team_name: str,
+    agent_name: str,
+    success: bool,
+    failure_threshold: int = DEFAULT_FAILURE_THRESHOLD,
+    cooldown_seconds: float = DEFAULT_COOLDOWN_SECONDS,
+) -> AgentHealth:
+    """Record a task outcome and update agent health state.
+
+    State transitions:
+    - healthy → degraded: first failure
+    - degraded → open: consecutive_failures >= threshold
+    - open → healthy: success after cooldown (half-open probe)
+    - any → healthy: success resets consecutive failures
     """
-    from clawteam.config import DATA_DIR
-    
-    registry_path = DATA_DIR / "teams" / team_name / "agents.json"
-    registry_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    registry = {}
-    if registry_path.exists():
+    path = _health_path(team_name)
+    with file_locked(path):
+        health_data = _load_health(team_name)
+        raw = health_data.get(agent_name, {"agentName": agent_name})
+        health = AgentHealth.model_validate(raw)
+        health.cooldown_seconds = cooldown_seconds
+
+        if success:
+            health.consecutive_failures = 0
+            health.total_successes += 1
+            health.quality_score = min(1.0, health.quality_score + 0.1)
+            health.state = HealthState.healthy
+        else:
+            health.consecutive_failures += 1
+            health.total_failures += 1
+            health.last_failure_at = time.time()
+            health.quality_score = max(0.0, health.quality_score - 0.2)
+            if health.consecutive_failures >= failure_threshold:
+                health.state = HealthState.open
+            elif health.consecutive_failures >= 1:
+                health.state = HealthState.degraded
+
+        health_data[agent_name] = json.loads(health.model_dump_json(by_alias=True))
+        _save_health(team_name, health_data)
+    return health
+
+
+def _registry_path(team_name: str) -> Path:
+    return ensure_within_root(
+        get_data_dir() / "teams",
+        validate_identifier(team_name, "team name"),
+        "spawn_registry.json",
+    )
+
+
+def register_agent(
+    team_name: str,
+    agent_name: str,
+    backend: str,
+    tmux_target: str = "",
+    pid: int = 0,
+    command: list[str] | None = None,
+    parent_agent: str = "",
+) -> None:
+    """Record spawn info for an agent (atomic + locked write)."""
+    path = _registry_path(team_name)
+    with file_locked(path):
+        registry = _load(path)
+        entry = {
+            "backend": backend,
+            "tmux_target": tmux_target,
+            "pid": pid,
+            "command": command or [],
+            "spawned_at": time.time(),
+        }
+        if parent_agent:
+            entry["parent_agent"] = parent_agent
+        registry[agent_name] = entry
+        _save(path, registry)
+
+
+def unregister_agent(team_name: str, agent_name: str) -> None:
+    """Remove an agent entry from the spawn registry."""
+    path = _registry_path(team_name)
+    registry = _load(path)
+    registry.pop(agent_name, None)
+    _save(path, registry)
+
+
+def get_registry(team_name: str) -> dict[str, dict]:
+    """Return the full spawn registry for a team."""
+    return _load(_registry_path(team_name))
+
+
+def get_agent_info(team_name: str, agent_name: str) -> dict | None:
+    """Return persisted spawn info for a single agent, if any."""
+    registry = get_registry(team_name)
+    info = registry.get(agent_name)
+    return info if isinstance(info, dict) else None
+
+
+def is_agent_alive(team_name: str, agent_name: str) -> bool | None:
+    """Check if a spawned agent process is still alive.
+
+    Returns True if alive, False if dead, None if no spawn info found.
+    """
+    registry = get_registry(team_name)
+    info = registry.get(agent_name)
+    if not info:
+        return None
+
+    backend = info.get("backend", "")
+    if backend == "tmux":
+        alive = _tmux_pane_alive(info.get("tmux_target", ""))
+        if alive is False:
+            # Tmux target may be invalid (e.g. after tile operation);
+            # fall back to PID check
+            pid = info.get("pid", 0)
+            if pid:
+                return _pid_alive(pid)
+        return alive
+    elif backend == "subprocess":
+        return _pid_alive(info.get("pid", 0))
+    return None
+
+
+def list_dead_agents(team_name: str) -> list[str]:
+    """Return names of agents whose processes are no longer alive."""
+    registry = get_registry(team_name)
+    dead = []
+    for name, info in registry.items():
+        alive = is_agent_alive(team_name, name)
+        if alive is False:
+            dead.append(name)
+    return dead
+
+
+def list_zombie_agents(team_name: str, max_hours: float = 2.0) -> list[dict]:
+    """Return agents that are still alive but have been running longer than max_hours.
+
+    Each entry contains: agent_name, pid, backend, spawned_at (unix ts), running_hours.
+    Agents with no spawned_at recorded are skipped (legacy registry entries).
+    """
+    registry = get_registry(team_name)
+    threshold = max_hours * 3600
+    now = time.time()
+    zombies = []
+    for name, info in registry.items():
+        spawned_at = info.get("spawned_at")
+        if not spawned_at:
+            continue
+        alive = is_agent_alive(team_name, name)
+        if alive is True:
+            running_seconds = now - spawned_at
+            if running_seconds > threshold:
+                zombies.append(
+                    {
+                        "agent_name": name,
+                        "pid": info.get("pid", 0),
+                        "backend": info.get("backend", ""),
+                        "spawned_at": spawned_at,
+                        "running_hours": round(running_seconds / 3600, 1),
+                    }
+                )
+    return zombies
+
+
+def _tmux_pane_alive(target: str) -> bool:
+    """Check if a tmux target (session:window) still has a running process."""
+    if not target:
+        return False
+    # Check if the window exists at all
+    result = subprocess.run(
+        ["tmux", "list-panes", "-t", target, "-F", "#{pane_dead} #{pane_current_command}"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        # Window doesn't exist anymore
+        return False
+    # Check pane_dead flag — "1" means the command has exited
+    for line in result.stdout.strip().splitlines():
+        parts = line.split(None, 1)
+        if parts and parts[0] == "1":
+            return False
+        # Also check if the pane is just running a shell (agent exited, shell remains)
+        if len(parts) >= 2 and parts[1] in ("bash", "zsh", "sh", "fish"):
+            return False
+    return True
+
+
+def _pid_alive(pid: int) -> bool:
+    """Check if a process with the given PID is still running."""
+    if pid <= 0:
+        return False
+    import os
+    import sys
+
+    if sys.platform == "win32":
+        # Windows doesn't support os.kill(pid, 0) for process checking
+        # Use psutil or tasklist instead
         try:
-            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+            import psutil
+
+            return psutil.pid_exists(pid)
+        except ImportError:
+            # Fallback: use tasklist command
+            import subprocess
+
+            result = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            # If PID exists, output will contain the PID number
+            return str(pid) in result.stdout
+    else:
+        try:
+            os.kill(pid, 0)
+            return True
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            # Process exists but we can't signal it
+            return True
+        except OSError:
+            # On some systems, OSError can be raised for non-existent processes
+            return False
+
+
+def get_children_of(team_name: str, parent_agent: str) -> list[str]:
+    """Return all direct child agents of a given parent agent."""
+    registry = get_registry(team_name)
+    return [name for name, info in registry.items() if info.get("parent_agent") == parent_agent]
+
+
+def get_descendants_of(team_name: str, parent_agent: str) -> list[str]:
+    """Return all descendant agents of a given parent (children, grandchildren, etc.).
+
+    Returns agents in breadth-first order (children before grandchildren).
+    """
+    registry = get_registry(team_name)
+    children = get_children_of(team_name, parent_agent)
+    descendants: list[str] = []
+    queue = list(children)
+    while queue:
+        child = queue.pop(0)
+        descendants.append(child)
+        grandchildren = get_children_of(team_name, child)
+        queue.extend(grandchildren)
+    return descendants
+
+
+def terminate_agent_tree(team_name: str, root_agent: str) -> list[str]:
+    """Terminate an entire agent tree, bottom-up (leaves first).
+
+    This kills actual processes via tmux/subprocess, then unregisters.
+    Returns list of agent names that were terminated in order.
+    """
+
+    descendants = get_descendants_of(team_name, root_agent)
+    # Reverse so leaves are terminated before their parents
+    terminated: list[str] = []
+    for agent in reversed(descendants):
+        info = get_agent_info(team_name, agent)
+        if info:
+            _kill_agent_process(info)
+        unregister_agent(team_name, agent)
+        terminated.append(agent)
+
+    # Finally terminate the root
+    info = get_agent_info(team_name, root_agent)
+    if info:
+        _kill_agent_process(info)
+    unregister_agent(team_name, root_agent)
+    terminated.append(root_agent)
+    return terminated
+
+
+def _kill_agent_process(info: dict) -> None:
+    """Kill the process for an agent given its spawn info."""
+    backend = info.get("backend", "")
+    pid = info.get("pid", 0)
+
+    if backend == "tmux" and info.get("tmux_target"):
+        target = info["tmux_target"]
+        try:
+            _subprocess.run(
+                ["tmux", "kill-window", "-t", target],
+                capture_output=True,
+                timeout=10,
+            )
         except Exception:
             pass
-    
-    registry[agent_name] = config
-    registry_path.write_text(json.dumps(registry, indent=2, ensure_ascii=False), encoding="utf-8")
+    elif backend == "subprocess" and pid > 0:
+        try:
+            import os as _os
+            import signal as _signal
+
+            if sys.platform == "win32":
+                _subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True)
+            else:
+                _os.kill(pid, _signal.SIGTERM)
+        except Exception:
+            pass
 
 
-# golutra's post-ready step constants (for reference)
-POST_READY_STEP_AI_ONBOARDING = "AI_ONBOARDING"
-POST_READY_STEP_WAIT_FOR_PATTERN = "WAIT_FOR_PATTERN"
-POST_READY_STEP_EXTRACT_SESSION = "EXTRACT_SESSION_ID"
+def _load(path: Path) -> dict:
+    if path.exists():
+        try:
+            return json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError):
+            return {}
+    return {}
 
 
-__all__ = [
-    "AgentConfig",
-    "BUILTIN_AGENTS",
-    "resolve_agent_config",
-    "list_agent_types",
-    "get_registry",
-    "register_agent",
-]
+def _save(path: Path, data: dict) -> None:
+    atomic_write_text(path, json.dumps(data, indent=2))
