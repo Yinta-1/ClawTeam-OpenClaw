@@ -1,6 +1,6 @@
 # ClawTeam-OpenClaw API Documentation
 
-> **Version**: v0.5.1 | **Base URL**: `http://localhost:8080/api/v1`
+> **Version**: v0.5.4 | **Base URL**: `http://localhost:8080/api/v1`
 
 ---
 
@@ -418,6 +418,192 @@ ws://localhost:8080/ws/board
 
 ---
 
+## Daemon API
+
+The Daemon API manages the persistent `agentd` daemon process via TCP (Windows) or Unix Socket (Unix). All communication uses a binary length-prefixed JSON protocol.
+
+### Connection
+
+| Platform | Address |
+|----------|---------|
+| Windows | `127.0.0.1:18792` |
+| Unix/Linux/macOS | `~/.clawteam/agentd.sock` |
+
+### Protocol
+
+1. Client sends 4-byte big-endian length prefix
+2. Client sends JSON request body
+3. Server responds with 4-byte length prefix + JSON response
+
+**Request format:**
+```json
+{
+  "command": "<command>",
+  "args": { ... }
+}
+```
+
+**Response format:**
+```json
+{
+  "ok": true,
+  "<result>": "..."
+}
+// or
+{
+  "ok": false,
+  "error": "Error message"
+}
+```
+
+---
+
+### Spawn Agent
+
+```
+POST /daemon/spawn
+```
+
+Spawn a persistent agent via the daemon.
+
+**Request:**
+```json
+{
+  "command": "spawn",
+  "args": {
+    "agent_name": "doc-writer",
+    "agent_id": "doc-writer",
+    "agent_type": "specialist",
+    "team_name": "my-team",
+    "prompt": "Update the API documentation"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true,
+  "message": "Agent 'doc-writer' started (session=abc123)"
+}
+```
+
+---
+
+### Send Task
+
+```
+POST /daemon/send_task
+```
+
+Send a new task to a running agent.
+
+**Request:**
+```json
+{
+  "command": "send_task",
+  "args": {
+    "agent_name": "doc-writer",
+    "task": "Also update the CLI reference"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true
+}
+```
+
+---
+
+### List Agents
+
+```
+POST /daemon/list_agents
+```
+
+List all agents managed by the daemon.
+
+**Request:**
+```json
+{
+  "command": "list_agents",
+  "args": {}
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true,
+  "agents": [
+    {
+      "name": "doc-writer",
+      "team": "my-team",
+      "type": "specialist",
+      "session_key": "abc123",
+      "running": true
+    }
+  ]
+}
+```
+
+---
+
+### Shutdown Agent
+
+```
+POST /daemon/shutdown_agent
+```
+
+Gracefully shut down a specific agent.
+
+**Request:**
+```json
+{
+  "command": "shutdown_agent",
+  "args": {
+    "agent_name": "doc-writer"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true
+}
+```
+
+---
+
+### Stop Daemon
+
+```
+POST /daemon/stop
+```
+
+Stop the daemon and all managed agents.
+
+**Request:**
+```json
+{
+  "command": "stop",
+  "args": {}
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true
+}
+```
+
+---
+
 ## Rate Limits
 
 | Endpoint | Limit |
@@ -441,4 +627,4 @@ ws://localhost:8080/ws/board
 
 ---
 
-*Last updated: 2026-05-04*
+*Last updated: 2026-05-04 | v0.5.4*

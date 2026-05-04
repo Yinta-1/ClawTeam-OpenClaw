@@ -201,3 +201,38 @@ class LifecycleManager:
     def get_ancestors(self, agent_name: str) -> list[str]:
         """Return all ancestors (parent, grandparent, etc.) of an agent."""
         return ParentChildRegistry.get_ancestors(self.team_name, agent_name)
+
+    def verify_leader_shutdown(self, sender_agent: str) -> bool:
+        """Verify that a shutdown request sender is actually the team leader.
+
+        This prevents unauthorized shutdown requests from non-leader agents.
+        Used by specialists when they receive a shutdown message.
+
+        Args:
+            sender_agent: The agent name from the message's from_agent field.
+
+        Returns:
+            True if sender_agent is the team leader, False otherwise.
+        """
+        from clawteam.team.manager import TeamManager
+
+        config = TeamManager.get_team(self.team_name)
+        if not config:
+            return False
+
+        # Find the leader's agent_id
+        leader_agent_id = config.lead_agent_id
+        if not leader_agent_id:
+            return False
+
+        # Find the leader's agent name by matching agent_id
+        leader_name = None
+        for member in config.members:
+            if member.agent_id == leader_agent_id:
+                leader_name = member.name
+                break
+
+        if leader_name is None:
+            return False
+
+        return sender_agent == leader_name

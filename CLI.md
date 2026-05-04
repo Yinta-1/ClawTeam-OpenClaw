@@ -1,6 +1,6 @@
 # ClawTeam-OpenClaw CLI Reference
 
-> **Version**: v0.5.1
+> **Version**: v0.5.4
 
 ---
 
@@ -505,6 +505,94 @@ clawteam monitor costs [options]
 
 ---
 
+## Daemon Commands
+
+### daemon start
+
+Start the agent daemon (`agentd`) in the background. The daemon manages persistent agent sessions and allows agents to stay alive between tasks.
+
+```bash
+clawteam daemon start
+```
+
+**Details:**
+- Runs `agentd.py` as a background subprocess
+- On Windows: uses TCP socket at `127.0.0.1:18792`
+- On Unix/Linux/macOS: uses Unix domain socket at `~/.clawteam/agentd.sock`
+- Saves PID to `~/.clawteam/agentd.pid`
+- Automatically restores previously running agents on restart
+
+### daemon stop
+
+Stop the running agent daemon and all managed agents.
+
+```bash
+clawteam daemon stop
+```
+
+**Details:**
+- Sends `stop` command to daemon via socket
+- Gracefully shuts down all running agents
+- Cleans up PID file
+
+### daemon status
+
+Check whether the daemon is currently running.
+
+```bash
+clawteam daemon status
+```
+
+**Details:**
+- Checks if `~/.clawteam/agentd.pid` exists
+- Verifies the process is alive via OS API
+- Reports stale PID file if process is dead
+
+### daemon list
+
+List all agents currently managed by the daemon.
+
+```bash
+clawteam daemon list
+```
+
+**Output:**
+| Column | Description |
+|--------|-------------|
+| Name | Agent name |
+| Team | Team the agent belongs to |
+| Type | Agent type (e.g. specialist) |
+| Status | Running or Stopped |
+
+### daemon spawn
+
+Spawn a new persistent agent through the daemon. The agent stays alive and awaits further tasks.
+
+```bash
+clawteam daemon spawn --team <team> --agent-name <name> --prompt <task> [options]
+```
+
+**Required Options:**
+- `--team <team>`: Team name
+- `--agent-name <name>`: Name for the new agent
+- `--prompt <task>`: Initial task prompt
+
+**Optional Options:**
+- `--agent-type <type>`: Agent type (default: `specialist`)
+
+**Examples:**
+```bash
+# Spawn a persistent specialist agent
+clawteam daemon spawn --team my-team --agent-name doc-writer \
+  --prompt "Update the API documentation"
+
+# Spawn with custom type
+clawteam daemon spawn --team ai-team --agent-name researcher \
+  --agent-type research --prompt "Analyze competition"
+```
+
+---
+
 ## Debug Commands
 
 ### debug logs
@@ -618,4 +706,4 @@ metrics:
 
 ---
 
-*Last updated: 2026-05-04*
+*Last updated: 2026-05-04 | v0.5.4*

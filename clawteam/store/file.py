@@ -228,6 +228,11 @@ class FileTaskStore(BaseTaskStore):
                 self._resolve_dependents_unlocked(task_id)
 
             self._save_unlocked(task)
+
+            # Emit TASK_STATUS_CHANGED event for board auto-update (Task 2: 任务状态机)
+            if status is not None and status != prev_status:
+                self._emit_task_status_event(task, prev_status, status)
+
             return task
 
     def _run_drift_detection_unlocked(self, task: TaskItem) -> None:
@@ -386,3 +391,42 @@ class FileTaskStore(BaseTaskStore):
                     self._save_unlocked(task)
             except Exception:
                 continue
+
+    def _emit_task_status_event(
+        self,
+        task: TaskItem,
+        prev_status: TaskStatus,
+        new_status: TaskStatus,
+    ) -> None:
+        """Emit TASK_STATUS_CHANGED event for board auto-update (Task 2: 任务状态机).
+
+        This event is picked up by the board's SSE subscriber and broadcasts
+        to all connected WebSocket clients for real-time UI updates.
+        """
+        try:
+            from clawteam.events.models import (
+                EventCategory,
+                EventType,
+                create_task_event,
+            )
+            from clawteam.events.tracker import track_event
+
+            event = create_task_event(
+                event_type=EventType.TASK_STATUS_CHANGED,
+                task_id=task.id,
+                team_name=self.team_name,
+                agent_name=task.owner or None,
+                message=f"Task '{task.subject}' status changed: {prev_status.value} → {new_status.value}",
+                data={
+                    "task_id": task.id,
+                    "subject": task.subject,
+                    "prev_status": prev_status.value,
+                    "new_status": new_status.value,
+                    "owner": task.owner,
+                    "priority": task.priority.value,
+                },
+            )
+            track_event(event)
+        except Exception:
+            # Don't fail task update if event tracking fails
+            pass
