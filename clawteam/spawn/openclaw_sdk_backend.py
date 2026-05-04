@@ -49,8 +49,17 @@ _CONTINUOUS_RUN_BLOCK = """
   2. Report completion to leader: `clawteam inbox send {team_name} {leader_name} "Task completed: [BRIEF_SUMMARY]"`
   3. Return to standby loop
 
+**Message Handling:**
+- When you receive any message from the leader, check its content:
+  - If the message contains the word "shutdown" (case-insensitive):
+    - Write to the shared workspace: `{{workspace}}/{{agent_name}}_shutdown.txt` with content "Agent {{agent_name}} received shutdown command"
+    - Call `exit` to terminate this session immediately
+  - If the message contains "continue" or "await" or "stay":
+    - Continue running and monitoring your inbox
+  - Otherwise, treat it as a new task and execute it
+
 **Shutdown Protocol:**
-- ONLY exit when the leader sends the exact message "shutdown"
+- ONLY exit when the leader sends a message containing "shutdown"
 - After completing a task, ALWAYS ask the leader:
   `clawteam inbox send {team_name} {leader_name} "Task done. Should I exit or await new tasks?"`
 - Wait for leader's response before deciding to exit or continue
