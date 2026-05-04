@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import sys
 import time
 import uuid
+from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
@@ -5165,6 +5167,31 @@ def _format_duration(duration: datetime.timedelta) -> str:
         days = total_seconds // 86400
         hours = (total_seconds % 86400) // 3600
         return f"{days}d {hours}h"
+
+
+@agent_app.command("list-types")
+def agent_list_types():
+    """List all known agent types (golutra-style registry)."""
+    from clawteam.spawn.registry import list_agent_types
+
+    agents = list_agent_types()
+
+    def _human(agent_list):
+        table = Table(title="Known Agent Types (golutra-style Registry)")
+        table.add_column("ID", style="cyan")
+        table.add_column("Name")
+        table.add_column("Default Command")
+        table.add_column("Unlimited Flag")
+        for a in agent_list:
+            table.add_row(
+                a.id,
+                a.name,
+                a.default_command,
+                a.unlimited_access_flag or "(none)",
+            )
+        console.print(table)
+
+    _output([asdict(a) for a in agents], _human)
 
 
 @agent_app.command("info")
