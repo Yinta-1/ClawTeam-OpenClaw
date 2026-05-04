@@ -50,6 +50,7 @@ from typing import Optional
 # 尝试导入必要的模块
 try:
     import locale
+
     LOCALE_ENCODING = locale.getpreferredencoding(False) or "utf-8"
 except Exception:
     LOCALE_ENCODING = "utf-8"
@@ -59,6 +60,7 @@ DATA_DIR = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.clawteam")).expanduser()
 PID_FILE = DATA_DIR / "agentd.pid"
 # Windows 不支持 Unix Socket，使用 TCP
 import platform
+
 IS_WINDOWS = platform.system() == "Windows"
 if IS_WINDOWS:
     DAEMON_PORT = 18792  # agentd 专用端口
@@ -75,6 +77,7 @@ GATEWAY_TOKEN = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
 @dataclass
 class OCAProcess:
     """追踪 OpenClaw SDK Agent 会话"""
+
     name: str
     session_key: str
     session_id: str
@@ -102,10 +105,8 @@ class AgentDaemon:
         for cmd in ["openclaw", "openclaw.exe"]:
             try:
                 import subprocess
-                r = subprocess.run(
-                    ["cmd", "/c", cmd, "gateway", "health"],
-                    capture_output=True, timeout=5
-                )
+
+                r = subprocess.run(["cmd", "/c", cmd, "gateway", "health"], capture_output=True, timeout=5)
                 if r.returncode == 0:
                     return cmd
             except Exception:
@@ -176,7 +177,9 @@ class AgentDaemon:
                             print(f"[Daemon] Failed to verify agent '{name}': {e}")
                             del agents[name]
                 # 保存清理后的注册表
-                RUNNING_AGENTS_FILE.write_text(json.dumps({"agents": agents}, indent=2, ensure_ascii=False), encoding="utf-8")
+                RUNNING_AGENTS_FILE.write_text(
+                    json.dumps({"agents": agents}, indent=2, ensure_ascii=False), encoding="utf-8"
+                )
             except Exception as e:
                 print(f"[Daemon] Failed to load running agents: {e}")
 
@@ -291,10 +294,7 @@ class AgentDaemon:
         if not proc or proc.done:
             return False
         try:
-            task_msg = (
-                f"## New Task Assignment\n\n{task}\n\n"
-                f"Execute this task and report completion when done."
-            )
+            task_msg = f"## New Task Assignment\n\n{task}\n\nExecute this task and report completion when done."
             self._gateway_call(
                 "sessions.send",
                 params={"key": proc.session_key, "message": task_msg},
@@ -482,12 +482,16 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
 
 if IS_WINDOWS:
+
     class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         """Windows TCP 服务器"""
+
         allow_reuse_address = True
 else:
+
     class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
         """Unix Socket TCP 服务器"""
+
         allow_reuse_address = True
 
 
@@ -501,6 +505,7 @@ def start_daemon():
         try:
             # 检查进程是否存在
             import ctypes
+
             kernel32 = ctypes.windll.kernel32
             PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
             handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
@@ -525,6 +530,7 @@ def start_daemon():
     def cleanup():
         if _daemon:
             _daemon.stop()
+
     atexit.register(cleanup)
 
     # 信号处理（跨平台）
@@ -540,7 +546,8 @@ def start_daemon():
     if IS_WINDOWS:
         # Windows: 使用控制台事件处理
         import ctypes
-        kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
         EVENT_SHUTDOWN = 0x0001  # CTRL_C_EVENT
 
@@ -550,10 +557,7 @@ def start_daemon():
             return 1  # tell caller we handled it
 
         # 注册控制台 Ctrl+C/Ctrl+Break 处理
-        kernel32.SetConsoleCtrlHandler(
-            ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)(windows_signal_handler),
-            True
-        )
+        kernel32.SetConsoleCtrlHandler(ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)(windows_signal_handler), True)
     else:
         # Unix: 使用标准 signal
         signal.signal(signal.SIGINT, signal_handler)
@@ -569,6 +573,7 @@ def start_daemon():
 
     # 保存 PID
     import os
+
     PID_FILE.write_text(str(os.getpid()), encoding="utf-8")
 
     print(f"[Daemon] Started (PID: {os.getpid()})")
@@ -598,6 +603,7 @@ if __name__ == "__main__":
         # 通过 socket 发送 stop 命令（跨平台）
         try:
             import socket
+
             if IS_WINDOWS:
                 # Windows: 使用 TCP 连接
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

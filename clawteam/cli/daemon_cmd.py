@@ -16,6 +16,7 @@ import struct
 
 try:
     import locale
+
     LOCALE_ENCODING = locale.getpreferredencoding(False) or "utf-8"
 except Exception:
     LOCALE_ENCODING = "utf-8"
@@ -25,13 +26,16 @@ from typing import Optional
 
 import typer
 
-from clawteam.console import console
+from rich.console import Console
+
+console = Console()
 
 DATA_DIR = Path("~/.clawteam").expanduser()
 PID_FILE = DATA_DIR / "agentd.pid"
 
 # Windows 不支持 Unix Socket
 import platform
+
 IS_WINDOWS = platform.system() == "Windows"
 if IS_WINDOWS:
     DAEMON_HOST = "127.0.0.1"
@@ -62,10 +66,13 @@ def _send_daemon_command(command: str, args: dict = None) -> dict:
         sock.settimeout(10)
         sock.connect(address)
 
-        request = json.dumps({
-            "command": command,
-            "args": args or {},
-        }, ensure_ascii=False).encode("utf-8")
+        request = json.dumps(
+            {
+                "command": command,
+                "args": args or {},
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
 
         sock.sendall(struct.pack("!I", len(request)))
         sock.sendall(request)
@@ -107,6 +114,7 @@ def start():
         try:
             pid = int(PID_FILE.read_text().strip())
             import ctypes
+
             kernel32 = ctypes.windll.kernel32
             PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
             handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
@@ -127,12 +135,13 @@ def start():
             cwd=str(daemon_script.parent.parent),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if hasattr(subprocess, 'CREATE_NEW_PROCESS_GROUP') else 0,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP") else 0,
         )
         console.print("[green]Starting daemon...[/green]")
 
         # 等待 daemon 启动
         import time
+
         for _ in range(10):
             time.sleep(0.5)
             if SOCKET_FILE.exists():
@@ -166,6 +175,7 @@ def status():
     try:
         pid = int(PID_FILE.read_text().strip())
         import ctypes
+
         kernel32 = ctypes.windll.kernel32
         PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
         handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
@@ -193,6 +203,7 @@ def list():
         return
 
     from rich.table import Table
+
     table = Table(title="Running Agents")
     table.add_column("Name", style="cyan")
     table.add_column("Team", style="magenta")
@@ -219,13 +230,16 @@ def spawn(
     prompt: str = typer.Option(..., help="Task prompt"),
 ):
     """通过 daemon spawn Agent（Mode 2 支持）"""
-    result = _send_daemon_command("spawn", {
-        "agent_name": agent_name,
-        "agent_id": agent_name,
-        "agent_type": agent_type,
-        "team_name": team,
-        "prompt": prompt,
-    })
+    result = _send_daemon_command(
+        "spawn",
+        {
+            "agent_name": agent_name,
+            "agent_id": agent_name,
+            "agent_type": agent_type,
+            "team_name": team,
+            "prompt": prompt,
+        },
+    )
 
     if result.get("ok"):
         console.print(f"[green]{result.get('message')}[/green]")
@@ -235,3 +249,6 @@ def spawn(
 
 if __name__ == "__main__":
     app()
+
+# Export for commands.py import
+daemon_app = app
