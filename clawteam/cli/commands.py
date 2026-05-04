@@ -454,12 +454,21 @@ def doctor_run():
 
 
 @doctor_app.command("fix")
-def doctor_fix():
+def doctor_fix(
+    all_fixes: bool = typer.Option(
+        False, "--all", "-a", help="Apply all possible fixes (not just directory creation)"
+    ),
+    cleanup: bool = typer.Option(
+        False, "--cleanup", "-c", help="Clean up dead agent sessions and temp files"
+    ),
+):
     """Attempt to fix common issues automatically.
 
-    Currently supported fixes:
+    Fixes:
     - Create data directory if missing
     - Create default config directory if missing
+    - With --cleanup: Clean up dead sessions and temp files
+    - With --all: Apply all fixes
     """
     from clawteam.config import config_path
     from clawteam.team.models import get_data_dir
@@ -488,6 +497,46 @@ def doctor_fix():
             console.print(f"[red]Failed to create config directory: {e}[/red]")
     else:
         console.print(f"[dim]Config directory already exists: {cfg_dir}[/dim]")
+
+    # Fix 3: Cleanup (optional)
+    if cleanup or all_fixes:
+        cleaned = 0
+
+        # Clean up temp files in data directory
+        try:
+            for pattern in [".*.tmp", "*.tmp", ".health-check"]:
+                for f in data_dir.glob(pattern):
+                    try:
+                        f.unlink()
+                        cleaned += 1
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+        # Clean up dead agent sessions from registry
+        try:
+            from clawteam.spawn.registry import list_dead_agents, terminate_agent_tree
+            teams_dir = data_dir / "teams"
+            if teams_dir.exists():
+                for team_dir in teams_dir.iterdir():
+                    if team_dir.is_dir():
+                        dead = list_dead_agents(team_dir.name)
+                        for agent_name in dead[:5]:  # Limit to 5 per team
+                            try:
+                                terminate_agent_tree(team_dir.name, agent_name)
+                                cleaned += 1
+                            except Exception:
+                                pass
+        except ImportError:
+            pass  # Registry not available
+        except Exception:
+            pass
+
+        if cleaned > 0:
+            fixes_applied.append(f"Cleaned up {cleaned} item(s)")
+        else:
+            console.print("[dim]No cleanup needed[/dim]")
 
     if fixes_applied:
         console.print()
