@@ -1940,7 +1940,7 @@ def cost_show(
     def _human(d):
         s = d["summary"]
         total = s.get("totalCostCents", 0)
-        console.print(f"\nCost Summary — [cyan]{team}[/cyan]")
+        console.print(f"\nCost Summary - [cyan]{team}[/cyan]")
         if budget > 0:
             console.print(f"  Total: ${total / 100:.4f} / ${budget / 100:.2f}")
         else:
@@ -2246,7 +2246,7 @@ def task_route(
     best = all_candidates[0]
 
     def _human(_data):
-        console.print(f"[bold]Task Route — '{subject}'[/bold]")
+        console.print(f"[bold]Task Route - '{subject}'[/bold]")
         console.print(f"  [green]Recommended: {best.name}[/green] (score: {best.match_score})")
         console.print(
             f"  Success rate: {best.success_rate:.0%}  Avg score: {best.avg_score:.1f}/10  Load: {best.current_load}"
@@ -2306,7 +2306,7 @@ def session_show(
             if not items:
                 console.print("[dim]No saved sessions[/dim]")
                 return
-            table = Table(title=f"Sessions — {team}")
+            table = Table(title=f"Sessions - {team}")
             table.add_column("Agent", style="cyan")
             table.add_column("Session ID")
             table.add_column("Last Task", style="dim")
@@ -2608,7 +2608,7 @@ def lifecycle_on_exit(
 
     store = TaskStore(team)
 
-    # Release locks held by this agent FIRST — must happen before unregister
+    # Release locks held by this agent FIRST - must happen before unregister
     # to avoid a race where is_agent_alive returns None (no registry entry)
     # and causes _acquire_lock to refuse overwriting a stale lock.
     store.release_stale_locks()
@@ -3588,7 +3588,7 @@ def workspace_list(
         console.print(f"No active workspaces for team '{team}'.")
         return
 
-    table = Table(title=f"Workspaces — {team}")
+    table = Table(title=f"Workspaces - {team}")
     table.add_column("Agent")
     table.add_column("Branch")
     table.add_column("Path")
@@ -3662,7 +3662,7 @@ def workspace_cleanup(
     agent: Optional[str] = typer.Option(None, "--agent", "-a", help="Agent name (all if omitted)"),
     repo: Optional[str] = typer.Option(None, "--repo", help="Git repo path"),
 ):
-    """Clean up worktree workspace(s) — removes worktree and branch."""
+    """Clean up worktree workspace(s) - removes worktree and branch."""
     from clawteam.workspace import get_workspace_manager
 
     ws_mgr = get_workspace_manager(repo)
@@ -3701,7 +3701,7 @@ def workspace_status(
         raise typer.Exit(1)
 
     stat = git.diff_stat(Path(ws.worktree_path))
-    console.print(f"[bold]Workspace status — {agent}[/bold] (branch: {ws.branch_name})")
+    console.print(f"[bold]Workspace status - {agent}[/bold] (branch: {ws.branch_name})")
     console.print(stat)
 
 
@@ -3751,7 +3751,7 @@ def template_show(
     data = json.loads(tmpl.model_dump_json(by_alias=True))
 
     def _human(_data):
-        console.print(f"[bold cyan]{tmpl.name}[/bold cyan] — {tmpl.description}")
+        console.print(f"[bold cyan]{tmpl.name}[/bold cyan] - {tmpl.description}")
         console.print(f"  Command: {' '.join(tmpl.command)}")
         console.print(f"  Backend: {tmpl.backend}")
         console.print()
@@ -4084,7 +4084,7 @@ def review_show(
         scored_tasks.sort(key=lambda t: max((s.total for s in t.scores), default=0), reverse=True)
 
     def _human(_data):
-        table = Table(title=f"Task Scores — Team '{team}'")
+        table = Table(title=f"Task Scores - Team '{team}'")
         table.add_column("Task", style="cyan")
         table.add_column("Owner")
         table.add_column("完整性", justify="right")
@@ -4143,7 +4143,7 @@ def review_compare(
         return
 
     def _human(_data):
-        table = Table(title=f"Comparison — '{subject_keyword}'")
+        table = Table(title=f"Comparison - '{subject_keyword}'")
         table.add_column("Task", style="cyan")
         table.add_column("Owner", style="magenta")
         table.add_column("完整性", justify="right")
@@ -4189,7 +4189,7 @@ def review_compare(
     )
 
 
-drift_app = typer.Typer(help="Drift detection — detect when agent output diverges from task intent.")
+drift_app = typer.Typer(help="Drift detection - detect when agent output diverges from task intent.")
 app.add_typer(drift_app, name="drift")
 
 
@@ -4277,7 +4277,7 @@ def drift_list(
 
         from rich.table import Table
 
-        table = Table(title=f"Drift Alerts — Team '{team}'")
+        table = Table(title=f"Drift Alerts - Team '{team}'")
         table.add_column("Task", style="cyan")
         table.add_column("Owner", style="blue")
         table.add_column("Score", justify="right")
@@ -4437,7 +4437,7 @@ def drift_scan(
             )
 
     def _human(_data):
-        console.print(f"[bold]Drift Scan — Team '{team}'[/bold]")
+        console.print(f"[bold]Drift Scan - Team '{team}'[/bold]")
         console.print(f"  Completed tasks: {len(tasks)}")
         console.print(f"  Scanned: {scanned}")
         console.print(f"  New alerts: {new_alerts}")
@@ -4451,7 +4451,7 @@ def drift_scan(
                     "critical": "[red bold]XXXX[/red bold]",
                 }.get(r["severity"], "!")
                 console.print(
-                    f"  {severity_icon} [{r['task_id']}] {r['subject']} — score: {r['drift_score']:.3f} ({r['severity']})"
+                    f"  {severity_icon} [{r['task_id']}] {r['subject']} - score: {r['drift_score']:.3f} ({r['severity']})"
                 )
         else:
             console.print("[green]* No drift detected on any completed task.[/green]")
@@ -4480,7 +4480,7 @@ def alert_check(
         if not alerts:
             console.print("[green]* No new alerts detected.[/green]")
         else:
-            console.print(f"[bold]New Alerts — Team '{team}'[/bold]")
+            console.print(f"[bold]New Alerts - Team '{team}'[/bold]")
             for alert in alerts:
                 severity_icon = {
                     "low": "[yellow]![/yellow]",
@@ -4520,7 +4520,7 @@ def alert_list(
         if not alerts:
             console.print(f"[green]* No alerts found for team '{team}'.[/green]")
         else:
-            console.print(f"[bold]Alerts — Team '{team}' ({len(alerts)} total)[/bold]")
+            console.print(f"[bold]Alerts - Team '{team}' ({len(alerts)} total)[/bold]")
             table = Table(show_header=True, header_style="bold")
             table.add_column("ID", style="dim", width=8)
             table.add_column("Type")
@@ -4585,7 +4585,7 @@ def alert_config(
         config = get_alert_config(team)
 
         def _human(_data):
-            console.print(f"[bold]Alert Configuration — Team '{team}'[/bold]")
+            console.print(f"[bold]Alert Configuration - Team '{team}'[/bold]")
             console.print(f"  Task timeout: {config.task_timeout_hours} hours")
             console.print(f"  Agent failure rate: {config.agent_failure_rate_threshold:.1%}")
             console.print(f"  Team inactivity: {config.team_inactivity_hours} hours")
@@ -4645,7 +4645,7 @@ def alert_check(
     total_alerts = len(timeout_alerts) + len(failure_alerts)
 
     def _human(_data):
-        console.print(f"[bold]Alert Check — Team '{team}'[/bold]")
+        console.print(f"[bold]Alert Check - Team '{team}'[/bold]")
         console.print(f"  Task timeout alerts created: {len(timeout_alerts)}")
         console.print(f"  Agent failure rate alerts created: {len(failure_alerts)}")
         console.print(f"  Total alerts created: {total_alerts}")
@@ -4680,7 +4680,7 @@ def alert_list(
             console.print(f"[green]* No alerts found for team '{team}'.[/green]")
             return
 
-        console.print(f"[bold]Alerts — Team '{team}'[/bold]")
+        console.print(f"[bold]Alerts - Team '{team}'[/bold]")
         console.print(f"  Total alerts: {len(alerts)}")
         console.print()
 
@@ -4778,7 +4778,7 @@ def audit_query(
         if not events:
             console.print("[dim]No audit entries found.[/dim]")
             return
-        table = Table(title=f"Audit Log — {team}")
+        table = Table(title=f"Audit Log - {team}")
         table.add_column("Time", style="dim", no_wrap=True)
         table.add_column("Type", style="cyan")
         table.add_column("Actor", style="green")
@@ -4789,7 +4789,7 @@ def audit_query(
                 e.timestamp[:19],
                 e.event_type.value,
                 e.actor,
-                e.target or "—",
+                e.target or "-",
                 json.dumps(e.details, ensure_ascii=False) if e.details else "",
             )
         console.print(table)
@@ -4823,11 +4823,11 @@ def audit_summary(
         if summary["total_events"] == 0:
             console.print(f"[dim]No audit entries for team '{team}'.[/dim]")
             return
-        table = Table(title=f"Audit Summary — {team}")
+        table = Table(title=f"Audit Summary - {team}")
         table.add_row("Total Events", str(summary["total_events"]))
-        table.add_row("First Event", summary["first_event"][:19] if summary["first_event"] else "—")
-        table.add_row("Last Event", summary["last_event"][:19] if summary["last_event"] else "—")
-        table.add_row("Active Agents", ", ".join(summary["active_agents"]) or "—")
+        table.add_row("First Event", summary["first_event"][:19] if summary["first_event"] else "-")
+        table.add_row("Last Event", summary["last_event"][:19] if summary["last_event"] else "-")
+        table.add_row("Active Agents", ", ".join(summary["active_agents"]) or "-")
         types_str = ", ".join(
             f"{k.value if hasattr(k, 'value') else k}={v}"
             for k, v in sorted(summary["event_types"].items(), key=lambda x: -x[1])
@@ -4901,7 +4901,7 @@ def dag_sort(
         raise typer.Exit(1)
 
     def _human(_data):
-        table = Table(title=f"Topological Order — {team}")
+        table = Table(title=f"Topological Order - {team}")
         table.add_column("#", style="dim", justify="right")
         table.add_column("ID", style="cyan")
         table.add_column("Subject")
@@ -4915,7 +4915,7 @@ def dag_sort(
                 "blocked": "red",
             }.get(t.status.value, "")
             status_text = f"[{status_style}]{t.status.value}[/{status_style}]" if status_style else t.status.value
-            deps = ", ".join(t.depends_on) if t.depends_on else "—"
+            deps = ", ".join(t.depends_on) if t.depends_on else "-"
             table.add_row(str(i), t.id, t.subject[:40], status_text, deps)
         console.print(table)
 
@@ -5002,12 +5002,12 @@ def dag_ready(
                     blockers = get_blocking_tasks(t, tasks)
                     if blockers:
                         blocker_names = ", ".join(f"{b.id} ({b.subject[:20]})" for b in blockers)
-                        console.print(f"  [{t.id}] {t.subject[:30]} — blocked by: {blocker_names}")
+                        console.print(f"  [{t.id}] {t.subject[:30]} - blocked by: {blocker_names}")
                     else:
-                        console.print(f"  [{t.id}] {t.subject[:30]} — no blockers (should be ready?)")
+                        console.print(f"  [{t.id}] {t.subject[:30]} - no blockers (should be ready?)")
             return
 
-        table = Table(title=f"Ready Tasks — {team}")
+        table = Table(title=f"Ready Tasks - {team}")
         table.add_column("ID", style="cyan")
         table.add_column("Subject")
         table.add_column("Owner")
@@ -5022,7 +5022,7 @@ def dag_ready(
             priority_text = (
                 f"[{priority_style}]{t.priority.value}[/{priority_style}]" if priority_style else t.priority.value
             )
-            table.add_row(t.id, t.subject[:40], t.owner or "—", priority_text)
+            table.add_row(t.id, t.subject[:40], t.owner or "-", priority_text)
         console.print(table)
 
     _output(
@@ -5123,14 +5123,14 @@ def role_list(
             console.print(f"[dim]No role assignments for team '{team}'.[/dim]")
             return
 
-        table = Table(title=f"Role Assignments — {team}")
+        table = Table(title=f"Role Assignments - {team}")
         table.add_column("Agent", style="cyan")
         table.add_column("Role")
         table.add_column("Assigned At", style="dim")
         table.add_column("Expires", style="dim")
         for agent_name, assigns in sorted(assignments.items()):
             for a in assigns:
-                expires = a.expires_at or "—"
+                expires = a.expires_at or "-"
                 if len(expires) > 19:
                     expires = expires[:19]
                 table.add_row(agent_name, a.role.value, (a.assigned_at or "")[:19], expires)
@@ -5219,7 +5219,7 @@ def insights_show(
     engine.close()
 
     def _human(d):
-        console.print(f"\n[bold cyan]Insights Report[/cyan] — Last {d['time_range_days']} days")
+        console.print(f"\n[bold cyan]Insights Report[/cyan] - Last {d['time_range_days']} days")
         console.print(f"Generated: {d['generated_at'][:19]}")
         console.print()
 
@@ -5234,7 +5234,7 @@ def insights_show(
 
         # Tool usage
         tool_u = d.get("tool_usage", {})
-        console.print(f"[bold]Tool Usage[/bold] — {tool_u.get('total_tool_calls', 0)} total calls")
+        console.print(f"[bold]Tool Usage[/bold] - {tool_u.get('total_tool_calls', 0)} total calls")
         top_tools = tool_u.get("top_tools", {})
         if top_tools:
             for tool, count in list(top_tools.items())[:5]:
@@ -5243,7 +5243,7 @@ def insights_show(
 
         # Skill usage
         skill_u = d.get("skill_usage", {})
-        console.print(f"[bold]Skill Usage[/bold] — {skill_u.get('total_skill_invocations', 0)} total invocations")
+        console.print(f"[bold]Skill Usage[/bold] - {skill_u.get('total_skill_invocations', 0)} total invocations")
         top_skills = skill_u.get("top_skills", {})
         if top_skills:
             for skill, count in list(top_skills.items())[:5]:
@@ -5276,7 +5276,7 @@ def insights_tools(
     engine.close()
 
     def _human(d):
-        console.print(f"\n[bold cyan]Tool Usage[/cyan] — Last {days} days")
+        console.print(f"\n[bold cyan]Tool Usage[/cyan] - Last {days} days")
         console.print(f"Total calls: {d.total_tool_calls}\n")
 
         table = Table(title="Tool Ranking")
@@ -5312,7 +5312,7 @@ def insights_skills(
     engine.close()
 
     def _human(d):
-        console.print(f"\n[bold cyan]Skill Usage[/cyan] — Last {days} days")
+        console.print(f"\n[bold cyan]Skill Usage[/cyan] - Last {days} days")
         console.print(f"Total invocations: {d.total_skill_invocations}\n")
 
         table = Table(title="Skill Ranking")
@@ -5344,7 +5344,7 @@ def insights_memory(
     engine.close()
 
     def _human(d):
-        console.print(f"\n[bold cyan]Memory Usage[/cyan] — Last {days} days")
+        console.print(f"\n[bold cyan]Memory Usage[/cyan] - Last {days} days")
         console.print(f"Active days: {d.active_days}")
         console.print(f"Total sessions: {d.total_sessions}")
         console.print(f"Avg session duration: {d.avg_session_duration_minutes:.1f} min")
