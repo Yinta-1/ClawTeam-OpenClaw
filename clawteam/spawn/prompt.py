@@ -33,6 +33,36 @@ After completing each task, include a confidence assessment:
 - If confidence is below 0.6, explain what you are uncertain about and recommend human review.
 - If you encounter something outside your expertise, say so and suggest escalation rather than guessing."""
 
+# ---------------------------------------------------------------------------
+# Leader-specific coordination rules
+# Injected when agent_type == "leader" to ensure proper board/task management.
+# ---------------------------------------------------------------------------
+
+LEADER_PROTOCOL = """## Leader Protocol
+
+As the team leader, you are responsible for task coordination and board management:
+
+**Task Board Management:**
+- When you receive a task assignment, create a board task immediately:
+  `clawteam task create {team_name} --title "[TASK_TITLE]" --status pending --owner [AGENT] --description "[DESCRIPTION]"`
+- When you assign a task to a member, update the board:
+  `clawteam task update {team_name} [TASK_ID] --status in_progress`
+- When a member reports task completion, update the board:
+  `clawteam task update {team_name} [TASK_ID] --status completed`
+- When you receive a message about progress, keep the board in sync.
+
+**Key Principle: ALWAYS sync tasks to the board.** The board is the source of truth for team progress. Every task mentioned in messages should be reflected on the board.
+
+**Inbox Monitoring:**
+- Check your inbox regularly for messages from team members.
+- When a member sends a status update, update the corresponding board task.
+- When a member completes work, acknowledge and update the board.
+
+**Team Coordination:**
+- Assign tasks to appropriate members based on their type (architect, backend, tester, etc.).
+- Monitor progress and re-assign if needed.
+- Report overall team status when asked."""
+
 
 def build_agent_prompt(
     agent_name: str,
@@ -98,6 +128,9 @@ def build_agent_prompt(
         )
     if team_size > 1:
         lines.extend(["", BOIDS_RULES])
+    # Inject leader protocol for team leads
+    if agent_type == "leader":
+        lines.extend(["", LEADER_PROTOCOL])
     lines.extend(
         [
             "",
