@@ -93,6 +93,87 @@ def _output(data: dict | list, human_fn=None):
         print(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, from_agent: str) -> bool:
+    """
+    Try to deliver a message directly to a running OpenClaw SDK agent.
+
+    This enables immediate message delivery to agents spawned via the OpenClaw SDK backend,
+    bypassing the file-based inbox for real-time communication.
+
+    Args:
+        agent_name: Target agent name
+        team_name: Team name
+        content: Message content
+        from_agent: Sender name
+
+    Returns:
+        True if the agent was found and message was delivered,
+        False if the agent is not a running SDK agent (caller should fall back to file inbox).
+    """
+    import os
+    import json
+    from pathlib import Path
+    import urllib.request
+    import urllib.error
+
+    # Read the running agents registry
+    data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.clawteam")).expanduser()
+    registry_file = data_dir / "running_agents.json"
+
+    if not registry_file.exists():
+        return False
+
+    try:
+        registry = json.loads(registry_file.read_text(encoding="utf-8"))
+        agents = registry.get("agents", {})
+
+        if agent_name not in agents:
+            return False
+
+        agent_info = agents[agent_name]
+        session_key = agent_info.get("session_key")
+
+        if not session_key:
+            return False
+
+        # Get Gateway credentials
+        gateway_port = os.environ.get("OPENCLAW_GATEWAY_PORT", "18789")
+        gateway_token = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
+
+        # Build the task message
+        task_msg = (
+            f"## New Task from {from_agent}\n\n{content}\n\n"
+            f"Execute this task and report completion to your leader when done.\n"
+            f'After completing, ask your leader: "Task done. Should I exit or await new tasks?"'
+        )
+
+        # Send via Gateway Sessions API
+        gateway_url = f"http://127.0.0.1:{gateway_port}/api/sessions/send"
+
+        payload = json.dumps({
+            "key": session_key,
+            "message": task_msg,
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            gateway_url,
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {gateway_token}",
+            },
+            method="POST",
+        )
+
+        with urllib.request.urlopen(req, timeout=10) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            return result.get("ok", False)
+
+    except (FileNotFoundError, json.JSONDecodeError, urllib.error.URLError, KeyError):
+        # Agent not found, invalid registry, or Gateway not reachable
+        return False
+
+
 # ============================================================================
 # Config Commands
 # ============================================================================
@@ -821,12 +902,24 @@ def inbox_send(
         None, "--from", "-f", help="Override sender name (default: from env identity)"
     ),
 ):
-    """Send a point-to-point message (write)."""
+    """Send a point-to-point message (write).
+
+    Smart routing: If the recipient is a running OpenClaw SDK agent,
+    the message is delivered directly via Gateway Sessions API for immediate receipt.
+    Otherwise, it falls back to file-based inbox delivery.
+    """
     from clawteam.identity import AgentIdentity
     from clawteam.team.mailbox import MailboxManager
     from clawteam.team.models import MessageType
 
     sender = from_agent or AgentIdentity.from_env().agent_name
+
+    # Try to deliver directly to a running SDK agent first
+    if _deliver_to_running_agent(to, team, content, sender):
+        _output({}, lambda d: console.print(f"[green]OK[/green] Message sent directly to running agent '{to}'"))
+        return
+
+    # Fallback: deliver via file inbox
     mailbox = MailboxManager(team)
     mt = MessageType(msg_type)
     msg = mailbox.send(
