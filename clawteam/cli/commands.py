@@ -100,6 +100,8 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
     This enables immediate message delivery to agents spawned via the OpenClaw SDK backend,
     bypassing the file-based inbox for real-time communication.
 
+    Also broadcasts a task_assigned activity to the board server for real-time monitoring.
+
     Args:
         agent_name: Target agent name
         team_name: Team name
@@ -110,8 +112,10 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
         True if the agent was found and message was delivered,
         False if the agent is not a running SDK agent (caller should fall back to file inbox).
     """
+    import locale
     import os
     import json
+    import subprocess
     from pathlib import Path
     import urllib.request
     import urllib.error
@@ -136,10 +140,6 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
         if not session_key:
             return False
 
-        # Get Gateway credentials
-        gateway_port = os.environ.get("OPENCLAW_GATEWAY_PORT", "18789")
-        gateway_token = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
-
         # Build the task message
         task_msg = (
             f"## New Task from {from_agent}\n\n{content}\n\n"
@@ -147,31 +147,72 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
             f'After completing, ask your leader: "Task done. Should I exit or await new tasks?"'
         )
 
-        # Send via Gateway Sessions API
-        gateway_url = f"http://127.0.0.1:{gateway_port}/api/sessions/send"
+        # Escape < > for cmd.exe (redirection operators)
+        task_msg_escaped = task_msg.replace("<", "^<").replace(">", "^>")
 
-        payload = json.dumps({
-            "key": session_key,
-            "message": task_msg,
-        }).encode("utf-8")
+        # Get Gateway token
+        gateway_token = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
 
-        req = urllib.request.Request(
-            gateway_url,
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {gateway_token}",
-            },
-            method="POST",
+        # Use openclaw gateway call CLI to send message
+        encoding = locale.getpreferredencoding(False) or "utf-8"
+        cmd = ["cmd", "/c", "openclaw", "gateway", "call", "sessions.send"]
+        params = json.dumps({"key": session_key, "message": task_msg}, ensure_ascii=False)
+        params_escaped = params.replace("<", "^<").replace(">", "^>")
+        cmd.extend(["--params", params_escaped])
+        if gateway_token:
+            cmd.extend(["--token", gateway_token])
+
+        result = subprocess.run(cmd, capture_output=True, timeout=10)
+
+        if result.returncode != 0:
+            return False
+
+        # Broadcast task_assigned activity to board server
+        _broadcast_activity_to_board(
+            agent_name=agent_name,
+            team_name=team_name,
+            status="task_assigned",
+            message=f"Task assigned to {agent_name} by {from_agent}",
         )
 
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(response.read().decode("utf-8"))
-            return result.get("ok", False)
+        return True
 
-    except (FileNotFoundError, json.JSONDecodeError, urllib.error.URLError, KeyError):
+    except (FileNotFoundError, json.JSONDecodeError, subprocess.TimeoutExpired, KeyError):
         # Agent not found, invalid registry, or Gateway not reachable
         return False
+
+
+def _broadcast_activity_to_board(agent_name: str, team_name: str, status: str, message: str) -> None:
+    """
+    Broadcast an activity event to the board server.
+
+    This allows the CLI to send activity events that will be picked up by the board monitor.
+    """
+    import os
+    import urllib.request
+    import urllib.error
+
+    board_port = os.environ.get("CLAWTEAM_BOARD_PORT", "8080")
+    board_url = f"http://127.0.0.1:{board_port}/api/agents/activity"
+
+    activity_data = {
+        "team_name": team_name,
+        "agent_name": agent_name,
+        "status": status,
+        "message": message,
+    }
+
+    try:
+        req = urllib.request.Request(
+            board_url,
+            data=json.dumps(activity_data).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=5):
+            pass  # Success
+    except (urllib.error.URLError, Exception):
+        pass  # Silently fail if board server is not running
 
 
 # ============================================================================
