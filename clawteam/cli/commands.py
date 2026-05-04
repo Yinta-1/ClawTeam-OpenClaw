@@ -2517,9 +2517,13 @@ def spawn_agent(
         raise typer.Exit(1)
 
     # Workspace: resolve from flag or config (default: auto)
+    # SDK backends (openclaw_sdk, openclaw_api) don't need git worktrees
+    _is_sdk_backend = backend in ("openclaw_sdk", "openclaw_api", "sdk")
+    if _is_sdk_backend:
+        workspace = False
+        ws_mode = "never (SDK backend)"
     cwd = None
     ws_branch = ""
-    ws_mode = ""
     ws_mgr = None
     if workspace is None:
         ws_mode, _ = get_effective("workspace")
@@ -2528,7 +2532,7 @@ def spawn_agent(
     elif workspace is False:
         ws_mode = "never"
 
-    if workspace:
+    if workspace and not _is_sdk_backend:
         from clawteam.workspace import get_workspace_manager
 
         ws_mgr = get_workspace_manager(repo)
