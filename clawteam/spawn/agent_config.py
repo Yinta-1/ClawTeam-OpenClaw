@@ -6,10 +6,10 @@ a registry of known agent types with their default commands and configurations.
 
 Usage:
     from clawteam.spawn.agent_config import list_agent_types, resolve_agent_config
-    
+
     # List all known agent types
     agents = list_agent_types()
-    
+
     # Get config for specific agent type
     config = resolve_agent_config("claude-code")
 """
@@ -24,14 +24,15 @@ from typing import Optional
 @dataclass
 class AgentConfig:
     """Configuration for a known agent type."""
-    id: str                          # Unique identifier (e.g., "claude-code")
-    name: str                        # Display name (e.g., "Claude Code")
-    terminal_type: str               # Terminal type (e.g., "claude")
-    default_command: str             # Default command to launch
+
+    id: str  # Unique identifier (e.g., "claude-code")
+    name: str  # Display name (e.g., "Claude Code")
+    terminal_type: str  # Terminal type (e.g., "claude")
+    default_command: str  # Default command to launch
     unlimited_access_flag: Optional[str] = None  # Flag for unlimited access
     resume_command_template: Optional[str] = None  # Template for resuming sessions
     post_ready_steps: list[str] = None  # Steps to execute after ready
-    
+
     def __post_init__(self):
         if self.post_ready_steps is None:
             self.post_ready_steps = []
@@ -98,10 +99,10 @@ BUILTIN_AGENTS: dict[str, AgentConfig] = {
 
 def resolve_agent_config(agent_id: str) -> Optional[AgentConfig]:
     """Resolve agent configuration by ID.
-    
+
     Args:
         agent_id: Agent identifier (e.g., "claude-code", "openclaw")
-        
+
     Returns:
         AgentConfig if found, None otherwise
     """
@@ -110,7 +111,7 @@ def resolve_agent_config(agent_id: str) -> Optional[AgentConfig]:
 
 def list_agent_types() -> list[AgentConfig]:
     """List all built-in agent configurations.
-    
+
     Returns:
         List of AgentConfig objects
     """
