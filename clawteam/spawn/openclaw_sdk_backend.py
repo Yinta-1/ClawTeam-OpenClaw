@@ -297,7 +297,7 @@ class OpenClawSDKBackend(SpawnBackend):
                     return f"Error: Agent '{agent_name}' is already running"
 
                 # Step 1: 创建 Session
-                create_data = self._gateway_call("sessions.create", timeout=10)
+                create_data = self._gateway_call("sessions.create", timeout=30)
                 session_key = create_data["key"]
                 session_id = create_data["sessionId"]
 
@@ -320,7 +320,7 @@ class OpenClawSDKBackend(SpawnBackend):
                 if model:
                     send_params["model"] = model
 
-                send_data = self._gateway_call("sessions.send", params=send_params, timeout=10)
+                send_data = self._gateway_call("sessions.send", params=send_params, timeout=30)
                 run_id = send_data.get("runId")
 
                 # Step 4: 注册到团队注册表

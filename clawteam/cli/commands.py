@@ -163,9 +163,14 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
         if gateway_token:
             cmd.extend(["--token", gateway_token])
 
-        result = subprocess.run(cmd, capture_output=True, timeout=10)
+        result = subprocess.run(cmd, capture_output=True, timeout=30)
 
         if result.returncode != 0:
+            # Log error for debugging
+            import logging
+            logger = logging.getLogger("clawteam")
+            stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+            logger.warning(f"Gateway sessions.send failed: {stderr}")
             return False
 
         # Broadcast task_assigned activity to board server
@@ -178,8 +183,15 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
 
         return True
 
-    except (FileNotFoundError, json.JSONDecodeError, subprocess.TimeoutExpired, KeyError):
-        # Agent not found, invalid registry, or Gateway not reachable
+    except subprocess.TimeoutExpired:
+        import logging
+        logger = logging.getLogger("clawteam")
+        logger.warning(f"Gateway sessions.send timed out for agent {agent_name}")
+        return False
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        import logging
+        logger = logging.getLogger("clawteam")
+        logger.warning(f"Failed to deliver message to agent {agent_name}: {e}")
         return False
 
 
