@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.tracker.file_tracker import (
+from agentteam.tracker.file_tracker import (
     FileChange,
     FileChangeTracker,
     FileChangeTrackerConfig,
@@ -438,7 +438,7 @@ class TestGlobalFunctions:
     def reset_global_tracker(self):
         """Reset the global tracker before each test."""
         # 清除全局追踪器
-        import clawteam.tracker.file_tracker as ft_module
+        import agentteam.tracker.file_tracker as ft_module
         ft_module._default_tracker = None
         yield
 

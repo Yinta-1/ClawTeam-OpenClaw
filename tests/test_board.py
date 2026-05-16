@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.board.collector import BoardCollector
-from clawteam.board.server import BoardHandler, _fetch_proxy_content, _normalize_proxy_target
-from clawteam.team.mailbox import MailboxManager
-from clawteam.team.manager import TeamManager
+from agentteam.board.collector import BoardCollector
+from agentteam.board.server import BoardHandler, _fetch_proxy_content, _normalize_proxy_target
+from agentteam.team.mailbox import MailboxManager
+from agentteam.team.manager import TeamManager
 
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_overview leader/pendingMessages fields")
@@ -72,7 +72,7 @@ def test_collect_overview_sums_inbox_counts_for_all_members(monkeypatch, tmp_pat
 
 
 def test_team_snapshot_cache_reuses_value_within_ttl():
-    from clawteam.board.server import TeamSnapshotCache
+    from agentteam.board.server import TeamSnapshotCache
 
     calls = {"count": 0}
 
@@ -91,10 +91,10 @@ def test_team_snapshot_cache_reuses_value_within_ttl():
 
 
 def test_team_snapshot_cache_expires_after_ttl(monkeypatch):
-    from clawteam.board.server import TeamSnapshotCache
+    from agentteam.board.server import TeamSnapshotCache
 
     now = {"value": 100.0}
-    monkeypatch.setattr("clawteam.board.server.time.monotonic", lambda: now["value"])
+    monkeypatch.setattr("agentteam.board.server.time.monotonic", lambda: now["value"])
 
     calls = {"count": 0}
 
@@ -327,7 +327,7 @@ def test_proxy_fetches_allowed_github_content(monkeypatch):
             seen["url"] = req.full_url
             return FakeResponse(req.full_url, b"ok")
 
-    monkeypatch.setattr("clawteam.board.server.urllib.request.build_opener", lambda *_: FakeOpener())
+    monkeypatch.setattr("agentteam.board.server.urllib.request.build_opener", lambda *_: FakeOpener())
 
     assert _fetch_proxy_content("https://raw.githubusercontent.com/org/repo/main/README.md") == b"ok"
     assert seen["url"] == "https://raw.githubusercontent.com/org/repo/main/README.md"
@@ -368,7 +368,7 @@ class TestBoardHTTPEndpoints:
         )
 
         # Start server in background
-        from clawteam.board.server import serve, BoardHandler, BoardCollector
+        from agentteam.board.server import serve, BoardHandler, BoardCollector
 
         collector = BoardCollector()
         BoardHandler.collector = collector
@@ -436,7 +436,7 @@ class TestBoardHTTPEndpoints:
 
     def test_post_api_team_task_creates_task(self, tmp_path):
         """Test that POST /api/team/{name}/task creates a new task."""
-        from clawteam.team.tasks import TaskStore
+        from agentteam.team.tasks import TaskStore
 
         TeamManager.create_team(
             name="task-test-team",
@@ -457,8 +457,8 @@ class TestBoardHTTPEndpoints:
 
     def test_patch_api_team_task_updates_status(self, tmp_path):
         """Test that PATCH /api/team/{name}/task/{id} updates task status."""
-        from clawteam.team.tasks import TaskStore
-        from clawteam.team.models import TaskStatus
+        from agentteam.team.tasks import TaskStore
+        from agentteam.team.models import TaskStatus
 
         TeamManager.create_team(
             name="status-test-team",
@@ -541,8 +541,8 @@ class TestBoardCollector:
 
     def test_collect_team_groups_tasks_by_status(self, tmp_path):
         """Test that collect_team correctly groups tasks by status."""
-        from clawteam.team.tasks import TaskStore
-        from clawteam.team.models import TaskStatus
+        from agentteam.team.tasks import TaskStore
+        from agentteam.team.models import TaskStatus
 
         TeamManager.create_team(
             name="group-test",

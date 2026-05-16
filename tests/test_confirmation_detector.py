@@ -9,13 +9,13 @@
 
 import pytest
 import re
-from clawteam.parser.confirmation_detector import (
+from agentteam.parser.confirmation_detector import (
     ConfirmationDetector,
     ProviderConfirmationConfig,
     get_default_detector,
     detect_confirmation
 )
-from clawteam.parser.types import ConfirmationDetection
+from agentteam.parser.types import ConfirmationDetection
 
 
 class TestProviderConfirmationConfig:

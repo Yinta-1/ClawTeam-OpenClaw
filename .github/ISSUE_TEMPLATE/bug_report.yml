@@ -14,7 +14,7 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. Run `clawteam spawn ...`
+        1. Run `agentteam spawn ...`
         2. ...
     validations:
       required: true
@@ -26,7 +26,7 @@ body:
       value: |
         - OS:
         - Python version (`python --version`):
-        - ClawTeam version (`clawteam --version`):
+        - ClawTeam version (`agentteam --version`):
         - OpenClaw version (`openclaw --version`):
         - Spawn backend (tmux / subprocess):
     validations:

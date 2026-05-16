@@ -1,4 +1,4 @@
-"""Tests for clawteam.team.snapshot — team state checkpoint/restore."""
+"""Tests for agentteam.team.snapshot — team state checkpoint/restore."""
 
 import sys
 
@@ -11,11 +11,11 @@ import json
 
 import pytest
 
-from clawteam.team.costs import CostStore
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import get_data_dir
-from clawteam.team.snapshot import SnapshotManager, SnapshotMeta, _snapshots_root
-from clawteam.team.tasks import TaskStore
+from agentteam.team.costs import CostStore
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import get_data_dir
+from agentteam.team.snapshot import SnapshotManager, SnapshotMeta, _snapshots_root
+from agentteam.team.tasks import TaskStore
 
 
 def _setup_team(team_name: str) -> None:
@@ -41,7 +41,7 @@ def team_with_data(team_name):
     cs.report("leader", provider="openai", model="gpt-4", cost_cents=12.5)
 
     # drop a message into the event log via mailbox
-    from clawteam.team.mailbox import MailboxManager
+    from agentteam.team.mailbox import MailboxManager
     mb = MailboxManager(team_name)
     mb.send("leader", "leader", content="hello from leader")
 
@@ -88,7 +88,7 @@ class TestSnapshotCreate:
 
     def test_captures_inbox_messages(self, team_with_data):
         # send a message that stays in inbox (don't consume it)
-        from clawteam.team.mailbox import MailboxManager
+        from agentteam.team.mailbox import MailboxManager
         mb = MailboxManager(team_with_data)
         mb.send("leader", "leader", content="pending msg")
 

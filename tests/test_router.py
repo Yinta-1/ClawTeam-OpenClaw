@@ -7,8 +7,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from clawteam.team.models import TaskItem, TaskStatus
-from clawteam.team.router import (
+from agentteam.team.models import TaskItem, TaskStatus
+from agentteam.team.router import (
     AgentProfile,
     RouteCandidate,
     TaskRouter,
@@ -77,7 +77,7 @@ def test_agent_profile_update_from_task():
     )
     
     # Add quality scores
-    from clawteam.team.models import QualityScore
+    from agentteam.team.models import QualityScore
     task.scores = [
         QualityScore(
             completeness=8,
@@ -133,7 +133,7 @@ def test_task_router_initialization():
     assert router._profiles == {}
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_load_save_profiles(mock_get_data_dir):
     """Test loading and saving agent profiles."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -163,7 +163,7 @@ def test_task_router_load_save_profiles(mock_get_data_dir):
         assert loaded_profile.topics == {"python": 5, "testing": 3}
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_route_basic(mock_get_data_dir):
     """Test basic routing functionality."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -202,7 +202,7 @@ def test_task_router_route_basic(mock_get_data_dir):
         assert "web" in candidate.matching_topics
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_route_with_load_penalty(mock_get_data_dir):
     """Test routing considers current load as a penalty."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -236,7 +236,7 @@ def test_task_router_route_with_load_penalty(mock_get_data_dir):
         assert agent1_score > agent2_score
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_get_all_candidates(mock_get_data_dir):
     """Test getting all candidates sorted by match score."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -272,7 +272,7 @@ def test_task_router_get_all_candidates(mock_get_data_dir):
         assert candidates[2].name == "agent0"
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_route_with_candidates_filter(mock_get_data_dir):
     """Test routing with specific candidate list."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -297,7 +297,7 @@ def test_task_router_route_with_candidates_filter(mock_get_data_dir):
         assert "agent3" not in candidate_names
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_get_router_function(mock_get_data_dir):
     """Test the get_router convenience function."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -328,7 +328,7 @@ def test_route_candidate_dataclass():
     assert candidate.matching_topics == ["python", "testing"]
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_empty_routing(mock_get_data_dir):
     """Test routing when no profiles exist."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -344,7 +344,7 @@ def test_task_router_empty_routing(mock_get_data_dir):
         assert candidates == []
 
 
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_update_profile_new_agent(mock_get_data_dir):
     """Test updating profile for a new agent."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -370,8 +370,8 @@ def test_task_router_update_profile_new_agent(mock_get_data_dir):
         assert profile.completed_tasks == 1
 
 
-@patch("clawteam.store.get_task_store")
-@patch("clawteam.team.router.get_data_dir")
+@patch("agentteam.store.get_task_store")
+@patch("agentteam.team.router.get_data_dir")
 def test_task_router_update_load(mock_get_data_dir, mock_store_class):
     """Test updating current load from task store."""
     with tempfile.TemporaryDirectory() as tmpdir:

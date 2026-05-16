@@ -9,11 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.team.models import TaskItem, TaskPriority, TaskStatus, get_data_dir
-from clawteam.store.file import FileTaskStore
-from clawteam.transport.file import FileTransport
-from clawteam.utils.retry import RetryConfig, retry
-from clawteam.utils.logger import get_logger, get_trace_id, set_trace_id
+from agentteam.team.models import TaskItem, TaskPriority, TaskStatus, get_data_dir
+from agentteam.store.file import FileTaskStore
+from agentteam.transport.file import FileTransport
+from agentteam.utils.retry import RetryConfig, retry
+from agentteam.utils.logger import get_logger, get_trace_id, set_trace_id
 
 
 class TestLoggingIntegration:
@@ -107,7 +107,7 @@ class TestRetryIntegration:
         os.environ["CLAWTEAM_RETRY_BASE_DELAY"] = "0.1"
 
         try:
-            from clawteam.config import get_effective
+            from agentteam.config import get_effective
 
             max_retries, source = get_effective("retry_max_retries")
             assert max_retries == "5"

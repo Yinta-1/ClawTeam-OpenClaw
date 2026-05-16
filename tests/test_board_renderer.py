@@ -6,7 +6,7 @@ from io import StringIO
 
 from rich.console import Console
 
-from clawteam.board.renderer import BoardRenderer
+from agentteam.board.renderer import BoardRenderer
 
 
 class TestBoardRenderer:

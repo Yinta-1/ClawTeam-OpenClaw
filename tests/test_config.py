@@ -1,7 +1,7 @@
-"""Tests for clawteam.config — new AppConfig-based configuration."""
+"""Tests for agentteam.config — new AppConfig-based configuration."""
 
 
-from clawteam.config import (
+from agentteam.config import (
     AppConfig, DatabaseConfig, AgentConfig, LogConfig,
     get_config, load_config, load_config_from_env
 )
@@ -13,7 +13,7 @@ class TestAppConfig:
         assert cfg.debug is False
         assert cfg.transport == "file"
         assert cfg.database is not None
-        assert cfg.database.path == "clawteam.db"
+        assert cfg.database.path == "agentteam.db"
         assert cfg.agents is not None
         assert cfg.agents.max_concurrent == 10
 
@@ -45,7 +45,7 @@ class TestAppConfig:
 class TestDatabaseConfig:
     def test_defaults(self):
         db = DatabaseConfig()
-        assert db.path == "clawteam.db"
+        assert db.path == "agentteam.db"
         assert db.pool_size == 5
         assert db.timeout == 30.0
         assert db.backup_enabled is True

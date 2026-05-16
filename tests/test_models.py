@@ -1,8 +1,8 @@
-"""Tests for clawteam.team.models — Pydantic models and data types."""
+"""Tests for agentteam.team.models — Pydantic models and data types."""
 
 import json
 
-from clawteam.team.models import (
+from agentteam.team.models import (
     MemberStatus,
     MessageType,
     TaskItem,

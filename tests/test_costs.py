@@ -1,8 +1,8 @@
-"""Tests for clawteam.team.costs — CostStore report/list/summary."""
+"""Tests for agentteam.team.costs — CostStore report/list/summary."""
 
 from pathlib import Path
 
-from clawteam.team.costs import CostEvent, CostStore, CostSummary
+from agentteam.team.costs import CostEvent, CostStore, CostSummary
 
 
 class TestCostEvent:

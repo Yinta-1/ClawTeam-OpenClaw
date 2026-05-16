@@ -9,10 +9,10 @@ import uuid
 
 import pytest
 
-# Ensure clawteam is importable
+# Ensure agentteam is importable
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from clawteam.session_awareness import (
+from agentteam.session_awareness import (
     AgentSessionTracker,
     SessionAwarenessManager,
     SessionContext,
@@ -300,7 +300,7 @@ class TestGlobalFunctions:
 
     def test_get_session_awareness_manager(self):
         # Reset global state for test
-        import clawteam.session_awareness as sa
+        import agentteam.session_awareness as sa
         sa._global_manager = None
 
         manager = get_session_awareness_manager("test-team")
@@ -309,7 +309,7 @@ class TestGlobalFunctions:
 
     def test_register_and_get_session(self):
         # Reset global state
-        import clawteam.session_awareness as sa
+        import agentteam.session_awareness as sa
         sa._global_manager = None
 
         team_name = f"test-team-{uuid.uuid4().hex[:8]}"
@@ -322,7 +322,7 @@ class TestGlobalFunctions:
 
     def test_get_team_summary(self):
         # Reset global state
-        import clawteam.session_awareness as sa
+        import agentteam.session_awareness as sa
         sa._global_manager = None
 
         team_name = f"test-team-{uuid.uuid4().hex[:8]}"

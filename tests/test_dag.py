@@ -1,8 +1,8 @@
-"""Tests for clawteam.team.dag — DAG dependency resolution."""
+"""Tests for agentteam.team.dag — DAG dependency resolution."""
 
 import pytest
 
-from clawteam.team.dag import (
+from agentteam.team.dag import (
     CycleDetectedError,
     detect_cycle,
     get_blocking_tasks,
@@ -10,7 +10,7 @@ from clawteam.team.dag import (
     get_ready_tasks,
     topological_sort,
 )
-from clawteam.team.models import TaskItem, TaskPriority, TaskStatus
+from agentteam.team.models import TaskItem, TaskPriority, TaskStatus
 
 
 def _task(id: str, status: TaskStatus = TaskStatus.pending, depends_on: list[str] | None = None, **kwargs) -> TaskItem:

@@ -1,9 +1,9 @@
-"""Tests for clawteam.team.manager — TeamManager lifecycle operations."""
+"""Tests for agentteam.team.manager — TeamManager lifecycle operations."""
 
 import pytest
 
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import get_data_dir
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import get_data_dir
 
 
 class TestCreateTeam:
@@ -161,13 +161,13 @@ class TestGetLeader:
 
 class TestInboxNameFor:
     def test_without_user(self):
-        from clawteam.team.models import TeamMember
+        from agentteam.team.models import TeamMember
 
         m = TeamMember(name="worker", agent_id="x")
         assert TeamManager.inbox_name_for(m) == "worker"
 
     def test_with_user(self):
-        from clawteam.team.models import TeamMember
+        from agentteam.team.models import TeamMember
 
         m = TeamMember(name="worker", user="alice", agent_id="x")
         assert TeamManager.inbox_name_for(m) == "alice_worker"

@@ -14,12 +14,12 @@ from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 from datetime import datetime, timezone
 
-from clawteam.notification.manager import (
+from agentteam.notification.manager import (
     NotificationManager,
     get_notification_manager,
     notify_confirmation,
 )
-from clawteam.notification.types import (
+from agentteam.notification.types import (
     Notification,
     NotificationType,
     NotificationPriority,

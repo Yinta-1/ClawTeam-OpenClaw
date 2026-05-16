@@ -3,7 +3,7 @@
 import pytest
 import time
 
-from clawteam.parser.inference import (
+from agentteam.parser.inference import (
     StateInference,
     SessionStatus,
     ProviderStateConfig

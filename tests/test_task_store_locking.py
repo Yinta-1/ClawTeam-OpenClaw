@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.team.models import TaskStatus
-from clawteam.team.tasks import TaskStore
+from agentteam.team.models import TaskStatus
+from agentteam.team.tasks import TaskStore
 
 
 def _claim_task(

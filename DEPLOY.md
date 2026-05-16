@@ -9,8 +9,8 @@
 ### 1. Clone and Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+git clone https://github.com/YOUR_USERNAME/AgentTeam-OpenClaw.git
+cd AgentTeam-OpenClaw
 ```
 
 ### 2. Configure Environment
@@ -27,13 +27,13 @@ nano .env
 
 ```bash
 # Build Docker image
-docker build -t clawteam .
+docker build -t agentteam .
 
 # Run with Docker Compose (includes optional Redis)
 docker-compose up -d
 
 # Or run standalone (no Redis)
-docker run -p 8080:8080 clawteam
+docker run -p 8080:8080 agentteam
 ```
 
 ### 4. Verify
@@ -64,10 +64,10 @@ cp .env.example .env
 
 ```bash
 # Start the board server
-python -m clawteam.board.server
+python -m agentteam.board.server
 
 # Or use the CLI
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 ```
 
 ## Environment Variables
@@ -86,15 +86,15 @@ clawteam board serve --port 8080
 
 ```ini
 [Unit]
-Description=ClawTeam Board Server
+Description=AgentTeam Board Server
 After=network.target
 
 [Service]
 Type=simple
-User=clawteam
-WorkingDirectory=/opt/clawteam
+User=agentteam
+WorkingDirectory=/opt/agentteam
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/opt/clawteam/venv/bin/python -m clawteam.board.server
+ExecStart=/opt/agentteam/venv/bin/python -m agentteam.board.server
 Restart=always
 RestartSec=5
 
@@ -105,14 +105,14 @@ WantedBy=multi-user.target
 ### Using Supervisor
 
 ```ini
-[program:clawteam]
-command=/opt/clawteam/venv/bin/python -m clawteam.board.server
-directory=/opt/clawteam
-user=clawteam
+[program:agentteam]
+command=/opt/agentteam/venv/bin/python -m agentteam.board.server
+directory=/opt/agentteam
+user=agentteam
 autostart=true
 autorestart=true
-stderr_logfile=/var/log/clawteam.err.log
-stdout_logfile=/var/log/clawteam.out.log
+stderr_logfile=/var/log/agentteam.err.log
+stdout_logfile=/var/log/agentteam.out.log
 ```
 
 ## Docker Compose Profiles
@@ -124,7 +124,7 @@ docker-compose up -d
 
 ### Minimal (no Redis)
 ```bash
-docker-compose up -d clawteam
+docker-compose up -d agentteam
 ```
 
 ### With Redis Commander (debugging)
@@ -136,7 +136,7 @@ docker-compose --profile debug up -d
 
 ### Docker Health Check
 ```bash
-docker inspect --format='{{.State.Health.Status}}' clawteam-clawteam-1
+docker inspect --format='{{.State.Health.Status}}' agentteam-agentteam-1
 ```
 
 ### API Health Check
@@ -149,10 +149,10 @@ curl http://localhost:8080/api/overview
 ### Container Won't Start
 ```bash
 # Check logs
-docker-compose logs clawteam
+docker-compose logs agentteam
 
 # Check environment
-docker-compose exec clawteam env
+docker-compose exec agentteam env
 ```
 
 ### Port Already in Use

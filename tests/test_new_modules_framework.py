@@ -29,37 +29,37 @@ class TestNewModulesFramework:
     
     def test_output_parser_module_exists(self):
         """测试 OutputParser 模块存在"""
-        from clawteam.parser.output_parser import OutputParser
+        from agentteam.parser.output_parser import OutputParser
         assert OutputParser is not None
     
     def test_notification_manager_module_exists(self):
         """测试 NotificationManager 模块存在"""
-        from clawteam.notification.manager import NotificationManager
+        from agentteam.notification.manager import NotificationManager
         assert NotificationManager is not None
     
     def test_concurrency_guard_module_exists(self):
         """测试 ConcurrencyGuard 模块存在"""
-        from clawteam.concurrency.guard import ConcurrencyGuard
+        from agentteam.concurrency.guard import ConcurrencyGuard
         assert ConcurrencyGuard is not None
     
     def test_confirmation_detector_module_exists(self):
         """测试 ConfirmationDetector 模块存在"""
-        from clawteam.parser.confirmation_detector import ConfirmationDetector
+        from agentteam.parser.confirmation_detector import ConfirmationDetector
         assert ConfirmationDetector is not None
     
     def test_skill_engine_module_exists(self):
         """测试 SkillEngine 模块存在"""
-        from clawteam.skill.engine import SkillEngine
+        from agentteam.skill.engine import SkillEngine
         assert SkillEngine is not None
     
     def test_all_modules_importable(self):
         """测试所有模块可导入"""
         modules = [
-            "clawteam.parser.output_parser",
-            "clawteam.notification.manager",
-            "clawteam.concurrency.guard",
-            "clawteam.parser.confirmation_detector",
-            "clawteam.skill.engine",
+            "agentteam.parser.output_parser",
+            "agentteam.notification.manager",
+            "agentteam.concurrency.guard",
+            "agentteam.parser.confirmation_detector",
+            "agentteam.skill.engine",
         ]
         for module in modules:
             __import__(module)
@@ -76,9 +76,9 @@ class TestPerformanceBaseline:
         """测试 OutputParser 导入时间"""
         start = time.time()
         # 强制重新导入
-        if "clawteam.parser.output_parser" in sys.modules:
-            del sys.modules["clawteam.parser.output_parser"]
-        from clawteam.parser.output_parser import OutputParser
+        if "agentteam.parser.output_parser" in sys.modules:
+            del sys.modules["agentteam.parser.output_parser"]
+        from agentteam.parser.output_parser import OutputParser
         elapsed = time.time() - start
         # 导入时间应该小于 1秒
         assert elapsed < 1.0
@@ -87,9 +87,9 @@ class TestPerformanceBaseline:
     def test_import_time_notification_manager(self):
         """测试 NotificationManager 导入时间"""
         start = time.time()
-        if "clawteam.notification.manager" in sys.modules:
-            del sys.modules["clawteam.notification.manager"]
-        from clawteam.notification.manager import NotificationManager
+        if "agentteam.notification.manager" in sys.modules:
+            del sys.modules["agentteam.notification.manager"]
+        from agentteam.notification.manager import NotificationManager
         elapsed = time.time() - start
         assert elapsed < 1.0
         print(f"NotificationManager import time: {elapsed:.3f}s")
@@ -97,9 +97,9 @@ class TestPerformanceBaseline:
     def test_import_time_concurrency_guard(self):
         """测试 ConcurrencyGuard 导入时间"""
         start = time.time()
-        if "clawteam.concurrency.guard" in sys.modules:
-            del sys.modules["clawteam.concurrency.guard"]
-        from clawteam.concurrency.guard import ConcurrencyGuard
+        if "agentteam.concurrency.guard" in sys.modules:
+            del sys.modules["agentteam.concurrency.guard"]
+        from agentteam.concurrency.guard import ConcurrencyGuard
         elapsed = time.time() - start
         assert elapsed < 1.0
         print(f"ConcurrencyGuard import time: {elapsed:.3f}s")
@@ -107,9 +107,9 @@ class TestPerformanceBaseline:
     def test_import_time_confirmation_detector(self):
         """测试 ConfirmationDetector 导入时间"""
         start = time.time()
-        if "clawteam.parser.confirmation_detector" in sys.modules:
-            del sys.modules["clawteam.parser.confirmation_detector"]
-        from clawteam.parser.confirmation_detector import ConfirmationDetector
+        if "agentteam.parser.confirmation_detector" in sys.modules:
+            del sys.modules["agentteam.parser.confirmation_detector"]
+        from agentteam.parser.confirmation_detector import ConfirmationDetector
         elapsed = time.time() - start
         assert elapsed < 1.0
         print(f"ConfirmationDetector import time: {elapsed:.3f}s")
@@ -117,9 +117,9 @@ class TestPerformanceBaseline:
     def test_import_time_skill_engine(self):
         """测试 SkillEngine 导入时间"""
         start = time.time()
-        if "clawteam.skill.engine" in sys.modules:
-            del sys.modules["clawteam.skill.engine"]
-        from clawteam.skill.engine import SkillEngine
+        if "agentteam.skill.engine" in sys.modules:
+            del sys.modules["agentteam.skill.engine"]
+        from agentteam.skill.engine import SkillEngine
         elapsed = time.time() - start
         assert elapsed < 1.0
         print(f"SkillEngine import time: {elapsed:.3f}s")
@@ -130,22 +130,22 @@ class TestPerformanceBaseline:
         
         # 清除所有模块
         modules_to_clear = [
-            "clawteam.parser.output_parser",
-            "clawteam.notification.manager",
-            "clawteam.concurrency.guard",
-            "clawteam.parser.confirmation_detector",
-            "clawteam.skill.engine",
+            "agentteam.parser.output_parser",
+            "agentteam.notification.manager",
+            "agentteam.concurrency.guard",
+            "agentteam.parser.confirmation_detector",
+            "agentteam.skill.engine",
         ]
         for m in modules_to_clear:
             if m in sys.modules:
                 del sys.modules[m]
         
         # 重新导入所有模块
-        from clawteam.parser.output_parser import OutputParser
-        from clawteam.notification.manager import NotificationManager
-        from clawteam.concurrency.guard import ConcurrencyGuard
-        from clawteam.parser.confirmation_detector import ConfirmationDetector
-        from clawteam.skill.engine import SkillEngine
+        from agentteam.parser.output_parser import OutputParser
+        from agentteam.notification.manager import NotificationManager
+        from agentteam.concurrency.guard import ConcurrencyGuard
+        from agentteam.parser.confirmation_detector import ConfirmationDetector
+        from agentteam.skill.engine import SkillEngine
         
         elapsed = time.time() - start
         # 总导入时间应该小于 5秒
@@ -158,7 +158,7 @@ class TestMemoryBaseline:
     
     def test_output_parser_memory(self):
         """测试 OutputParser 内存使用"""
-        from clawteam.parser.output_parser import OutputParser
+        from agentteam.parser.output_parser import OutputParser
         import tracemalloc
         
         tracemalloc.start()
@@ -175,7 +175,7 @@ class TestMemoryBaseline:
     
     def test_notification_manager_memory(self):
         """测试 NotificationManager 内存使用"""
-        from clawteam.notification.manager import NotificationManager
+        from agentteam.notification.manager import NotificationManager
         import tracemalloc
         
         tracemalloc.start()
@@ -191,7 +191,7 @@ class TestMemoryBaseline:
     
     def test_concurrency_guard_memory(self):
         """测试 ConcurrencyGuard 内存使用"""
-        from clawteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
+        from agentteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
         import tracemalloc
         
         tracemalloc.start()
@@ -207,7 +207,7 @@ class TestMemoryBaseline:
     
     def test_skill_engine_memory(self):
         """测试 SkillEngine 内存使用"""
-        from clawteam.skill.engine import SkillEngine, Skill, SkillType
+        from agentteam.skill.engine import SkillEngine, Skill, SkillType
         import tracemalloc
         
         tracemalloc.start()
@@ -236,7 +236,7 @@ class TestExecutionTimeBaseline:
     
     def test_output_parser_parse_speed(self):
         """测试 OutputParser 解析速度"""
-        from clawteam.parser.output_parser import OutputParser
+        from agentteam.parser.output_parser import OutputParser
         
         parser = OutputParser()
         start = time.time()
@@ -252,7 +252,7 @@ class TestExecutionTimeBaseline:
     
     def test_notification_manager_notify_speed(self):
         """测试 NotificationManager 通知速度"""
-        from clawteam.notification.manager import NotificationManager
+        from agentteam.notification.manager import NotificationManager
         
         manager = NotificationManager()
         start = time.time()
@@ -267,7 +267,7 @@ class TestExecutionTimeBaseline:
     
     def test_concurrency_guard_check_speed(self):
         """测试 ConcurrencyGuard 检查速度"""
-        from clawteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
+        from agentteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
         
         guard = ConcurrencyGuard(ConcurrencyConfig(max_sessions=100))
         start = time.time()
@@ -282,7 +282,7 @@ class TestExecutionTimeBaseline:
     
     def test_skill_engine_expand_speed(self):
         """测试 SkillEngine 展开速度"""
-        from clawteam.skill.engine import SkillEngine, Skill, SkillType
+        from agentteam.skill.engine import SkillEngine, Skill, SkillType
         
         engine = SkillEngine()
         skill = Skill(
@@ -345,8 +345,8 @@ class TestNewModulesIntegration:
     
     def test_parser_with_notification(self):
         """测试 Parser 与 Notification 集成"""
-        from clawteam.parser.output_parser import OutputParser
-        from clawteam.notification.manager import NotificationManager
+        from agentteam.parser.output_parser import OutputParser
+        from agentteam.notification.manager import NotificationManager
         
         parser = OutputParser()
         manager = NotificationManager()
@@ -359,8 +359,8 @@ class TestNewModulesIntegration:
     
     def test_concurrency_with_session(self):
         """测试 Concurrency 与 Session 集成"""
-        from clawteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
-        from clawteam.session.registry import SessionRegistry
+        from agentteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
+        from agentteam.session.registry import SessionRegistry
         
         guard = ConcurrencyGuard(ConcurrencyConfig(max_sessions=5))
         registry = SessionRegistry()
@@ -374,8 +374,8 @@ class TestNewModulesIntegration:
     
     def test_skill_with_parser(self):
         """测试 Skill 与 Parser 集成"""
-        from clawteam.skill.engine import SkillEngine, Skill, SkillType
-        from clawteam.parser.output_parser import OutputParser
+        from agentteam.skill.engine import SkillEngine, Skill, SkillType
+        from agentteam.parser.output_parser import OutputParser
         
         engine = SkillEngine()
         parser = OutputParser()
@@ -397,10 +397,10 @@ class TestNewModulesIntegration:
     
     def test_full_workflow(self):
         """测试完整工作流"""
-        from clawteam.parser.output_parser import OutputParser
-        from clawteam.notification.manager import NotificationManager
-        from clawteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
-        from clawteam.skill.engine import SkillEngine, Skill, SkillType
+        from agentteam.parser.output_parser import OutputParser
+        from agentteam.notification.manager import NotificationManager
+        from agentteam.concurrency.guard import ConcurrencyGuard, ConcurrencyConfig
+        from agentteam.skill.engine import SkillEngine, Skill, SkillType
         
         # 初始化所有模块
         parser = OutputParser()

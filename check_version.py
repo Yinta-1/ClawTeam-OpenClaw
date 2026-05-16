@@ -1,9 +1,9 @@
-import clawteam
-print("clawteam file:", clawteam.__file__)
-print("clawteam version:", clawteam.__version__)
+import agentteam
+print("agentteam file:", agentteam.__file__)
+print("agentteam version:", agentteam.__version__)
 
 # Check if the backend has escaping
-from clawteam.spawn.openclaw_sdk_backend import OpenClawSDKBackend
+from agentteam.spawn.openclaw_sdk_backend import OpenClawSDKBackend
 import inspect
 source = inspect.getsource(OpenClawSDKBackend._gateway_call)
 if 'replace' in source and '^<' in source:

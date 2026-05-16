@@ -6,17 +6,17 @@ import pytest
 import time
 from datetime import datetime, timezone
 
-from clawteam.notification import (
+from agentteam.notification import (
     NotificationManager,
     NotificationType,
     NotificationConfig,
 )
-from clawteam.notification.types import (
+from agentteam.notification.types import (
     Notification,
     NotificationPriority,
     NotificationEvent,
 )
-from clawteam.notification.manager import (
+from agentteam.notification.manager import (
     get_notification_manager,
     notify_confirmation,
     notify_error,

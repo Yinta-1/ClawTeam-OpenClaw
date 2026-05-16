@@ -1,4 +1,4 @@
-# ClawTeam-OpenClaw API Documentation
+# AgentTeam-OpenClaw API Documentation
 
 > **Version**: v0.5.4 | **Base URL**: `http://localhost:8080/api/v1`
 
@@ -6,12 +6,12 @@
 
 ## Overview
 
-ClawTeam provides a RESTful API for team management, agent orchestration, and monitoring. All endpoints require authentication via `X-ClawTeam-Token` header.
+AgentTeam provides a RESTful API for team management, agent orchestration, and monitoring. All endpoints require authentication via `X-AgentTeam-Token` header.
 
 ### Authentication
 
 ```bash
-curl -H "X-ClawTeam-Token: your-token" http://localhost:8080/api/v1/teams
+curl -H "X-AgentTeam-Token: your-token" http://localhost:8080/api/v1/teams
 ```
 
 ### Response Format
@@ -427,7 +427,7 @@ The Daemon API manages the persistent `agentd` daemon process via TCP (Windows) 
 | Platform | Address |
 |----------|---------|
 | Windows | `127.0.0.1:18792` |
-| Unix/Linux/macOS | `~/.clawteam/agentd.sock` |
+| Unix/Linux/macOS | `~/.agentteam/agentd.sock` |
 
 ### Protocol
 

@@ -7,13 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.session.cross_session import (
+from agentteam.session.cross_session import (
     CrossSessionBus,
     CrossSessionMessage,
     NotificationType,
     get_cross_session_bus,
 )
-from clawteam.session.registry import (
+from agentteam.session.registry import (
     SessionRegistry,
     SessionStatus,
 )
@@ -461,7 +461,7 @@ class TestGetCrossSessionBus:
 
     def test_singleton(self, temp_data_dir):
         """Test that get_cross_session_bus returns singleton."""
-        import clawteam.session.cross_session as bus_module
+        import agentteam.session.cross_session as bus_module
         bus_module._bus = None
         
         os.environ["CLAWTEAM_DATA_DIR"] = str(temp_data_dir)

@@ -1,8 +1,8 @@
-# ClawTeam Docker Compose Configuration
+# AgentTeam Docker Compose Configuration
 # For local development and testing
 
 services:
-  clawteam:
+  agentteam:
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,11 +10,11 @@ services:
       - "8080:8080"
     environment:
       - PYTHONUNBUFFERED=1
-      - CLAWTEAM_HOME=/app
+      - AGENTEAM_HOME=/app
       # Optional: Redis for message transport
       - REDIS_URL=redis://redis:6379/0
     volumes:
-      # Mount local clawteam data directory for persistence
+      # Mount local agentteam data directory for persistence
       - ./data:/app/data
       # Mount tmp for worktrees
       - ./tmp:/app/tmp

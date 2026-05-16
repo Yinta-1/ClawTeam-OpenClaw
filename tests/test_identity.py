@@ -1,6 +1,6 @@
-"""Tests for clawteam.identity — AgentIdentity from_env / to_env."""
+"""Tests for agentteam.identity — AgentIdentity from_env / to_env."""
 
-from clawteam.identity import AgentIdentity, _env, _env_bool
+from agentteam.identity import AgentIdentity, _env, _env_bool
 
 
 class TestEnvHelpers:
@@ -74,7 +74,7 @@ class TestFromEnv:
 
     def test_from_env_user_from_config(self, tmp_path, monkeypatch):
         monkeypatch.delenv("CLAWTEAM_USER", raising=False)
-        from clawteam.config import ClawTeamConfig, save_config
+        from agentteam.config import ClawTeamConfig, save_config
         cfg = ClawTeamConfig(user="config-user")
         save_config(cfg)
 

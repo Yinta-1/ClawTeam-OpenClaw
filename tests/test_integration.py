@@ -10,13 +10,13 @@ import tempfile
 import shutil
 from pathlib import Path
 
-from clawteam.config import AppConfig
-from clawteam.session import get_session_registry, SessionRegistry
-from clawteam.team import TeamManager
-from clawteam.tracker.file_tracker import FileChangeTracker, get_file_change_tracker, FileChangeTrackerConfig
-from clawteam.tracker.file_watcher import watch_directory
-from clawteam.tracker.diff_tracker import DiffTracker, DiffStore
-from clawteam.profiler import Profiler
+from agentteam.config import AppConfig
+from agentteam.session import get_session_registry, SessionRegistry
+from agentteam.team import TeamManager
+from agentteam.tracker.file_tracker import FileChangeTracker, get_file_change_tracker, FileChangeTrackerConfig
+from agentteam.tracker.file_watcher import watch_directory
+from agentteam.tracker.diff_tracker import DiffTracker, DiffStore
+from agentteam.profiler import Profiler
 
 
 class TestIntegrationBasic:
@@ -53,7 +53,7 @@ class TestIntegrationFileTracking:
         """Test watching a directory"""
         # watch_directory requires a handler which is complex to set up
         # This test verifies the import works
-        from clawteam.tracker.file_watcher import watch_directory
+        from agentteam.tracker.file_watcher import watch_directory
 
         assert callable(watch_directory)
 
@@ -147,7 +147,7 @@ class TestIntegrationCrossCutting:
 
     def test_error_context_propagation(self):
         """Test that error context propagates through layers"""
-        from clawteam.exceptions import (
+        from agentteam.exceptions import (
             ClawTeamError,
             AgentError,
             ErrorContext,
@@ -234,7 +234,7 @@ class TestIntegrationFullScenario:
 
     def test_full_error_recovery_workflow(self):
         """Test error handling through a full workflow"""
-        from clawteam.exceptions import AgentSpawnError, ErrorRecovery, ErrorContext
+        from agentteam.exceptions import AgentSpawnError, ErrorRecovery, ErrorContext
 
         profiler = Profiler()
         recovery = ErrorRecovery()

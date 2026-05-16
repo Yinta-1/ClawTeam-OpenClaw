@@ -1,12 +1,12 @@
-# ClawTeam Multimodal Support - P30-P33 Architecture Design
+# AgentTeam Multimodal Support - P30-P33 Architecture Design
 
 ## Overview
 
-This document defines the architecture for ClawTeam Multimodal Support (Phases 30-33), enabling rich media and real-time streaming capabilities in inter-agent communication.
+This document defines the architecture for AgentTeam Multimodal Support (Phases 30-33), enabling rich media and real-time streaming capabilities in inter-agent communication.
 
 ## Motivation
 
-Currently, ClawTeam supports only plain text messages (`TeamMessage.content`). Modern AI agents can generate and consume multiple modalities (images, audio, video, files). This enhancement enables:
+Currently, AgentTeam supports only plain text messages (`TeamMessage.content`). Modern AI agents can generate and consume multiple modalities (images, audio, video, files). This enhancement enables:
 
 1. **Image Support** - Agents can share generated images, screenshots, charts
 2. **File Attachments** - Agents can share documents, code files, data
@@ -33,10 +33,10 @@ image_url: str | None = None
 
 ### Implementation
 
-1. **`clawteam/team/models.py`**: Add image fields to `TeamMessage` and `Notification`
-2. **`clawteam/notification/types.py`**: Add `image_url` to `Notification`
-3. **`clawteam/cli/inbox.py`**: Render images in CLI using iTerm2 inline images or fallback to URL display
-4. **`clawteam/board/web/`**: Display images in web board notification cards
+1. **`agentteam/team/models.py`**: Add image fields to `TeamMessage` and `Notification`
+2. **`agentteam/notification/types.py`**: Add `image_url` to `Notification`
+3. **`agentteam/cli/inbox.py`**: Render images in CLI using iTerm2 inline images or fallback to URL display
+4. **`agentteam/board/web/`**: Display images in web board notification cards
 
 ### CLI Rendering
 
@@ -72,10 +72,10 @@ class TeamMessage(BaseModel):
 
 ### Implementation
 
-1. **`clawteam/team/models.py`**: Add `FileAttachment` class and `attachments` to `TeamMessage`
-2. **`clawteam/team/mailbox.py`**: Handle attachment storage (copy to data dir or reference URL)
-3. **`clawteam/cli/inbox.py`**: Display attachment list with icons by MIME type
-4. **`clawteam/board/web/`**: File list component with download buttons
+1. **`agentteam/team/models.py`**: Add `FileAttachment` class and `attachments` to `TeamMessage`
+2. **`agentteam/team/mailbox.py`**: Handle attachment storage (copy to data dir or reference URL)
+3. **`agentteam/cli/inbox.py`**: Display attachment list with icons by MIME type
+4. **`agentteam/board/web/`**: File list component with download buttons
 
 ### File Type Icons
 
@@ -118,9 +118,9 @@ class NotificationType(str, Enum):
 
 ### Implementation
 
-1. **`clawteam/notification/types.py`**: Extend `Notification` and `NotificationType`
-2. **`clawteam/notification/manager.py`**: Handle rich notification rendering
-3. **`clawteam/board/web/`**: Rich notification cards with progress bars, images
+1. **`agentteam/notification/types.py`**: Extend `Notification` and `NotificationType`
+2. **`agentteam/notification/manager.py`**: Handle rich notification rendering
+3. **`agentteam/board/web/`**: Rich notification cards with progress bars, images
 
 ---
 
@@ -160,10 +160,10 @@ class AgentActivity(BaseModel):
 
 ### Implementation
 
-1. **`clawteam/team/models.py`**: Add streaming message types and `AgentActivity`
-2. **`clawteam/team/mailbox.py`**: Support streaming message sequences
-3. **`clawteam/board/web/`**: Real-time activity feed with SSE/WebSocket
-4. **`clawteam/cli/board.py`**: Live activity display in CLI
+1. **`agentteam/team/models.py`**: Add streaming message types and `AgentActivity`
+2. **`agentteam/team/mailbox.py`**: Support streaming message sequences
+3. **`agentteam/board/web/`**: Real-time activity feed with SSE/WebSocket
+4. **`agentteam/cli/board.py`**: Live activity display in CLI
 
 ### Web Board Streaming
 

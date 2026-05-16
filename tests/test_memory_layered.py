@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
-from clawteam.memory.layered import (
+from agentteam.memory.layered import (
     LayeredMemoryProvider,
     L1WorkingMemory,
     L2SessionMemory,

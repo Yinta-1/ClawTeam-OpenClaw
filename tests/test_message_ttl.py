@@ -14,7 +14,7 @@ class TestTTLConfig:
 
     def test_default_ttl_is_24_hours(self):
         """Default TTL should be 24 hours (86400 seconds)."""
-        from clawteam.utils.ttl import DEFAULT_TTL_SECONDS, get_message_ttl
+        from agentteam.utils.ttl import DEFAULT_TTL_SECONDS, get_message_ttl
 
         with patch.dict(os.environ, {}, clear=True):
             ttl = get_message_ttl()
@@ -23,7 +23,7 @@ class TestTTLConfig:
 
     def test_custom_ttl_from_environment(self):
         """TTL can be set via CLAWTEAM_MESSAGE_TTL environment variable."""
-        from clawteam.utils.ttl import get_message_ttl
+        from agentteam.utils.ttl import get_message_ttl
 
         with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
             ttl = get_message_ttl()
@@ -31,7 +31,7 @@ class TestTTLConfig:
 
     def test_ttl_disabled_with_zero(self):
         """TTL can be disabled by setting to 0."""
-        from clawteam.utils.ttl import get_message_ttl, is_ttl_enabled
+        from agentteam.utils.ttl import get_message_ttl, is_ttl_enabled
 
         with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
             ttl = get_message_ttl()
@@ -40,7 +40,7 @@ class TestTTLConfig:
 
     def test_invalid_ttl_falls_back_to_default(self):
         """Invalid TTL values fall back to default."""
-        from clawteam.utils.ttl import get_message_ttl, DEFAULT_TTL_SECONDS
+        from agentteam.utils.ttl import get_message_ttl, DEFAULT_TTL_SECONDS
 
         with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "invalid"}):
             ttl = get_message_ttl()
@@ -52,7 +52,7 @@ class TestIsMessageExpired:
 
     def test_recent_message_not_expired(self):
         """A recent message should not be expired."""
-        from clawteam.utils.ttl import is_message_expired
+        from agentteam.utils.ttl import is_message_expired
 
         current_ms = int(time.time() * 1000)
         recent_ts = current_ms - 1000
@@ -61,7 +61,7 @@ class TestIsMessageExpired:
 
     def test_old_message_is_expired(self):
         """An old message should be expired."""
-        from clawteam.utils.ttl import is_message_expired
+        from agentteam.utils.ttl import is_message_expired
 
         current_ms = int(time.time() * 1000)
         old_ts = current_ms - (2 * 3600 * 1000)
@@ -70,7 +70,7 @@ class TestIsMessageExpired:
 
     def test_expired_check_disabled_with_zero_ttl(self):
         """Expiration check returns False when TTL is 0."""
-        from clawteam.utils.ttl import is_message_expired
+        from agentteam.utils.ttl import is_message_expired
 
         old_ts = 1000
 
@@ -82,7 +82,7 @@ class TestTTLConfigClass:
 
     def test_from_env_creates_config(self):
         """TTLConfig.from_env() creates config from environment."""
-        from clawteam.utils.ttl import TTLConfig
+        from agentteam.utils.ttl import TTLConfig
 
         with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "7200"}):
             config = TTLConfig.from_env()
@@ -91,7 +91,7 @@ class TestTTLConfigClass:
 
     def test_is_expired_method(self):
         """TTLConfig.is_expired() checks message expiration."""
-        from clawteam.utils.ttl import TTLConfig
+        from agentteam.utils.ttl import TTLConfig
 
         config = TTLConfig(ttl_seconds=3600, enabled=True)
 
@@ -104,7 +104,7 @@ class TestTTLConfigClass:
 
     def test_disabled_config_never_expired(self):
         """Disabled TTLConfig never reports expired."""
-        from clawteam.utils.ttl import TTLConfig
+        from agentteam.utils.ttl import TTLConfig
 
         config = TTLConfig(ttl_seconds=0, enabled=False)
 
@@ -117,7 +117,7 @@ class TestFileTransportTTL:
 
     def test_cleanup_expired_messages_removes_old_files(self, tmp_path, monkeypatch):
         """cleanup_expired_messages removes files older than TTL."""
-        from clawteam.transport.file import FileTransport
+        from agentteam.transport.file import FileTransport
 
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("CLAWTEAM_MESSAGE_TTL", "10")
@@ -143,7 +143,7 @@ class TestFileTransportTTL:
 
     def test_cleanup_returns_zero_when_ttl_disabled(self, tmp_path, monkeypatch):
         """cleanup_expired_messages returns 0 when TTL is disabled."""
-        from clawteam.transport.file import FileTransport
+        from agentteam.transport.file import FileTransport
 
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
         monkeypatch.setenv("CLAWTEAM_MESSAGE_TTL", "0")
@@ -165,14 +165,14 @@ class TestRedisTransportTTL:
 
     def test_deliver_sets_ttl_on_inbox_key(self):
         """deliver() sets EXPIRE on inbox key when TTL is enabled."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.lpush.return_value = 1
         mock_client.expire.return_value = True
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
@@ -185,13 +185,13 @@ class TestRedisTransportTTL:
 
     def test_deliver_skips_ttl_when_disabled(self):
         """deliver() does not set EXPIRE when TTL is disabled."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
@@ -202,14 +202,14 @@ class TestRedisTransportTTL:
 
     def test_set_inbox_ttl(self):
         """set_inbox_ttl() sets TTL on existing inbox key."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.exists.return_value = True
         mock_client.expire.return_value = True
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "7200"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
@@ -221,7 +221,7 @@ class TestRedisTransportTTL:
 
     def test_cleanup_expired_messages(self):
         """cleanup_expired_messages removes expired messages from list."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
@@ -236,7 +236,7 @@ class TestRedisTransportTTL:
         mock_client.lrange.return_value = [expired_msg, fresh_msg]
         mock_client.lrem.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
@@ -248,12 +248,12 @@ class TestRedisTransportTTL:
 
     def test_cleanup_returns_zero_when_ttl_disabled(self):
         """cleanup_expired_messages returns 0 when TTL is disabled."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client

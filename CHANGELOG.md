@@ -1,4 +1,4 @@
-# ClawTeam 升级日志
+# AgentTeam 升级日志
 
 ## v0.5.1（2026-05-04）— 文档完善 + P37 完成
 
@@ -24,7 +24,7 @@
 
 #### P26: Parent-Child 生命周期管理 ✅
 - **commit**: `cb52d4e feat(lifecycle): implement Parent-Child lifecycle management (P26)`
-- **文件**: `clawteam/team/lifecycle.py`
+- **文件**: `agentteam/team/lifecycle.py`
 - **新增功能**:
   - `ParentChildRegistry` - 追踪父子关系
   - `parentToAgents: Map[parentSessionId, Set[agentId]]` - 父子映射
@@ -38,12 +38,12 @@
   - `--parent` flag for spawn command
 
 #### P28: 工具注册增强 ✅
-- **文件**: `clawteam/tools/registry.py`
+- **文件**: `agentteam/tools/registry.py`
 - **状态**: 已完成
 - **功能**: 增强工具注册表，支持动态工具发现
 
 #### P29: 协作增强 ✅
-- **目录**: `clawteam/collaboration/`
+- **目录**: `agentteam/collaboration/`
 - **状态**: 已完成
 - **功能**:
   - Activity Feed（活动流）
@@ -54,30 +54,30 @@
 #### P30-P33: 多模态支持 🔄→✅（部分代码）
 - **文档**: `docs/superpowers/specs/P30-P33-multimodal-support-design.md` ✅
 - **commit**: `bd32e9c` feat(models): P30-P33 multimodal support - image fields and FileAttachment class
-- **已实现** (`clawteam/team/models.py` + `clawteam/notification/types.py`):
+- **已实现** (`agentteam/team/models.py` + `agentteam/notification/types.py`):
   - `TeamMessage` 新增: `image_url`, `image_data`, `image_mime_type`, `image_width`, `image_height`, `attachments: list[FileAttachment]`
   - `Notification` 新增: `image_url`
   - 新增 `FileAttachment` 模型类
-  - CLI inbox 图片渲染: `clawteam/cli/inbox.py` - iTerm2 inline images + URL fallback
+  - CLI inbox 图片渲染: `agentteam/cli/inbox.py` - iTerm2 inline images + URL fallback
   - Web board 富媒体: `index.html` renderMessage() 支持 image_url/base64/attachments 渲染
   - Streaming/SSE: `board/server.py` _serve_sse() + polling fallback
 
 #### P34: Dashboard 监控面板 ✅
 - **新增文件**:
-  - `clawteam/api/monitor.py`
-  - `clawteam/board/dashboard.py`
+  - `agentteam/api/monitor.py`
+  - `agentteam/board/dashboard.py`
 - **状态**: 已完成
 - **功能**: 实时会话监控、Token 使用统计、风险评估、collector + renderer
 
 #### P35: 事件追踪系统 ✅
-- **目录**: `clawteam/events/`
+- **目录**: `agentteam/events/`
 - **状态**: 已完成
 - **目标**: 40+ 事件类型、SQLite 持久化、事件查询 API
 
 #### P36: 实时 SSE 推送 ✅
 - **修改文件**:
-  - `clawteam/board/server.py`
-  - `clawteam/board/static/index.html`
+  - `agentteam/board/server.py`
+  - `agentteam/board/static/index.html`
 - **状态**: 已完成
 - **目标**: Server-Sent Events、实时日志推送
 
@@ -89,7 +89,7 @@
 
 #### P38: 智能模型路由 ✅
 - **commit**: `2f102db` feat(orchestrator): P38 intelligent model router
-- **文件**: `clawteam/orchestrator/model_router.py`
+- **文件**: `agentteam/orchestrator/model_router.py`
 - **状态**: 已完成
 - **功能**:
   - `TaskComplexityAnalyzer`: 基于关键词 + 启发式的任务复杂度分析（1-10分）
@@ -104,7 +104,7 @@
 
 #### P41: AuthManager 安全强制执行 ✅
 - **commit**: `72bb841` security(P41): enforce AuthManager on board API endpoints
-- **文件**: `clawteam/board/server.py`
+- **文件**: `agentteam/board/server.py`
 - **状态**: 已完成
 - **功能**: 在 board HTTP API endpoints 上强制执行 AuthManager 认证检查
 
@@ -115,13 +115,13 @@
 
 #### P43: P30-P33 多模态 Web UI 完善 ✅
 - **commit**: `6c06044` feat(multimodal): P30-P33 complete streaming and rich notification support
-- **文件**: `clawteam/board/static/index.html`, `clawteam/notification/types.py`, `clawteam/team/models.py`
+- **文件**: `agentteam/board/static/index.html`, `agentteam/notification/types.py`, `agentteam/team/models.py`
 - **状态**: 已完成
 - **功能**: Web board 消息面板支持图片和附件渲染，Notification 支持富媒体
 
 #### P3: 数据库连接池 ✅
 - **commit**: `9464edd` perf(database): P3 database connection pooling + WAL mode
-- **文件**: `clawteam/database/manager.py`
+- **文件**: `agentteam/database/manager.py`
 - **状态**: 已完成
 - **功能**:
   - `DatabaseConnectionPool`: 基于 `queue.Queue` 的连接池，线程本地连接
@@ -132,7 +132,7 @@
 
 #### P4: 查询预编译缓存 ✅
 - **commit**: `dcfacb3` perf(events): P4 prepared statement caching for EventTracker.query()
-- **文件**: `clawteam/events/tracker.py`
+- **文件**: `agentteam/events/tracker.py`
 - **状态**: 已完成
 - **功能**:
   - `_stmt_cache: OrderedDict` 缓存预编译语句模板
@@ -142,7 +142,7 @@
 
 #### P5: 异步订阅者通知 ✅
 - **commit**: `541c707` feat(events): P5 async subscriber notification with timeout
-- **文件**: `clawteam/events/tracker.py`
+- **文件**: `agentteam/events/tracker.py`
 - **状态**: 已完成
 - **功能**:
   - `_notify_subscribers_async()` 使用 `ThreadPoolExecutor` 异步通知
@@ -152,7 +152,7 @@
 
 #### P6: 内存配置可调参数 ✅
 - **commit**: `e36ebc7` feat(board): P6 Memory Config Tunables
-- **文件**: `clawteam/board/server.py`
+- **文件**: `agentteam/board/server.py`
 - **状态**: 已完成
 - **功能**:
   - `_event_queue` / `_chat_event_queue` 队列大小可配置
@@ -164,15 +164,15 @@
 
 | 模块 | 文件 | 功能 | 状态 |
 |------|------|------|------|
-| **MailboxManager** | `clawteam/team/mailbox.py` | Agent 间消息传递 | ✅ |
-| **P2P Transport** | `clawteam/transport/p2p.py` | ZeroMQ PUSH/PULL + 文件回退 | ✅ |
-| **RoleStore** | `clawteam/team/roles.py` | 动态角色分配 | ✅ |
-| **BaseTaskStore** | `clawteam/store/base.py` | 任务存储抽象 | ✅ |
-| **WebSocketManager** | `clawteam/board/websocket.py` | WebSocket 连接管理 | ✅ |
-| **Board Server** | `clawteam/board/server.py` | HTTP API + SSE | ✅ |
-| **Transport 抽象** | `clawteam/transport/base.py` | File/P2P/Redis | ✅ |
-| **LifecycleManager** | `clawteam/team/lifecycle.py` | Agent 生命周期状态机 | ✅ |
-| **OpenClaw SDK Backend** | `clawteam/spawn/openclaw_sdk_backend.py` | Gateway Sessions API 集成 | ✅ |
+| **MailboxManager** | `agentteam/team/mailbox.py` | Agent 间消息传递 | ✅ |
+| **P2P Transport** | `agentteam/transport/p2p.py` | ZeroMQ PUSH/PULL + 文件回退 | ✅ |
+| **RoleStore** | `agentteam/team/roles.py` | 动态角色分配 | ✅ |
+| **BaseTaskStore** | `agentteam/store/base.py` | 任务存储抽象 | ✅ |
+| **WebSocketManager** | `agentteam/board/websocket.py` | WebSocket 连接管理 | ✅ |
+| **Board Server** | `agentteam/board/server.py` | HTTP API + SSE | ✅ |
+| **Transport 抽象** | `agentteam/transport/base.py` | File/P2P/Redis | ✅ |
+| **LifecycleManager** | `agentteam/team/lifecycle.py` | Agent 生命周期状态机 | ✅ |
+| **OpenClaw SDK Backend** | `agentteam/spawn/openclaw_sdk_backend.py` | Gateway Sessions API 集成 | ✅ |
 
 ### 升级团队状态（2026-05-03）
 
@@ -204,14 +204,14 @@
 ### 新增模块
 
 #### 审计日志（Audit Logging）
-- 文件：`clawteam/audit.py`
+- 文件：`agentteam/audit.py`
 - 追加写入模式，历史事件永不修改
 - 每个事件包含：event_id, event_type, actor, details, timestamp, team
 - 支持按类型/时间范围/actor 过滤查询
 - 测试：`tests/test_audit.py`（7 项，全部通过）
 
 #### 智能路由（Intelligent Routing）
-- 文件：`clawteam/team/router.py`
+- 文件：`agentteam/team/router.py`
 - 基于三因素路由算法：
   - **历史表现**：成功率 + 质量评分加权
   - **负载感知**：当前进行中的任务数
@@ -221,11 +221,11 @@
 - 测试：`tests/test_routing.py`（18 项，全部通过）
 
 #### 告警机制（Alerting）
-- 文件：`clawteam/alerts.py`
+- 文件：`agentteam/alerts.py`
 - 四级严重程度：LOW / MEDIUM / HIGH / CRITICAL
 - 支持告警类型：TASK_TIMEOUT, AGENT_FAILURE_RATE_HIGH, TEAM_INACTIVITY
 - CRUD 操作：创建、查询、列表、确认
-- CLI 集成：`clawteam alert check/list/ack`
+- CLI 集成：`agentteam alert check/list/ack`
 - 测试：`tests/test_alerts.py`（5 项，全部通过）
 
 ### 修复问题
@@ -263,17 +263,17 @@ total = topic_match(0-50) + success_score(0-30) + quality_score(0-20) - load_pen
 ### CLI 命令（v0.4.0 补充，2026-04-27）
 
 **审计日志 CLI**：
-- `clawteam audit query <team>` — 查询审计日志（支持 `--action`/`--actor`/`--target`/`--limit`/`--json`）
-- `clawteam audit summary <team>` — 审计活动摘要
-- `clawteam audit log <team>` — 手动记录审计事件（测试/调试用）
+- `agentteam audit query <team>` — 查询审计日志（支持 `--action`/`--actor`/`--target`/`--limit`/`--json`）
+- `agentteam audit summary <team>` — 审计活动摘要
+- `agentteam audit log <team>` — 手动记录审计事件（测试/调试用）
 
 ### 修复问题（v0.4.0 补充，2026-04-27）
 
 | 问题 | 修复内容 | 影响范围 |
 |------|----------|----------|
 | 漂移检测字段名不匹配 | `jaccard_similarity` → `jaccard`，`semantic_similarity` → `semantic` | 漂移检测 |
-| audit.py 导入路径错误 | `from clawteam.audit import AuditEventType` | 漂移检测 |
-| 审计日志 CLI 缺失 | 新增 `clawteam audit query/summary/log` | 审计日志 |
+| audit.py 导入路径错误 | `from agentteam.audit import AuditEventType` | 漂移检测 |
+| 审计日志 CLI 缺失 | 新增 `agentteam audit query/summary/log` | 审计日志 |
 
 ### 升级步骤
 
@@ -288,9 +288,9 @@ pip install -e .
 python -m pytest tests/test_audit.py tests/test_routing.py tests/test_alerts.py -v
 
 # 4. 验证 CLI
-clawteam audit query <team>
-clawteam audit summary <team>
-clawteam alert check --team <your-team>
+agentteam audit query <team>
+agentteam audit summary <team>
+agentteam alert check --team <your-team>
 ```
 
 ### 向后兼容
@@ -305,12 +305,12 @@ clawteam alert check --team <your-team>
 
 ### 新增
 
-- **结构化日志**：`clawteam/utils/logger.py`
+- **结构化日志**：`agentteam/utils/logger.py`
   - JSON 格式，trace_id 上下文追踪
   - RotatingFileHandler（10MB/5 备份）
   - 环境变量：`CLAWTEAM_LOG_LEVEL`
 
-- **重试框架**：`clawteam/utils/retry.py`
+- **重试框架**：`agentteam/utils/retry.py`
   - `@retry` / `@retry_async` 装饰器
   - 指数退避 + 抖动
   - 自动统计重试次数

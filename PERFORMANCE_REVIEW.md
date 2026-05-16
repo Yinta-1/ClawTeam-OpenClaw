@@ -3,20 +3,20 @@
 # Date: 2026-05-03
 
 ## Summary
-Reviewed ClawTeam-OpenClaw v0.5.0 codebase for performance optimization opportunities.
+Reviewed AgentTeam-OpenClaw v0.5.0 codebase for performance optimization opportunities.
 Identified 6 key areas for improvement.
 
 ---
 
 ## 1. Event Tracker Query Optimization
-- **File**: `clawteam/events/tracker.py`
+- **File**: `agentteam/events/tracker.py`
 - **Current**: `query()` builds SQL dynamically without caching
 - **Issue**: Repeated query compilation overhead on repeated calls
 - **Impact**: Medium
 - **Recommendation**: Cache prepared statement templates for common filter combinations
 
 ## 2. Session Awareness Lock Contention  
-- **File**: `clawteam/session_awareness.py`
+- **File**: `agentteam/session_awareness.py`
 - **Current**: `RLock` acquired for every `update_activity()` call
 - **Issue**: Serialization under concurrent session updates causes bottleneck
 - **Impact**: High under concurrent load
@@ -26,7 +26,7 @@ Identified 6 key areas for improvement.
   - Consider atomic operations for simple counters
 
 ## 3. SSE Heartbeat Overhead
-- **File**: `clawteam/board/server.py` (`_serve_events`)
+- **File**: `agentteam/board/server.py` (`_serve_events`)
 - **Current**: Fixed 10-second heartbeat regardless of activity
 - **Issue**: Unnecessary network traffic for idle connections
 - **Impact**: Medium
@@ -36,7 +36,7 @@ Identified 6 key areas for improvement.
   - Skip heartbeat when client is disconnected
 
 ## 4. Database Connection Pooling
-- **File**: `clawteam/database/manager.py`
+- **File**: `agentteam/database/manager.py`
 - **Current**: Single sqlite3 connection per DatabaseManager instance
 - **Issue**: No pooling for concurrent request handling
 - **Impact**: Medium under concurrent load
@@ -46,7 +46,7 @@ Identified 6 key areas for improvement.
   - Consider `WAL` mode benefits for concurrent reads
 
 ## 5. Event Subscriber Notification
-- **File**: `clawteam/events/tracker.py` (`_notify_event_subscribers`)
+- **File**: `agentteam/events/tracker.py` (`_notify_event_subscribers`)
 - **Current**: Linear iteration through all subscribers under lock
 - **Issue**: O(n) notification time with blocking
 - **Impact**: Medium
@@ -57,8 +57,8 @@ Identified 6 key areas for improvement.
 
 ## 6. Memory Configuration (deque limits)
 - **Files**: 
-  - `clawteam/board/server.py`: `_event_queue` (maxlen=500)
-  - `clawteam/board/server.py`: `_chat_event_queue` (maxlen=100)
+  - `agentteam/board/server.py`: `_event_queue` (maxlen=500)
+  - `agentteam/board/server.py`: `_chat_event_queue` (maxlen=100)
 - **Issue**: Fixed limits without profiling data
 - **Impact**: Low (may lose events or waste memory)
 - **Recommendation**:
@@ -84,7 +84,7 @@ Identified 6 key areas for improvement.
 ## Implemented Optimizations (2026-05-03)
 
 ### 1. SSE Heartbeat Optimization (P2 - COMPLETED)
-**File**: `clawteam/board/server.py`
+**File**: `agentteam/board/server.py`
 **Changes**:
 - Added adaptive heartbeat interval based on activity
 - Active connections: 10-second heartbeat
@@ -93,7 +93,7 @@ Identified 6 key areas for improvement.
 - Includes `idle_cycles` in heartbeat payload for client awareness
 
 ### 2. Session Awareness Lock Contention (P1 - COMPLETED)
-**File**: `clawteam/session_awareness.py`
+**File**: `agentteam/session_awareness.py`
 **Changes**:
 - Added `_update_activity_unsafe()` - doesn't acquire lock (for internal use)
 - Added `_update_activity_level_unsafe()` - doesn't acquire lock (for internal use)
@@ -115,9 +115,9 @@ Identified 6 key areas for improvement.
 
 ## Files Reviewed
 
-- `clawteam/profiler.py` - Profiler utilities (well implemented)
-- `clawteam/concurrency/guard.py` - Concurrency control (good)
-- `clawteam/database/manager.py` - Database layer (needs pooling)
-- `clawteam/session_awareness.py` - Session tracking (lock contention)
-- `clawteam/events/tracker.py` - Event tracking (query optimization opportunity)
-- `clawteam/board/server.py` - Board HTTP server (SSE optimization opportunity)
+- `agentteam/profiler.py` - Profiler utilities (well implemented)
+- `agentteam/concurrency/guard.py` - Concurrency control (good)
+- `agentteam/database/manager.py` - Database layer (needs pooling)
+- `agentteam/session_awareness.py` - Session tracking (lock contention)
+- `agentteam/events/tracker.py` - Event tracking (query optimization opportunity)
+- `agentteam/board/server.py` - Board HTTP server (SSE optimization opportunity)

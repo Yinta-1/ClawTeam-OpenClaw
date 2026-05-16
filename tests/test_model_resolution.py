@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from clawteam.model_resolution import DEFAULT_TIERS, resolve_model
+from agentteam.model_resolution import DEFAULT_TIERS, resolve_model
 
 
 class TestResolveModel:
@@ -185,28 +185,28 @@ class TestTemplateModelFields:
     """Test model fields on AgentDef and TemplateDef."""
 
     def test_agent_def_model_field(self):
-        from clawteam.templates import AgentDef
+        from agentteam.templates import AgentDef
         agent = AgentDef(name="test", model="opus")
         assert agent.model == "opus"
 
     def test_agent_def_model_tier_field(self):
-        from clawteam.templates import AgentDef
+        from agentteam.templates import AgentDef
         agent = AgentDef(name="test", model_tier="strong")
         assert agent.model_tier == "strong"
 
     def test_agent_def_model_tier_invalid(self):
-        from clawteam.templates import AgentDef
+        from agentteam.templates import AgentDef
         with pytest.raises(ValueError, match="Invalid model_tier"):
             AgentDef(name="test", model_tier="invalid")
 
     def test_agent_def_no_model(self):
-        from clawteam.templates import AgentDef
+        from agentteam.templates import AgentDef
         agent = AgentDef(name="test")
         assert agent.model is None
         assert agent.model_tier is None
 
     def test_template_def_model_fields(self):
-        from clawteam.templates import AgentDef, TemplateDef
+        from agentteam.templates import AgentDef, TemplateDef
         tmpl = TemplateDef(
             name="test",
             model="sonnet-4.6",
@@ -217,7 +217,7 @@ class TestTemplateModelFields:
         assert tmpl.model_strategy == "auto"
 
     def test_template_def_model_strategy_invalid(self):
-        from clawteam.templates import AgentDef, TemplateDef
+        from agentteam.templates import AgentDef, TemplateDef
         with pytest.raises(ValueError, match="Invalid model_strategy"):
             TemplateDef(
                 name="test",
@@ -227,7 +227,7 @@ class TestTemplateModelFields:
 
     def test_template_toml_with_model(self, tmp_path):
         """TOML template with model fields parses correctly."""
-        from clawteam.templates import _parse_toml
+        from agentteam.templates import _parse_toml
         toml_content = """
 [template]
 name = "test-model"
@@ -258,17 +258,17 @@ class TestConfigModelFields:
     """Test model fields on ClawTeamConfig."""
 
     def test_config_default_model(self):
-        from clawteam.config import ClawTeamConfig
+        from agentteam.config import ClawTeamConfig
         cfg = ClawTeamConfig(default_model="opus")
         assert cfg.default_model == "opus"
 
     def test_config_model_tiers(self):
-        from clawteam.config import ClawTeamConfig
+        from agentteam.config import ClawTeamConfig
         cfg = ClawTeamConfig(model_tiers={"strong": "my-opus"})
         assert cfg.model_tiers["strong"] == "my-opus"
 
     def test_config_defaults_empty(self):
-        from clawteam.config import ClawTeamConfig
+        from agentteam.config import ClawTeamConfig
         cfg = ClawTeamConfig()
         assert cfg.default_model == ""
         assert cfg.model_tiers == {}
@@ -278,24 +278,24 @@ class TestIdentityModelField:
     """Test model field on AgentIdentity."""
 
     def test_identity_model_field(self):
-        from clawteam.identity import AgentIdentity
+        from agentteam.identity import AgentIdentity
         identity = AgentIdentity(model="opus")
         assert identity.model == "opus"
 
     def test_identity_model_from_env(self, monkeypatch):
-        from clawteam.identity import AgentIdentity
+        from agentteam.identity import AgentIdentity
         monkeypatch.setenv("CLAWTEAM_MODEL", "sonnet-4.6")
         identity = AgentIdentity.from_env()
         assert identity.model == "sonnet-4.6"
 
     def test_identity_model_to_env(self):
-        from clawteam.identity import AgentIdentity
+        from agentteam.identity import AgentIdentity
         identity = AgentIdentity(model="opus")
         env = identity.to_env()
         assert env["CLAWTEAM_MODEL"] == "opus"
 
     def test_identity_no_model(self):
-        from clawteam.identity import AgentIdentity
+        from agentteam.identity import AgentIdentity
         identity = AgentIdentity()
         assert identity.model is None
         env = identity.to_env()
@@ -306,17 +306,17 @@ class TestTeamMemberModelField:
     """Test model_name field on TeamMember."""
 
     def test_member_model_name(self):
-        from clawteam.team.models import TeamMember
+        from agentteam.team.models import TeamMember
         member = TeamMember(name="test", model_name="opus")
         assert member.model_name == "opus"
 
     def test_member_model_name_default(self):
-        from clawteam.team.models import TeamMember
+        from agentteam.team.models import TeamMember
         member = TeamMember(name="test")
         assert member.model_name == ""
 
     def test_member_model_name_serialization(self):
-        from clawteam.team.models import TeamMember
+        from agentteam.team.models import TeamMember
         member = TeamMember(name="test", model_name="opus")
         data = json.loads(member.model_dump_json(by_alias=True))
         assert data["modelName"] == "opus"

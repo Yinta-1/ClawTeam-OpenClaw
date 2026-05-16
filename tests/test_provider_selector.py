@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.orchestrator.provider_selector import (
+from agentteam.orchestrator.provider_selector import (
     ProviderInfo,
     ProviderSelector,
     ProviderStatus,
@@ -419,14 +419,14 @@ class TestFallbackChains:
 
     def test_default_fallback_chain(self):
         """Test default fallback chain exists."""
-        from clawteam.orchestrator.provider_selector import FallbackChain
+        from agentteam.orchestrator.provider_selector import FallbackChain
         chain = FallbackChain.default_chain()
         assert chain.name == "default"
         assert len(chain.providers) > 0
 
     def test_code_generation_chain(self):
         """Test code generation fallback chain."""
-        from clawteam.orchestrator.provider_selector import FallbackChain
+        from agentteam.orchestrator.provider_selector import FallbackChain
         chain = FallbackChain.code_generation_chain()
         assert chain.task_type == "code_generation"
         assert "codex" in chain.providers

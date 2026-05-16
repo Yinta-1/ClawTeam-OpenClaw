@@ -9,14 +9,14 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from clawteam.team.router import (
+from agentteam.team.router import (
     TaskRouter,
     AgentProfile,
     RouteCandidate,
     _extract_keywords,
     _router_root,
 )
-from clawteam.team.models import TaskItem, TaskStatus, QualityScore
+from agentteam.team.models import TaskItem, TaskStatus, QualityScore
 
 
 class TestKeywordExtraction:

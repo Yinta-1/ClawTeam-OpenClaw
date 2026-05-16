@@ -1,9 +1,9 @@
 #!/bin/bash
-# ClawTeam Bash Completion
+# AgentTeam Bash Completion
 # Installation: Add to ~/.bashrc:
 #   source /path/to/shell-completion.sh
 
-_clawteam_completion() {
+_agentteam_completion() {
     local cur prev words cword
     _init_completion || return
 
@@ -98,4 +98,4 @@ _clawteam_completion() {
     COMPREPLY+=( $(compgen -W "--help --verbose" -- "$cur") )
 }
 
-complete -F _clawteam_completion clawteam
+complete -F _agentteam_completion agentteam

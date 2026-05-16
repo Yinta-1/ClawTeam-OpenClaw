@@ -13,21 +13,21 @@ import time
 from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 
-from clawteam.parser.output_parser import (
+from agentteam.parser.output_parser import (
     OutputParser,
     _strip_ansi,
     _get_or_create_state,
     get_parser,
     parse_output,
 )
-from clawteam.parser.types import (
+from agentteam.parser.types import (
     ActivityEvent,
     ActivityEventType,
     ParserState,
     ParserRule,
     UsageSummary,
 )
-from clawteam.parser.rules import PARSER_RULES
+from agentteam.parser.rules import PARSER_RULES
 
 
 class TestStripAnsi:

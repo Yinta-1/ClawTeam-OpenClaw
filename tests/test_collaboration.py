@@ -13,10 +13,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from clawteam.collaboration.presence import PresenceManager, PresenceStatus
-from clawteam.collaboration.context_board import ContextBoard, ContextCategory, ContextEntry
-from clawteam.collaboration.activity_feed import ActivityFeed, ActivityType, ActivityEntry
-from clawteam.collaboration.mentions import MentionParser, MentionType, Mention
+from agentteam.collaboration.presence import PresenceManager, PresenceStatus
+from agentteam.collaboration.context_board import ContextBoard, ContextCategory, ContextEntry
+from agentteam.collaboration.activity_feed import ActivityFeed, ActivityType, ActivityEntry
+from agentteam.collaboration.mentions import MentionParser, MentionType, Mention
 
 
 class TestPresenceStatus:

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from clawteam.team.mailbox import MailboxManager
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import MessageType
-from clawteam.team.plan import PlanManager
+from agentteam.team.mailbox import MailboxManager
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import MessageType
+from agentteam.team.plan import PlanManager
 
 
 def _create_team(tmp_path: Path, monkeypatch, team_name: str) -> None:

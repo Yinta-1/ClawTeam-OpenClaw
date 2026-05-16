@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from clawteam.team.models import get_data_dir
+from agentteam.team.models import get_data_dir
 
 
 class TestDeliverToRunningAgent:
@@ -18,10 +18,10 @@ class TestDeliverToRunningAgent:
 
     def test_delivers_to_running_agent_via_gateway(self, tmp_path, monkeypatch):
         """When agent is running, message is sent via Gateway API."""
-        from clawteam.cli.commands import _deliver_to_running_agent
+        from agentteam.cli.commands import _deliver_to_running_agent
 
         # Setup: Create a fake running_agents.json
-        data_dir = tmp_path / ".clawteam"
+        data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
 
@@ -50,7 +50,7 @@ class TestDeliverToRunningAgent:
         # Mock activity broadcast
         mock_broadcast = MagicMock()
         monkeypatch.setattr(
-            "clawteam.cli.commands._broadcast_activity_to_board", mock_broadcast
+            "agentteam.cli.commands._broadcast_activity_to_board", mock_broadcast
         )
 
         # Call the function
@@ -65,10 +65,10 @@ class TestDeliverToRunningAgent:
 
     def test_falls_back_to_file_when_agent_not_running(self, tmp_path, monkeypatch):
         """When agent is not running, function returns False to fall back to file."""
-        from clawteam.cli.commands import _deliver_to_running_agent
+        from agentteam.cli.commands import _deliver_to_running_agent
 
         # Setup: Empty running_agents.json
-        data_dir = tmp_path / ".clawteam"
+        data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
 
@@ -90,10 +90,10 @@ class TestDeliverToRunningAgent:
 
     def test_falls_back_on_gateway_error(self, tmp_path, monkeypatch):
         """When Gateway API fails, function returns False."""
-        from clawteam.cli.commands import _deliver_to_running_agent
+        from agentteam.cli.commands import _deliver_to_running_agent
 
         # Setup: Running agent exists
-        data_dir = tmp_path / ".clawteam"
+        data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
 
@@ -132,7 +132,7 @@ class TestBroadcastActivityToBoard:
 
     def test_broadcasts_activity_to_board_server(self, tmp_path, monkeypatch):
         """Activity is broadcast to Board server via HTTP POST."""
-        from clawteam.cli.commands import _broadcast_activity_to_board
+        from agentteam.cli.commands import _broadcast_activity_to_board
 
         # Mock HTTP request
         mock_response = MagicMock()
@@ -170,7 +170,7 @@ class TestBroadcastActivityToBoard:
 
     def test_returns_false_on_board_server_error(self, tmp_path, monkeypatch):
         """Returns False when Board server is unavailable."""
-        from clawteam.cli.commands import _broadcast_activity_to_board
+        from agentteam.cli.commands import _broadcast_activity_to_board
 
         # Mock HTTP request to fail
         mock_urlopen = MagicMock(side_effect=Exception("Connection refused"))
@@ -193,7 +193,7 @@ class TestActivityEventTypes:
 
     def test_completed_event(self, tmp_path, monkeypatch):
         """Completed event is broadcast correctly."""
-        from clawteam.cli.commands import _broadcast_activity_to_board
+        from agentteam.cli.commands import _broadcast_activity_to_board
 
         mock_response = MagicMock()
         mock_response.getcode.return_value = 200
@@ -216,7 +216,7 @@ class TestActivityEventTypes:
 
     def test_started_event(self, tmp_path, monkeypatch):
         """Started event is broadcast correctly."""
-        from clawteam.cli.commands import _broadcast_activity_to_board
+        from agentteam.cli.commands import _broadcast_activity_to_board
 
         mock_response = MagicMock()
         mock_response.getcode.return_value = 200
@@ -239,7 +239,7 @@ class TestActivityEventTypes:
 
     def test_terminated_event(self, tmp_path, monkeypatch):
         """Terminated event is broadcast correctly."""
-        from clawteam.cli.commands import _broadcast_activity_to_board
+        from agentteam.cli.commands import _broadcast_activity_to_board
 
         mock_response = MagicMock()
         mock_response.getcode.return_value = 200
@@ -266,10 +266,10 @@ class TestSmartRoutingIntegration:
 
     def test_routing_skips_non_sdk_agents(self, tmp_path, monkeypatch):
         """Non-SDK agents (tmux, subprocess) are not routed via Gateway."""
-        from clawteam.cli.commands import _deliver_to_running_agent
+        from agentteam.cli.commands import _deliver_to_running_agent
 
         # Setup: Agent registered but with tmux backend type
-        data_dir = tmp_path / ".clawteam"
+        data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
         monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
 

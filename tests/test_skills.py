@@ -15,7 +15,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch, MagicMock
 
-from clawteam.skills.auto_creator import (
+from agentteam.skills.auto_creator import (
     DetectedPattern,
     SkillSpec,
     SkillAutoCreator,
@@ -245,7 +245,7 @@ class TestSkillUsageTracker:
         # 记录一些旧数据（模拟超过30天）
         old_time = datetime.now() - timedelta(days=40)
         
-        with patch('clawteam.skills.auto_creator.datetime') as mock_datetime:
+        with patch('agentteam.skills.auto_creator.datetime') as mock_datetime:
             mock_datetime.now.return_value = old_time
             mock_datetime.fromisoformat = datetime.fromisoformat
             

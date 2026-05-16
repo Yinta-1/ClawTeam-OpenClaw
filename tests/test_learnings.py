@@ -18,7 +18,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
-from clawteam.learnings.auto_capture import (
+from agentteam.learnings.auto_capture import (
     LearningType,
     ExperienceEntry,
     AutoCaptureEngine,

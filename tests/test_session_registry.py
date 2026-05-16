@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from clawteam.session.registry import (
+from agentteam.session.registry import (
     SessionRegistry,
     SessionInfo,
     SessionStatus,
@@ -387,7 +387,7 @@ class TestGetSessionRegistry:
     def test_singleton(self, temp_data_dir):
         """Test that get_session_registry returns singleton."""
         # Reset singleton
-        import clawteam.session.registry as reg_module
+        import agentteam.session.registry as reg_module
         reg_module._registry = None
         
         # Set env var for data dir

@@ -2,7 +2,7 @@
 
 import pytest
 
-from clawteam.orchestrator.model_router import (
+from agentteam.orchestrator.model_router import (
     ComplexityLevel,
     ModelRouter,
     ModelTier,

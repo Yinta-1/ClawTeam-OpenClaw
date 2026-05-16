@@ -4,7 +4,7 @@ import tempfile
 import json
 from pathlib import Path
 
-from clawteam.memory import FTS5MemoryProvider
+from agentteam.memory import FTS5MemoryProvider
 
 
 @pytest.fixture

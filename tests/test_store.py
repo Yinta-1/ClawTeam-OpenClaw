@@ -7,11 +7,11 @@ from unittest.mock import patch
 
 import pytest
 
-from clawteam.store import BaseTaskStore, TaskLockError, get_task_store
-from clawteam.store.base import BaseTaskStore as BaseTaskStoreFromBase
-from clawteam.store.file import FileTaskStore
-from clawteam.team.models import TaskPriority, TaskStatus
-from clawteam.team.tasks import TaskStore  # backward compat alias
+from agentteam.store import BaseTaskStore, TaskLockError, get_task_store
+from agentteam.store.base import BaseTaskStore as BaseTaskStoreFromBase
+from agentteam.store.file import FileTaskStore
+from agentteam.team.models import TaskPriority, TaskStatus
+from agentteam.team.tasks import TaskStore  # backward compat alias
 
 
 class TestBackwardCompat:
@@ -21,11 +21,11 @@ class TestBackwardCompat:
         assert TaskStore is FileTaskStore
 
     def test_tasklockerror_importable_from_old_path(self):
-        from clawteam.team.tasks import TaskLockError as OldLockError
+        from agentteam.team.tasks import TaskLockError as OldLockError
         assert OldLockError is TaskLockError
 
     def test_basetaskstore_importable_from_old_path(self):
-        from clawteam.team.tasks import BaseTaskStore as OldBase
+        from agentteam.team.tasks import BaseTaskStore as OldBase
         assert OldBase is BaseTaskStoreFromBase
 
     def test_old_import_creates_working_store(self, team_name):
@@ -121,13 +121,13 @@ class TestStoreRoundTrip:
 
 class TestConfigIntegration:
     def test_task_store_in_config(self):
-        from clawteam.config import ClawTeamConfig
+        from agentteam.config import ClawTeamConfig
         cfg = ClawTeamConfig()
         assert hasattr(cfg, "task_store")
         assert cfg.task_store == ""
 
     def test_task_store_env_var_in_get_effective(self):
-        from clawteam.config import get_effective
+        from agentteam.config import get_effective
         with patch.dict(os.environ, {"CLAWTEAM_TASK_STORE": "redis"}):
             val, source = get_effective("task_store")
         assert val == "redis"

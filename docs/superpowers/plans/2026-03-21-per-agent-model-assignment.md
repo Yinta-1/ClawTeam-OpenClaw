@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Allow ClawTeam templates and CLI to assign different models to different agents, passing `--model` to OpenClaw at spawn time.
+**Goal:** Allow AgentTeam templates and CLI to assign different models to different agents, passing `--model` to OpenClaw at spawn time.
 
 **Architecture:** Add optional `model`/`model_tier` fields to templates, a `resolve_model()` function that implements a 7-level priority chain, and `--model` injection into spawn backends. All fields are optional — backward compatible.
 
@@ -16,15 +16,15 @@
 
 | File | Role | Action |
 |------|------|--------|
-| `clawteam/model_resolution.py` | Model resolution logic, tier defaults, auto role map | Create |
-| `clawteam/templates/__init__.py` | Template schema + TOML parser | Modify |
-| `clawteam/team/models.py` | TeamMember runtime model | Modify |
-| `clawteam/identity.py` | AgentIdentity env var support | Modify |
-| `clawteam/config.py` | Global config with default_model | Modify |
-| `clawteam/spawn/base.py` | SpawnBackend base class | Modify |
-| `clawteam/spawn/tmux_backend.py` | Tmux spawn with --model injection | Modify |
-| `clawteam/spawn/subprocess_backend.py` | Subprocess spawn with --model injection | Modify |
-| `clawteam/cli/commands.py` | CLI spawn/launch with --model flag | Modify |
+| `agentteam/model_resolution.py` | Model resolution logic, tier defaults, auto role map | Create |
+| `agentteam/templates/__init__.py` | Template schema + TOML parser | Modify |
+| `agentteam/team/models.py` | TeamMember runtime model | Modify |
+| `agentteam/identity.py` | AgentIdentity env var support | Modify |
+| `agentteam/config.py` | Global config with default_model | Modify |
+| `agentteam/spawn/base.py` | SpawnBackend base class | Modify |
+| `agentteam/spawn/tmux_backend.py` | Tmux spawn with --model injection | Modify |
+| `agentteam/spawn/subprocess_backend.py` | Subprocess spawn with --model injection | Modify |
+| `agentteam/cli/commands.py` | CLI spawn/launch with --model flag | Modify |
 | `tests/test_model_resolution.py` | Tests for resolve_model() | Create |
 | `tests/test_templates.py` | Additional template model field tests | Modify |
 | `tests/test_models.py` | TeamMember model_name field test | Modify |
@@ -36,18 +36,18 @@
 ### Task 1: Model Resolution Function
 
 **Files:**
-- Create: `clawteam/model_resolution.py`
+- Create: `agentteam/model_resolution.py`
 - Create: `tests/test_model_resolution.py`
 
 - [ ] **Step 1: Write failing tests for resolve_model()**
 
 ```python
 # tests/test_model_resolution.py
-"""Tests for clawteam.model_resolution — 7-level priority chain."""
+"""Tests for agentteam.model_resolution — 7-level priority chain."""
 
 import pytest
 
-from clawteam.model_resolution import (
+from agentteam.model_resolution import (
     AUTO_ROLE_MAP,
     DEFAULT_TIERS,
     resolve_model,
@@ -213,13 +213,13 @@ class TestTierOverrides:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_model_resolution.py -v`
-Expected: ModuleNotFoundError — `clawteam.model_resolution` does not exist yet.
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_model_resolution.py -v`
+Expected: ModuleNotFoundError — `agentteam.model_resolution` does not exist yet.
 
 - [ ] **Step 3: Implement resolve_model()**
 
 ```python
-# clawteam/model_resolution.py
+# agentteam/model_resolution.py
 """Model resolution for per-agent model assignment.
 
 Implements a 7-level priority chain:
@@ -294,14 +294,14 @@ def resolve_model(
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_model_resolution.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_model_resolution.py -v`
 Expected: All 14 tests PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/model_resolution.py tests/test_model_resolution.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/model_resolution.py tests/test_model_resolution.py
 git commit -m "feat: add resolve_model() with 7-level priority chain"
 ```
 
@@ -310,8 +310,8 @@ git commit -m "feat: add resolve_model() with 7-level priority chain"
 ### Task 2: Template Schema — Add model fields to AgentDef and TemplateDef
 
 **Files:**
-- Modify: `clawteam/templates/__init__.py:24-44` (AgentDef, TemplateDef)
-- Modify: `clawteam/templates/__init__.py:75-100` (_parse_toml)
+- Modify: `agentteam/templates/__init__.py:24-44` (AgentDef, TemplateDef)
+- Modify: `agentteam/templates/__init__.py:75-100` (_parse_toml)
 - Modify: `tests/test_templates.py`
 
 - [ ] **Step 1: Write failing tests for new template fields**
@@ -387,7 +387,7 @@ model_tier = "cheap"
         tpl_dir.mkdir()
         (tpl_dir / "model-test.toml").write_text(toml_content)
 
-        import clawteam.templates as tmod
+        import agentteam.templates as tmod
         monkeypatch.setattr(tmod, "_USER_DIR", tpl_dir)
 
         tmpl = load_template("model-test")
@@ -409,7 +409,7 @@ type = "leader"
         tpl_dir.mkdir()
         (tpl_dir / "strategy-test.toml").write_text(toml_content)
 
-        import clawteam.templates as tmod
+        import agentteam.templates as tmod
         monkeypatch.setattr(tmod, "_USER_DIR", tpl_dir)
 
         tmpl = load_template("strategy-test")
@@ -418,12 +418,12 @@ type = "leader"
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_templates.py::TestModelFields tests/test_templates.py::TestParseTomlWithModel -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_templates.py::TestModelFields tests/test_templates.py::TestParseTomlWithModel -v`
 Expected: FAIL — `AgentDef` has no `model` attribute, `TemplateDef` has no `model_strategy`.
 
 - [ ] **Step 3: Add model fields to AgentDef and TemplateDef**
 
-Edit `clawteam/templates/__init__.py`. Replace the Pydantic models section (lines 24-44):
+Edit `agentteam/templates/__init__.py`. Replace the Pydantic models section (lines 24-44):
 
 ```python
 from pydantic import BaseModel, field_validator
@@ -475,7 +475,7 @@ class TemplateDef(BaseModel):
 
 - [ ] **Step 4: Update _parse_toml() to forward new fields**
 
-Edit `clawteam/templates/__init__.py` `_parse_toml()` (lines 92-100). The `AgentDef(**leader_data)` and `AgentDef(**a)` calls already pass through all TOML keys via `**`, so `model` and `model_tier` on agents are automatically forwarded. Only the `TemplateDef` constructor needs updating:
+Edit `agentteam/templates/__init__.py` `_parse_toml()` (lines 92-100). The `AgentDef(**leader_data)` and `AgentDef(**a)` calls already pass through all TOML keys via `**`, so `model` and `model_tier` on agents are automatically forwarded. Only the `TemplateDef` constructor needs updating:
 
 ```python
     return TemplateDef(
@@ -493,14 +493,14 @@ Edit `clawteam/templates/__init__.py` `_parse_toml()` (lines 92-100). The `Agent
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_templates.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_templates.py -v`
 Expected: All tests PASS (existing + new).
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/templates/__init__.py tests/test_templates.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/templates/__init__.py tests/test_templates.py
 git commit -m "feat: add model and model_tier fields to template schema"
 ```
 
@@ -509,8 +509,8 @@ git commit -m "feat: add model and model_tier fields to template schema"
 ### Task 3: Runtime Models — TeamMember and AgentIdentity
 
 **Files:**
-- Modify: `clawteam/team/models.py:58-68` (TeamMember)
-- Modify: `clawteam/identity.py:26-74` (AgentIdentity)
+- Modify: `agentteam/team/models.py:58-68` (TeamMember)
+- Modify: `agentteam/identity.py:26-74` (AgentIdentity)
 - Modify: `tests/test_models.py`
 
 - [ ] **Step 1: Write failing tests**
@@ -541,7 +541,7 @@ Add a new test file `tests/test_identity_model.py`:
 ```python
 """Tests for AgentIdentity model field."""
 
-from clawteam.identity import AgentIdentity
+from agentteam.identity import AgentIdentity
 
 
 class TestAgentIdentityModel:
@@ -580,12 +580,12 @@ class TestAgentIdentityModel:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_models.py::TestTeamMember::test_model_name_default tests/test_identity_model.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_models.py::TestTeamMember::test_model_name_default tests/test_identity_model.py -v`
 Expected: FAIL — `model_name` not a field on TeamMember, `model` not a field on AgentIdentity.
 
 - [ ] **Step 3: Add model_name to TeamMember**
 
-Edit `clawteam/team/models.py` line 67, add after `joined_at`:
+Edit `agentteam/team/models.py` line 67, add after `joined_at`:
 
 ```python
     model_name: str = Field(default="", alias="modelName")
@@ -593,7 +593,7 @@ Edit `clawteam/team/models.py` line 67, add after `joined_at`:
 
 - [ ] **Step 4: Add model to AgentIdentity**
 
-Edit `clawteam/identity.py`:
+Edit `agentteam/identity.py`:
 
 Add `model` field to `AgentIdentity` dataclass (after line 36):
 ```python
@@ -613,14 +613,14 @@ Update `to_env()` (after line 73) — add:
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_models.py tests/test_identity_model.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_models.py tests/test_identity_model.py -v`
 Expected: All PASS.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/team/models.py clawteam/identity.py tests/test_models.py tests/test_identity_model.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/team/models.py agentteam/identity.py tests/test_models.py tests/test_identity_model.py
 git commit -m "feat: add model field to TeamMember and AgentIdentity"
 ```
 
@@ -629,8 +629,8 @@ git commit -m "feat: add model field to TeamMember and AgentIdentity"
 ### Task 4: Config — Add default_model and model_tiers
 
 **Files:**
-- Modify: `clawteam/config.py:12-19` (ClawTeamConfig)
-- Modify: `clawteam/config.py:53-61` (env_map in get_effective)
+- Modify: `agentteam/config.py:12-19` (ClawTeamConfig)
+- Modify: `agentteam/config.py:53-61` (env_map in get_effective)
 - Modify: `tests/test_config.py`
 
 - [ ] **Step 1: Write failing tests**
@@ -673,12 +673,12 @@ Add to `tests/test_config.py`:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_config.py::TestClawTeamConfig::test_default_model_empty tests/test_config.py::TestGetEffective::test_default_model_from_env -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_config.py::TestClawTeamConfig::test_default_model_empty tests/test_config.py::TestGetEffective::test_default_model_from_env -v`
 Expected: FAIL — `default_model` not a field.
 
 - [ ] **Step 3: Add fields to ClawTeamConfig**
 
-Edit `clawteam/config.py` line 19, add after `skip_permissions`:
+Edit `agentteam/config.py` line 19, add after `skip_permissions`:
 
 ```python
     default_model: str = ""
@@ -687,7 +687,7 @@ Edit `clawteam/config.py` line 19, add after `skip_permissions`:
 
 - [ ] **Step 4: Add to env_map in get_effective()**
 
-Edit `clawteam/config.py` line 60, add after `"skip_permissions"` entry:
+Edit `agentteam/config.py` line 60, add after `"skip_permissions"` entry:
 
 ```python
         "default_model": "CLAWTEAM_DEFAULT_MODEL",
@@ -695,14 +695,14 @@ Edit `clawteam/config.py` line 60, add after `"skip_permissions"` entry:
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_config.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_config.py -v`
 Expected: All PASS.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/config.py tests/test_config.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/config.py tests/test_config.py
 git commit -m "feat: add default_model and model_tiers to config"
 ```
 
@@ -711,9 +711,9 @@ git commit -m "feat: add default_model and model_tiers to config"
 ### Task 5: Spawn Backend — Add model parameter and --model injection
 
 **Files:**
-- Modify: `clawteam/spawn/base.py:11-23`
-- Modify: `clawteam/spawn/tmux_backend.py:27-38,84-96`
-- Modify: `clawteam/spawn/subprocess_backend.py:20-31,63-86`
+- Modify: `agentteam/spawn/base.py:11-23`
+- Modify: `agentteam/spawn/tmux_backend.py:27-38,84-96`
+- Modify: `agentteam/spawn/subprocess_backend.py:20-31,63-86`
 - Modify: `tests/test_spawn_backends.py`
 
 - [ ] **Step 1: Write failing tests for --model injection**
@@ -724,7 +724,7 @@ Add to `tests/test_spawn_backends.py`:
 def test_tmux_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
     """When model is provided and command is openclaw, --model should appear in the tmux command."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -747,16 +747,16 @@ def test_tmux_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
 
     original_which = __import__("shutil").which
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend.shutil.which",
+        "agentteam.spawn.tmux_backend.shutil.which",
         lambda name, path=None: "/opt/homebrew/bin/tmux" if name == "tmux" else original_which(name),
     )
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/openclaw" if name == "openclaw" else original_which(name),
     )
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -779,7 +779,7 @@ def test_tmux_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
 def test_tmux_backend_no_model_flag_when_none(monkeypatch, tmp_path):
     """When model is None, --model should NOT appear."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -802,16 +802,16 @@ def test_tmux_backend_no_model_flag_when_none(monkeypatch, tmp_path):
 
     original_which = __import__("shutil").which
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend.shutil.which",
+        "agentteam.spawn.tmux_backend.shutil.which",
         lambda name, path=None: "/opt/homebrew/bin/tmux" if name == "tmux" else original_which(name),
     )
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/openclaw" if name == "openclaw" else original_which(name),
     )
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -834,7 +834,7 @@ def test_tmux_backend_no_model_flag_when_none(monkeypatch, tmp_path):
 def test_subprocess_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
     """Subprocess backend should include --model in the openclaw command."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -847,11 +847,11 @@ def test_subprocess_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/openclaw" if name == "openclaw" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -873,12 +873,12 @@ def test_subprocess_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_spawn_backends.py::test_tmux_backend_passes_model_to_openclaw tests/test_spawn_backends.py::test_subprocess_backend_passes_model_to_openclaw -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_spawn_backends.py::test_tmux_backend_passes_model_to_openclaw tests/test_spawn_backends.py::test_subprocess_backend_passes_model_to_openclaw -v`
 Expected: TypeError — `spawn()` got unexpected keyword argument `model`.
 
 - [ ] **Step 3: Add model param to SpawnBackend base class**
 
-Edit `clawteam/spawn/base.py` line 22, add before `) -> str:`:
+Edit `agentteam/spawn/base.py` line 22, add before `) -> str:`:
 
 ```python
         model: str | None = None,
@@ -886,7 +886,7 @@ Edit `clawteam/spawn/base.py` line 22, add before `) -> str:`:
 
 - [ ] **Step 4: Add model to TmuxBackend.spawn()**
 
-Edit `clawteam/spawn/tmux_backend.py`:
+Edit `agentteam/spawn/tmux_backend.py`:
 
 1. Add `model: str | None = None,` to the `spawn()` signature (after `skip_permissions` param).
 
@@ -910,7 +910,7 @@ Edit `clawteam/spawn/tmux_backend.py`:
 
 - [ ] **Step 5: Add model to SubprocessBackend.spawn()**
 
-Edit `clawteam/spawn/subprocess_backend.py`:
+Edit `agentteam/spawn/subprocess_backend.py`:
 
 1. Add `model: str | None = None,` to the `spawn()` signature.
 
@@ -933,14 +933,14 @@ Edit `clawteam/spawn/subprocess_backend.py`:
 
 - [ ] **Step 6: Run all spawn backend tests**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_spawn_backends.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_spawn_backends.py -v`
 Expected: All PASS (existing + new).
 
 - [ ] **Step 7: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/spawn/base.py clawteam/spawn/tmux_backend.py clawteam/spawn/subprocess_backend.py tests/test_spawn_backends.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/spawn/base.py agentteam/spawn/tmux_backend.py agentteam/spawn/subprocess_backend.py tests/test_spawn_backends.py
 git commit -m "feat: add --model injection to spawn backends"
 ```
 
@@ -949,15 +949,15 @@ git commit -m "feat: add --model injection to spawn backends"
 ### Task 6: CLI — Add --model flag to spawn and launch commands
 
 **Files:**
-- Modify: `clawteam/cli/commands.py:1606-1617` (spawn_agent)
-- Modify: `clawteam/cli/commands.py:2145-2153` (launch_team)
-- Modify: `clawteam/cli/commands.py:2231-2281` (launch_team spawn loop)
+- Modify: `agentteam/cli/commands.py:1606-1617` (spawn_agent)
+- Modify: `agentteam/cli/commands.py:2145-2153` (launch_team)
+- Modify: `agentteam/cli/commands.py:2231-2281` (launch_team spawn loop)
 
 This task modifies the CLI wiring. The `commands.py` file is 2311 lines, so read the exact sections before editing.
 
 - [ ] **Step 1: Read the current spawn_agent and launch_team functions**
 
-Run: Read `clawteam/cli/commands.py` lines 1600-1750 and 2140-2310 to get exact current code.
+Run: Read `agentteam/cli/commands.py` lines 1600-1750 and 2140-2310 to get exact current code.
 
 - [ ] **Step 2: Add --model to spawn_agent**
 
@@ -982,8 +982,8 @@ Add to `launch_team()` function signature:
 
 Import at top of file:
 ```python
-from clawteam.config import load_config
-from clawteam.model_resolution import resolve_model
+from agentteam.config import load_config
+from agentteam.model_resolution import resolve_model
 ```
 
 Near the top of `launch_team()`, load config:
@@ -1016,19 +1016,19 @@ Also add a log warning when model is resolved but command may not support it:
 
 - [ ] **Step 5: Run existing CLI tests to verify no regression**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_spawn_cli.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_spawn_cli.py -v`
 Expected: All existing tests PASS.
 
 - [ ] **Step 6: Run full test suite**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest -v`
 Expected: All tests PASS.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/cli/commands.py
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/cli/commands.py
 git commit -m "feat: add --model flag to spawn and launch CLI commands"
 ```
 
@@ -1037,10 +1037,10 @@ git commit -m "feat: add --model flag to spawn and launch CLI commands"
 ### Task 7: Update Built-in Templates with Example Model Assignments
 
 **Files:**
-- Modify: `clawteam/templates/code-review.toml`
-- Modify: `clawteam/templates/hedge-fund.toml`
-- Modify: `clawteam/templates/research-paper.toml`
-- Modify: `clawteam/templates/strategy-room.toml`
+- Modify: `agentteam/templates/code-review.toml`
+- Modify: `agentteam/templates/hedge-fund.toml`
+- Modify: `agentteam/templates/research-paper.toml`
+- Modify: `agentteam/templates/strategy-room.toml`
 
 - [ ] **Step 1: Read current templates**
 
@@ -1064,14 +1064,14 @@ Do the same for all 4 templates.
 
 - [ ] **Step 3: Run template tests to verify no breakage**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest tests/test_templates.py -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_templates.py -v`
 Expected: All PASS.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
-git add clawteam/templates/*.toml
+cd ~/Projects/AgentTeam-OpenClaw
+git add agentteam/templates/*.toml
 git commit -m "feat: add model_strategy=auto to all built-in templates"
 ```
 
@@ -1084,22 +1084,22 @@ git commit -m "feat: add model_strategy=auto to all built-in templates"
 
 - [ ] **Step 1: Run the full test suite**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m pytest -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest -v`
 Expected: All tests PASS.
 
 - [ ] **Step 2: Verify backward compatibility — existing templates parse without model fields**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -c "from clawteam.templates import load_template; t = load_template('hedge-fund'); print(f'OK: {t.name}, model={t.model}, strategy={t.model_strategy}')"`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -c "from agentteam.templates import load_template; t = load_template('hedge-fund'); print(f'OK: {t.name}, model={t.model}, strategy={t.model_strategy}')"`
 Expected: Prints template name with model_strategy=auto (from Task 7).
 
 - [ ] **Step 3: Verify resolve_model returns None when nothing set**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -c "from clawteam.model_resolution import resolve_model; r = resolve_model(None,None,None,None,None,'','general-purpose'); print(f'Result: {r}'); assert r is None"`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -c "from agentteam.model_resolution import resolve_model; r = resolve_model(None,None,None,None,None,'','general-purpose'); print(f'Result: {r}'); assert r is None"`
 Expected: `Result: None`
 
 - [ ] **Step 4: Verify CLI help shows --model flag**
 
-Run: `cd ~/Projects/ClawTeam-OpenClaw && python -m clawteam spawn --help | grep -A1 model`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m agentteam spawn --help | grep -A1 model`
 Expected: Shows `--model` / `-m` option with help text.
 
 - [ ] **Step 5: Commit any remaining fixes**
@@ -1107,7 +1107,7 @@ Expected: Shows `--model` / `-m` option with help text.
 If any test failures were found and fixed, commit them:
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
+cd ~/Projects/AgentTeam-OpenClaw
 git add -A
 git commit -m "fix: address integration test findings"
 ```
@@ -1115,6 +1115,6 @@ git commit -m "fix: address integration test findings"
 - [ ] **Step 6: Final commit — tag the feature**
 
 ```bash
-cd ~/Projects/ClawTeam-OpenClaw
+cd ~/Projects/AgentTeam-OpenClaw
 git log --oneline -8  # verify all commits look correct
 ```

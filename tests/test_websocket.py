@@ -6,7 +6,7 @@ import pytest
 import time
 import threading
 
-from clawteam.board.websocket import (
+from agentteam.board.websocket import (
     WebSocketManager,
     WebSocketConnection,
     ConnectionPool,

@@ -6,9 +6,9 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from clawteam.parser import OutputParser, ActivityEvent, ActivityEventType
-from clawteam.parser.integration import ClawTeamIntegration, get_integration, parse_and_notify
-from clawteam.notification import NotificationManager, NotificationType
+from agentteam.parser import OutputParser, ActivityEvent, ActivityEventType
+from agentteam.parser.integration import ClawTeamIntegration, get_integration, parse_and_notify
+from agentteam.notification import NotificationManager, NotificationType
 
 
 class TestClawTeamIntegration:
@@ -119,7 +119,7 @@ class TestClawTeamIntegration:
     
     def test_remove_integration(self):
         """Test removing integration."""
-        from clawteam.parser.integration import remove_integration
+        from agentteam.parser.integration import remove_integration
         
         integration = get_integration("team-to-remove")
         remove_integration("team-to-remove")

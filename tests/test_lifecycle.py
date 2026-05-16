@@ -1,10 +1,10 @@
-"""Tests for clawteam.team.lifecycle — LifecycleManager shutdown/idle protocol."""
+"""Tests for agentteam.team.lifecycle — LifecycleManager shutdown/idle protocol."""
 
-from clawteam.team.lifecycle import LifecycleManager
-from clawteam.team.mailbox import MailboxManager
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import MessageType
-from clawteam.transport.file import FileTransport
+from agentteam.team.lifecycle import LifecycleManager
+from agentteam.team.mailbox import MailboxManager
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import MessageType
+from agentteam.transport.file import FileTransport
 
 
 def _setup(team_name: str) -> tuple[LifecycleManager, MailboxManager]:

@@ -12,7 +12,7 @@
   <a href="README_PT-BR.md">Português (Brasil)</a>
 </p>
 
-<h1 align="center">🦞ClawTeam-OpenClaw</h1>
+<h1 align="center">🦞AgentTeam-OpenClaw</h1>
 
 <p align="center">
   <strong>面向命令列程式碼智能體的多智能體集群協作 — 預設使用 <a href="https://openclaw.ai">OpenClaw</a></strong>
@@ -39,11 +39,11 @@
 
 ---
 
-## 為什麼選擇 ClawTeam？
+## 為什麼選擇 AgentTeam？
 
-當前的人工智慧智能體功能強大，但都在**孤立**運作。ClawTeam 讓智能體自組織為團隊 — 拆分工作、互相溝通、匯聚結果，無需人類事必躬親。
+當前的人工智慧智能體功能強大，但都在**孤立**運作。AgentTeam 讓智能體自組織為團隊 — 拆分工作、互相溝通、匯聚結果，無需人類事必躬親。
 
-| | ClawTeam | 其他多智能體框架 |
+| | AgentTeam | 其他多智能體框架 |
 |---|---------|----------------------------|
 | **誰在使用** | 人工智慧智能體自身 | 人類編寫編排程式碼 |
 | **設定** | `pip install` + 一句提示詞 | Docker、雲端 API、YAML 設定檔 |
@@ -60,10 +60,10 @@
 <td width="33%">
 
 ### 智能體啟動智能體
-領導者呼叫 `clawteam spawn` 建立工作者。每個工作者都擁有獨立的 **git worktree**、**tmux 視窗**和**身份標識**。
+領導者呼叫 `agentteam spawn` 建立工作者。每個工作者都擁有獨立的 **git worktree**、**tmux 視窗**和**身份標識**。
 
 ```bash
-clawteam spawn --team my-team \
+agentteam spawn --team my-team \
   --agent-name worker1 \
   --task "Implement auth module"
 ```
@@ -75,8 +75,8 @@ clawteam spawn --team my-team \
 工作者檢查收件匣、更新任務、回報結果 — 全部透過**自動注入**提示詞的命令列指令完成。
 
 ```bash
-clawteam task list my-team --owner me
-clawteam inbox send my-team leader \
+agentteam task list my-team --owner me
+agentteam inbox send my-team leader \
   "Auth done. All tests passing."
 ```
 
@@ -87,9 +87,9 @@ clawteam inbox send my-team leader \
 透過分割式 tmux 檢視或 Web 介面監控集群。領導者負責協調一切。
 
 ```bash
-clawteam board attach my-team
+agentteam board attach my-team
 # Or web dashboard
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 ```
 
 </td>
@@ -102,38 +102,38 @@ clawteam board serve --port 8080
 
 ### 方式一：讓智能體自行驅動（推薦）
 
-安裝 ClawTeam，然後向您的智能體發出提示：
+安裝 AgentTeam，然後向您的智能體發出提示：
 
 ```
-"Build a web app. Use clawteam to split the work across multiple agents."
+"Build a web app. Use agentteam to split the work across multiple agents."
 ```
 
-智能體自動建立團隊、啟動工作者、分配任務並協調 — 全部透過 `clawteam` 命令列完成。
+智能體自動建立團隊、啟動工作者、分配任務並協調 — 全部透過 `agentteam` 命令列完成。
 
 ### 方式二：手動驅動
 
 ```bash
 # Create a team
-clawteam team spawn-team my-team -d "Build the auth module" -n leader
+agentteam team spawn-team my-team -d "Build the auth module" -n leader
 
 # Spawn workers — each gets a git worktree + tmux window
-clawteam spawn --team my-team --agent-name alice --task "Implement OAuth2 flow"
-clawteam spawn --team my-team --agent-name bob   --task "Write unit tests for auth"
+agentteam spawn --team my-team --agent-name alice --task "Implement OAuth2 flow"
+agentteam spawn --team my-team --agent-name bob   --task "Write unit tests for auth"
 
 # Watch them work
-clawteam board attach my-team
+agentteam board attach my-team
 ```
 
 ### 支援的智能體
 
 | 智能體 | 啟動指令 | 狀態 |
 |-------|--------------|--------|
-| [OpenClaw](https://openclaw.ai) | `clawteam spawn tmux openclaw --team ...` | **預設** |
-| [Claude Code](https://claude.ai/claude-code) | `clawteam spawn tmux claude --team ...` | 完整支援 |
-| [Codex](https://openai.com/codex) | `clawteam spawn tmux codex --team ...` | 完整支援 |
-| [nanobot](https://github.com/HKUDS/nanobot) | `clawteam spawn tmux nanobot --team ...` | 完整支援 |
-| [Cursor](https://cursor.com) | `clawteam spawn subprocess cursor --team ...` | 實驗性 |
-| 自訂腳本 | `clawteam spawn subprocess python --team ...` | 完整支援 |
+| [OpenClaw](https://openclaw.ai) | `agentteam spawn tmux openclaw --team ...` | **預設** |
+| [Claude Code](https://claude.ai/claude-code) | `agentteam spawn tmux claude --team ...` | 完整支援 |
+| [Codex](https://openai.com/codex) | `agentteam spawn tmux codex --team ...` | 完整支援 |
+| [nanobot](https://github.com/HKUDS/nanobot) | `agentteam spawn tmux nanobot --team ...` | 完整支援 |
+| [Cursor](https://cursor.com) | `agentteam spawn subprocess cursor --team ...` | 實驗性 |
+| 自訂腳本 | `agentteam spawn subprocess python --team ...` | 完整支援 |
 
 ---
 
@@ -141,7 +141,7 @@ clawteam board attach my-team
 
 ### 第一步：前置條件
 
-ClawTeam 需要 **Python 3.10+**、**tmux** 以及至少一個命令列程式碼智能體（OpenClaw、Claude Code、Codex 等）。
+AgentTeam 需要 **Python 3.10+**、**tmux** 以及至少一個命令列程式碼智能體（OpenClaw、Claude Code、Codex 等）。
 
 **檢查您已有的環境：**
 
@@ -161,18 +161,18 @@ openclaw --version  # Or: claude --version / codex --version
 
 > 如果使用 Claude Code 或 Codex 而非 OpenClaw，請按照它們各自的文件進行安裝。OpenClaw 是預設選項，但並非嚴格必需。
 
-### 第二步：安裝 ClawTeam
+### 第二步：安裝 AgentTeam
 
-> **⚠️ 請勿直接執行 `pip install clawteam` 或 `npm install -g clawteam`：**
-> - `pip install clawteam` 會安裝 PyPI 上的上游版本，預設使用 `claude` 且缺少 OpenClaw 適配。
-> - `npm install -g clawteam` 會安裝一個無關的搶注套件（發佈者 `a9logic`）。如果 `clawteam --version` 顯示 "Coming Soon"，表示裝錯了，請先 `npm uninstall -g clawteam`。
+> **⚠️ 請勿直接執行 `pip install agentteam` 或 `npm install -g agentteam`：**
+> - `pip install agentteam` 會安裝 PyPI 上的上游版本，預設使用 `claude` 且缺少 OpenClaw 適配。
+> - `npm install -g agentteam` 會安裝一個無關的搶注套件（發佈者 `a9logic`）。如果 `agentteam --version` 顯示 "Coming Soon"，表示裝錯了，請先 `npm uninstall -g agentteam`。
 >
 > **正確做法是下面三條命令——clone 之後的 `pip install -e .` 是必須的，它從本地倉庫安裝，不是從 PyPI。**
 
 ```bash
 git clone https://github.com/win4r/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
-pip install -e .    # ← 必須執行！從本地倉庫安裝，不同於 pip install clawteam
+cd AgentTeam-OpenClaw
+pip install -e .    # ← 必須執行！從本地倉庫安裝，不同於 pip install agentteam
 ```
 
 可選 — P2P 傳輸層（ZeroMQ）：
@@ -183,14 +183,14 @@ pip install -e ".[p2p]"
 
 ### 第三步：建立 `~/bin/clawteam` 符號連結
 
-被啟動的智能體在全新的 shell 環境中執行，可能沒有將 pip 的 bin 目錄加入 PATH。在 `~/bin` 中建立符號連結可確保 `clawteam` 始終可達：
+被啟動的智能體在全新的 shell 環境中執行，可能沒有將 pip 的 bin 目錄加入 PATH。在 `~/bin` 中建立符號連結可確保 `agentteam` 始終可達：
 
 ```bash
 mkdir -p ~/bin
-ln -sf "$(which clawteam)" ~/bin/clawteam
+ln -sf "$(which agentteam)" ~/bin/clawteam
 ```
 
-如果 `which clawteam` 沒有回傳結果，請手動尋找二進位檔案：
+如果 `which agentteam` 沒有回傳結果，請手動尋找二進位檔案：
 
 ```bash
 # Common locations:
@@ -198,7 +198,7 @@ ln -sf "$(which clawteam)" ~/bin/clawteam
 # /opt/homebrew/bin/clawteam
 # /usr/local/bin/clawteam
 # /Library/Frameworks/Python.framework/Versions/3.*/bin/clawteam
-find / -name clawteam -type f 2>/dev/null | head -5
+find / -name agentteam -type f 2>/dev/null | head -5
 ```
 
 然後確保 `~/bin` 在您的 PATH 中 — 如果尚未加入，請將以下內容新增至 `~/.zshrc` 或 `~/.bashrc`：
@@ -209,7 +209,7 @@ export PATH="$HOME/bin:$PATH"
 
 ### 第四步：安裝 OpenClaw 技能（僅限 OpenClaw 使用者）
 
-技能檔案讓 OpenClaw 智能體能夠透過自然語言使用 ClawTeam。如果您不使用 OpenClaw，請跳過此步驟。
+技能檔案讓 OpenClaw 智能體能夠透過自然語言使用 AgentTeam。如果您不使用 OpenClaw，請跳過此步驟。
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills/clawteam
@@ -218,7 +218,7 @@ cp skills/openclaw/SKILL.md ~/.openclaw/workspace/skills/clawteam/SKILL.md
 
 ### 第五步：配置執行授權（僅限 OpenClaw 使用者）
 
-被啟動的 OpenClaw 智能體需要權限來執行 `clawteam` 指令。如果沒有配置，智能體會在互動式權限提示中被阻塞。
+被啟動的 OpenClaw 智能體需要權限來執行 `agentteam` 指令。如果沒有配置，智能體會在互動式權限提示中被阻塞。
 
 ```bash
 # Ensure security mode is "allowlist" (not "full")
@@ -234,8 +234,8 @@ else:
     print('exec-approvals.json not found — run openclaw once first, then re-run this step')
 "
 
-# Add clawteam to the allowlist (use the absolute path — OpenClaw 4.2+ requires it)
-openclaw approvals allowlist add --agent "*" "$(which clawteam)"
+# Add agentteam to the allowlist (use the absolute path — OpenClaw 4.2+ requires it)
+openclaw approvals allowlist add --agent "*" "$(which agentteam)"
 ```
 
 > 如果 `openclaw approvals` 失敗，OpenClaw 閘道器可能未在執行。請先啟動閘道器，然後重試。
@@ -243,14 +243,14 @@ openclaw approvals allowlist add --agent "*" "$(which clawteam)"
 ### 第六步：驗證
 
 ```bash
-clawteam --version          # Should print version
-clawteam config health      # Should show all green
+agentteam --version          # Should print version
+agentteam config health      # Should show all green
 ```
 
 如果使用 OpenClaw，還需驗證技能是否已載入：
 
 ```bash
-openclaw skills list | grep clawteam
+openclaw skills list | grep agentteam
 ```
 
 ### 自動化安裝腳本
@@ -259,7 +259,7 @@ openclaw skills list | grep clawteam
 
 ```bash
 git clone https://github.com/win4r/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+cd AgentTeam-OpenClaw
 bash scripts/install-openclaw.sh
 ```
 
@@ -267,13 +267,13 @@ bash scripts/install-openclaw.sh
 
 | 問題 | 原因 | 解決方法 |
 |---------|-------|-----|
-| `clawteam: command not found` | pip 的 bin 目錄未在 PATH 中 | 執行第三步（符號連結 + PATH） |
-| 被啟動的智能體找不到 `clawteam` | 智能體在沒有 pip PATH 的全新 shell 中執行 | 驗證 `~/bin/clawteam` 符號連結是否存在且 `~/bin` 已在 PATH 中 |
+| `agentteam: command not found` | pip 的 bin 目錄未在 PATH 中 | 執行第三步（符號連結 + PATH） |
+| 被啟動的智能體找不到 `agentteam` | 智能體在沒有 pip PATH 的全新 shell 中執行 | 驗證 `~/bin/clawteam` 符號連結是否存在且 `~/bin` 已在 PATH 中 |
 | `openclaw approvals` 失敗 | 閘道器未在執行 | 先啟動 `openclaw gateway`，然後重試第五步 |
 | `exec-approvals.json not found` | OpenClaw 從未執行過 | 先執行一次 `openclaw` 以產生設定檔，然後重試第五步 |
 | 智能體在權限提示中被阻塞 | 執行授權安全模式為 "full" | 執行第五步切換為 "allowlist" |
 | `pip install -e .` 失敗 | 缺少建置依賴 | 先執行 `pip install hatchling` |
-| `clawteam --version` 顯示 "Coming Soon" | 誤裝了 npm 同名搶注套件（`a9logic`，與本專案無關） | `npm uninstall -g clawteam`，然後按第二步重新安裝 |
+| `agentteam --version` 顯示 "Coming Soon" | 誤裝了 npm 同名搶注套件（`a9logic`，與本專案無關） | `npm uninstall -g agentteam`，然後按第二步重新安裝 |
 
 ---
 
@@ -314,7 +314,7 @@ Leader agent:
 一個 TOML 模板即可透過一條指令啟動完整的 7 智能體投資團隊：
 
 ```bash
-clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 2026"
+agentteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 2026"
 ```
 
 5 個分析師智能體（價值型、成長型、技術型、基本面、情緒面）並行工作。風險管理智能體綜合所有訊號。投資組合管理智能體做出最終決策。
@@ -339,7 +339,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 - 每個智能體擁有獨立的 **git worktree**
 - 並行智能體之間不會產生合併衝突
 - 支援檢查點、合併和清理指令
-- 分支命名規則：`clawteam/{team}/{agent}`
+- 分支命名規則：`agentteam/{team}/{agent}`
 
 ### 含依賴關係的任務追蹤
 - 共享看板：`pending` → `in_progress` → `completed` / `blocked`
@@ -362,7 +362,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ### 團隊模板
 - TOML 檔案定義團隊原型（角色、任務、提示詞）
-- 一條指令：`clawteam launch <template>`
+- 一條指令：`agentteam launch <template>`
 - 變數替換：`{goal}`、`{team_name}`、`{agent_name}`
 - **按智能體分配模型**（預覽版）：為不同角色分配不同模型 — 詳見[下方](#按智能體分配模型預覽版)
 
@@ -376,9 +376,9 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ## OpenClaw 整合
 
-本分叉版本將 [OpenClaw](https://openclaw.ai) 設為**預設智能體**。沒有 ClawTeam 時，每個 OpenClaw 智能體各自孤立工作。ClawTeam 將其轉化為多智能體平台。
+本分叉版本將 [OpenClaw](https://openclaw.ai) 設為**預設智能體**。沒有 AgentTeam 時，每個 OpenClaw 智能體各自孤立工作。AgentTeam 將其轉化為多智能體平台。
 
-| 能力 | 單獨使用 OpenClaw | OpenClaw + ClawTeam |
+| 能力 | 單獨使用 OpenClaw | OpenClaw + AgentTeam |
 |-----------|---------------|-------------------|
 | **任務分配** | 手動逐一傳送訊息 | 領導者自主拆分、分配、監控 |
 | **並行開發** | 共享工作目錄 | 每個智能體獨立的 git worktrees |
@@ -391,29 +391,29 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 | 您說的內容 | 發生的事情 |
 |-------------|-------------|
 | "建立一個 5 智能體團隊來開發 Web 應用程式" | 建立團隊、任務，在 tmux 中啟動 5 個智能體 |
-| "啟動一個對沖基金分析團隊" | 執行 `clawteam launch hedge-fund`，啟動 7 個智能體 |
-| "檢查我的智能體團隊狀態" | 執行 `clawteam board show` 顯示看板輸出 |
+| "啟動一個對沖基金分析團隊" | 執行 `agentteam launch hedge-fund`，啟動 7 個智能體 |
+| "檢查我的智能體團隊狀態" | 執行 `agentteam board show` 顯示看板輸出 |
 
 ```
   You (Telegram/Discord/TUI)
          │
          ▼
   ┌──────────────────┐
-  │  OpenClaw Gateway │  ← activates clawteam skill
+  │  OpenClaw Gateway │  ← activates agentteam skill
   └────────┬─────────┘
            │
            ▼
-  ┌──────────────────┐     clawteam spawn     ┌─────────────────┐
+  ┌──────────────────┐     agentteam spawn     ┌─────────────────┐
   │  Leader Agent    │ ─────────────────────► │  openclaw tui   │
   │  (openclaw)      │ ──┐                    │  (tmux window)  │
   │                  │   │                    │  git worktree   │
   │  Manages swarm   │   ├──────────────────► ├─────────────────┤
-  │  via clawteam    │   │                    │  openclaw tui   │
+  │  via agentteam    │   │                    │  openclaw tui   │
   │  CLI             │   ├──────────────────► ├─────────────────┤
   └──────────────────┘   │                    │  openclaw tui   │
                          └──────────────────► └─────────────────┘
                                                All coordinate via
-                                               ~/.clawteam/ (tasks, inboxes)
+                                               ~/.agentteam/ (tasks, inboxes)
 ```
 
 ---
@@ -424,7 +424,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
   Human: "Optimize this LLM"
          │
          ▼
-  ┌──────────────┐     clawteam spawn     ┌──────────────┐
+  ┌──────────────┐     agentteam spawn     ┌──────────────┐
   │  Leader      │ ──────────────────────► │  Worker      │
   │  (any agent) │ ──────┐                │  git worktree │
   │              │       ├──────────────► │  tmux window  │
@@ -436,7 +436,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
                                                  │
                                                  ▼
                                       ┌─────────────────────┐
-                                      │    ~/.clawteam/     │
+                                      │    ~/.agentteam/     │
                                       │ ├── teams/   (who) │
                                       │ ├── tasks/   (what)│
                                       │ ├── inboxes/ (talk)│
@@ -444,11 +444,11 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
                                       └─────────────────────┘
 ```
 
-所有狀態以 JSON 檔案形式儲存在 `~/.clawteam/` 中。無需資料庫，無需伺服器。透過 `fcntl` 檔案鎖的原子寫入確保當機安全。
+所有狀態以 JSON 檔案形式儲存在 `~/.agentteam/` 中。無需資料庫，無需伺服器。透過 `fcntl` 檔案鎖的原子寫入確保當機安全。
 
 | 設定項 | 環境變數 | 預設值 |
 |---------|---------|---------|
-| 資料目錄 | `CLAWTEAM_DATA_DIR` | `~/.clawteam` |
+| 資料目錄 | `CLAWTEAM_DATA_DIR` | `~/.agentteam` |
 | 傳輸層 | `CLAWTEAM_TRANSPORT` | `file` |
 | 工作區模式 | `CLAWTEAM_WORKSPACE` | `auto` |
 | 啟動後端 | `CLAWTEAM_DEFAULT_BACKEND` | `tmux` |
@@ -462,32 +462,32 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ```bash
 # Team lifecycle
-clawteam team spawn-team <team> -d "description" -n <leader>
-clawteam team discover                    # List all teams
-clawteam team status <team>               # Show members
-clawteam team cleanup <team> --force      # Delete team
+agentteam team spawn-team <team> -d "description" -n <leader>
+agentteam team discover                    # List all teams
+agentteam team status <team>               # Show members
+agentteam team cleanup <team> --force      # Delete team
 
 # Spawn agents
-clawteam spawn --team <team> --agent-name <name> --task "do this"
-clawteam spawn tmux codex --team <team> --agent-name <name> --task "do this"
+agentteam spawn --team <team> --agent-name <name> --task "do this"
+agentteam spawn tmux codex --team <team> --agent-name <name> --task "do this"
 
 # Task management
-clawteam task create <team> "subject" -o <owner> --blocked-by <id1>,<id2>
-clawteam task update <team> <id> --status completed   # auto-unblocks dependents
-clawteam task list <team> --status blocked --owner worker1
-clawteam task wait <team> --timeout 300
+agentteam task create <team> "subject" -o <owner> --blocked-by <id1>,<id2>
+agentteam task update <team> <id> --status completed   # auto-unblocks dependents
+agentteam task list <team> --status blocked --owner worker1
+agentteam task wait <team> --timeout 300
 
 # Messaging
-clawteam inbox send <team> <to> "message"
-clawteam inbox broadcast <team> "message"
-clawteam inbox receive <team>             # consume messages
-clawteam inbox peek <team>                # read without consuming
+agentteam inbox send <team> <to> "message"
+agentteam inbox broadcast <team> "message"
+agentteam inbox receive <team>             # consume messages
+agentteam inbox peek <team>                # read without consuming
 
 # Monitoring
-clawteam board show <team>                # terminal kanban
-clawteam board live <team> --interval 3   # auto-refresh
-clawteam board attach <team>              # tiled tmux view
-clawteam board serve --port 8080          # web UI
+agentteam board show <team>                # terminal kanban
+agentteam board live <team> --interval 3   # auto-refresh
+agentteam board attach <team>              # tiled tmux view
+agentteam board serve --port 8080          # web UI
 ```
 
 </details>
@@ -497,29 +497,29 @@ clawteam board serve --port 8080          # web UI
 
 ```bash
 # Workspace (git worktree management)
-clawteam workspace list <team>
-clawteam workspace checkpoint <team> <agent>    # auto-commit
-clawteam workspace merge <team> <agent>         # merge back to main
-clawteam workspace cleanup <team> <agent>       # remove worktree
+agentteam workspace list <team>
+agentteam workspace checkpoint <team> <agent>    # auto-commit
+agentteam workspace merge <team> <agent>         # merge back to main
+agentteam workspace cleanup <team> <agent>       # remove worktree
 
 # Plan approval
-clawteam plan submit <team> <agent> "plan" --summary "TL;DR"
-clawteam plan approve <team> <plan-id> <agent> --feedback "LGTM"
-clawteam plan reject <team> <plan-id> <agent> --feedback "Revise X"
+agentteam plan submit <team> <agent> "plan" --summary "TL;DR"
+agentteam plan approve <team> <plan-id> <agent> --feedback "LGTM"
+agentteam plan reject <team> <plan-id> <agent> --feedback "Revise X"
 
 # Lifecycle
-clawteam lifecycle request-shutdown <team> <agent> --reason "done"
-clawteam lifecycle approve-shutdown <team> <request-id> <agent>
-clawteam lifecycle idle <team>
+agentteam lifecycle request-shutdown <team> <agent> --reason "done"
+agentteam lifecycle approve-shutdown <team> <request-id> <agent>
+agentteam lifecycle idle <team>
 
 # Templates
-clawteam launch <template> --team <name> --goal "Build X"
-clawteam template list
+agentteam launch <template> --team <name> --goal "Build X"
+agentteam template list
 
 # Config
-clawteam config show
-clawteam config set transport p2p
-clawteam config health
+agentteam config show
+agentteam config set transport p2p
+agentteam config health
 ```
 
 </details>
@@ -536,7 +536,7 @@ clawteam config health
 
 ```bash
 # Install from the feature branch
-pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=clawteam"
+pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
 ```
 
 **模板中的按智能體模型配置：**
@@ -558,9 +558,9 @@ model_tier = "cheap"              # cost tiers: strong / balanced / cheap
 
 **命令列旗標：**
 ```bash
-clawteam spawn --model opus                          # single agent
-clawteam launch my-template --model gpt-5.4          # override all agents
-clawteam launch my-template --model-strategy auto     # auto-assign by role
+agentteam spawn --model opus                          # single agent
+agentteam launch my-template --model gpt-5.4          # override all agents
+agentteam launch my-template --model-strategy auto     # auto-assign by role
 ```
 
 詳見 [issue #1](https://github.com/win4r/ClawTeam-OpenClaw/issues/1) 的完整功能需求與討論。
@@ -608,6 +608,6 @@ MIT — 可自由使用、修改與分發。
 
 <div align="center">
 
-**ClawTeam** — *智能體集群協作。*
+**AgentTeam** — *智能體集群協作。*
 
 </div>

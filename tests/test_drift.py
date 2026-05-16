@@ -1,15 +1,15 @@
-"""Tests for clawteam.team.drift — drift detection between task intent and output."""
+"""Tests for agentteam.team.drift — drift detection between task intent and output."""
 
 import pytest
 
-from clawteam.team.drift import (
+from agentteam.team.drift import (
     _extract_keywords,
     _jaccard_similarity,
     _semantic_signal_score,
     check_task_drift,
     detect_drift,
 )
-from clawteam.team.models import DriftAlert, TaskItem, TaskPriority, TaskStatus
+from agentteam.team.models import DriftAlert, TaskItem, TaskPriority, TaskStatus
 
 
 # ── Keyword extraction ──────────────────────────────────────────────

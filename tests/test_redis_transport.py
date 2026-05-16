@@ -16,18 +16,18 @@ class TestRedisTransportInit:
 
     def test_init_with_defaults(self):
         """Test initialization with default settings."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             assert transport.team_name == "test-team"
             assert transport._redis_url == "redis://localhost:6379"
 
     def test_init_with_custom_url(self):
         """Test initialization with custom Redis URL."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport(
                 "test-team",
                 redis_url="redis://192.168.1.100:6379",
@@ -44,17 +44,17 @@ class TestRedisTransportURLParsing:
 
     def test_parse_host_simple(self):
         """Test parsing host from simple URL."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team", redis_url="redis://localhost:6379")
             assert transport._parse_host() == "localhost"
 
     def test_parse_port_simple(self):
         """Test parsing port from simple URL."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team", redis_url="redis://localhost:6379")
             assert transport._parse_port() == 6379
 
@@ -64,13 +64,13 @@ class TestRedisTransportDeliver:
 
     def test_deliver_single_message(self):
         """Test delivering a single message."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -85,7 +85,7 @@ class TestRedisTransportFetch:
 
     def test_fetch_consume_messages(self):
         """Test fetching and consuming messages."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
@@ -95,7 +95,7 @@ class TestRedisTransportFetch:
         msg2 = json.dumps({"timestamp": 1001, "uid": "def", "data": "world"}).encode()
         mock_client.rpop.side_effect = [msg1, msg2, None]
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -105,13 +105,13 @@ class TestRedisTransportFetch:
 
     def test_fetch_empty_queue(self):
         """Test fetching from empty queue."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.rpop.return_value = None
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -125,13 +125,13 @@ class TestRedisTransportCount:
 
     def test_count_messages(self):
         """Test counting messages in queue."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.llen.return_value = 5
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -145,15 +145,15 @@ class TestRedisTransportListRecipients:
 
     def test_list_recipients(self):
         """Test listing recipients with existing queues."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.scan.side_effect = [
-            (0, [b"clawteam:test-team:inbox:agent1", b"clawteam:test-team:inbox:agent2"]),
+            (0, [b"agentteam:test-team:inbox:agent1", b"agentteam:test-team:inbox:agent2"]),
         ]
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -168,16 +168,16 @@ class TestRedisTransportBroadcast:
 
     def test_broadcast_to_all(self):
         """Test broadcasting to all recipients."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.scan.side_effect = [
-            (0, [b"clawteam:test-team:inbox:agent1", b"clawteam:test-team:inbox:agent2"]),
+            (0, [b"agentteam:test-team:inbox:agent1", b"agentteam:test-team:inbox:agent2"]),
         ]
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -191,13 +191,13 @@ class TestRedisTransportPeers:
 
     def test_register_peer(self):
         """Test registering a peer."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.hset.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -207,14 +207,14 @@ class TestRedisTransportPeers:
 
     def test_deregister_peer(self):
         """Test deregistering a peer."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.delete.return_value = 1
         mock_client.hdel.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -228,12 +228,12 @@ class TestRedisTransportClose:
 
     def test_close(self):
         """Test closing connection."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_pool = MagicMock()
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport._pool = mock_pool
@@ -249,15 +249,15 @@ class TestGetTransportFactory:
 
     def test_get_redis_transport(self):
         """Test getting Redis transport."""
-        from clawteam.transport import get_transport
+        from agentteam.transport import get_transport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = get_transport("redis", "test-team")
             assert transport.team_name == "test-team"
 
     def test_get_file_transport_default(self):
         """Test getting file transport as default."""
-        from clawteam.transport import get_transport
+        from agentteam.transport import get_transport
 
         transport = get_transport("unknown", "test-team")
         assert transport.team_name == "test-team"
@@ -268,12 +268,12 @@ class TestRedisKeyFunctions:
 
     def test_key_prefix(self):
         """Test key prefix generation."""
-        from clawteam.transport.redis import _key_prefix
+        from agentteam.transport.redis import _key_prefix
 
-        assert _key_prefix("myteam") == "clawteam:myteam"
+        assert _key_prefix("myteam") == "agentteam:myteam"
 
     def test_inbox_key(self):
         """Test inbox key generation."""
-        from clawteam.transport.redis import _inbox_key
+        from agentteam.transport.redis import _inbox_key
 
-        assert _inbox_key("myteam", "agent1") == "clawteam:myteam:inbox:agent1"
+        assert _inbox_key("myteam", "agent1") == "agentteam:myteam:inbox:agent1"

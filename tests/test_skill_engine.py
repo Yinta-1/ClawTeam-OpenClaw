@@ -9,7 +9,7 @@
 """
 
 import pytest
-from clawteam.skill.engine import (
+from agentteam.skill.engine import (
     SkillEngine,
     Skill,
     SkillVariable,

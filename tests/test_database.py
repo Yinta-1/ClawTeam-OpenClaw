@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.database.manager import DatabaseManager
-from clawteam.database.types import (
+from agentteam.database.manager import DatabaseManager
+from agentteam.database.types import (
     DatabaseTask,
     DatabaseSession,
     DatabaseAgent,
@@ -41,8 +41,8 @@ class TestDatabaseManager:
     def test_init_default_path(self):
         """Test initialization with default path."""
         db = DatabaseManager()
-        assert db.db_path.endswith("clawteam.db")
-        assert ".clawteam" in db.db_path
+        assert db.db_path.endswith("agentteam.db")
+        assert ".agentteam" in db.db_path
         db.close()
     
     def test_init_custom_path(self):

@@ -1,4 +1,4 @@
-"""Tests for clawteam.team.mailbox — MailboxManager send/receive/broadcast."""
+"""Tests for agentteam.team.mailbox — MailboxManager send/receive/broadcast."""
 
 import json
 import os
@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.team.mailbox import MailboxManager
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import MessageType, get_data_dir
-from clawteam.transport.file import FileTransport, try_lock
+from agentteam.team.mailbox import MailboxManager
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import MessageType, get_data_dir
+from agentteam.transport.file import FileTransport, try_lock
 
 
 @staticmethod
@@ -121,7 +121,7 @@ class TestPeek:
         mb = _make_mailbox(team_name)
         mb.send(from_agent="a", to="bob", content="good")
 
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         inbox = get_data_dir() / "teams" / team_name / "inboxes" / "bob"
         (inbox / "msg-corrupt.json").write_text("not valid json", encoding="utf-8")
@@ -135,7 +135,7 @@ class TestBroadcast:
     def test_broadcast_to_all_except_sender(self, team_name):
         mb = _make_mailbox(team_name)
         # set up inboxes so list_recipients finds them
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         for name in ["alice", "bob", "carol"]:
             inbox = get_data_dir() / "teams" / team_name / "inboxes" / name
@@ -149,7 +149,7 @@ class TestBroadcast:
 
     def test_broadcast_with_exclude(self, team_name):
         mb = _make_mailbox(team_name)
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         for name in ["alice", "bob", "carol", "dave"]:
             inbox = get_data_dir() / "teams" / team_name / "inboxes" / name
@@ -184,7 +184,7 @@ class TestBroadcast:
         mb = _make_mailbox(team_name)
         mb.send(from_agent="a", to="bob", content="good")
 
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         inbox = get_data_dir() / "teams" / team_name / "inboxes" / "bob"
         (inbox / "msg-corrupt.json").write_text("not valid json", encoding="utf-8")
@@ -263,7 +263,7 @@ class TestReceiveQuarantine:
         assert not _dead_letter_root(team_name, "bob").exists()
 
     def test_p2p_offline_fallback_receive_matches_file_quarantine_behavior(self, team_name):
-        from clawteam.transport.p2p import P2PTransport
+        from agentteam.transport.p2p import P2PTransport
 
         transport = P2PTransport(team_name)
         mb = MailboxManager(team_name, transport=transport)
@@ -375,7 +375,7 @@ class TestFileTransport:
         transport = FileTransport(team_name)
         transport.deliver("bob", b'{"type":"message","from":"alice","to":"bob","content":"hello"}')
 
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         inbox = get_data_dir() / "teams" / team_name / "inboxes" / "bob"
         message_files = list(inbox.glob("msg-*.json"))
@@ -394,8 +394,8 @@ class TestFileTransport:
         assert len(list(inbox.glob("msg-*.json"))) == 1
 
     def test_p2p_fetch_consume_reuses_claim_path(self, team_name, monkeypatch):
-        from clawteam.transport.claimed import ClaimedMessage
-        from clawteam.transport.p2p import P2PTransport
+        from agentteam.transport.claimed import ClaimedMessage
+        from agentteam.transport.p2p import P2PTransport
 
         transport = P2PTransport(team_name)
         seen = {"calls": 0, "acks": 0}
@@ -422,7 +422,7 @@ class TestFileTransport:
 
 class TestP2PLease:
     def test_remote_peer_addr_uses_fresh_lease_instead_of_local_pid(self, team_name):
-        from clawteam.transport.p2p import P2PTransport
+        from agentteam.transport.p2p import P2PTransport
 
         transport = P2PTransport(team_name)
         now_ms = int(time.time() * 1000)
@@ -444,7 +444,7 @@ class TestP2PLease:
         transport.close()
 
     def test_remote_peer_addr_rejects_stale_lease_even_if_local_pid_is_alive(self, team_name):
-        from clawteam.transport.p2p import P2PTransport
+        from agentteam.transport.p2p import P2PTransport
 
         transport = P2PTransport(team_name)
         now_ms = int(time.time() * 1000)
@@ -468,7 +468,7 @@ class TestP2PLease:
         transport.close()
 
     def test_same_host_peer_addr_keeps_live_pid_even_when_lease_is_stale(self, team_name):
-        from clawteam.transport.p2p import P2PTransport
+        from agentteam.transport.p2p import P2PTransport
 
         transport = P2PTransport(team_name)
         now_ms = int(time.time() * 1000)
@@ -503,7 +503,7 @@ class TestEventLog:
 
     def test_broadcast_logs_per_recipient(self, team_name):
         mb = _make_mailbox(team_name)
-        from clawteam.team.models import get_data_dir
+        from agentteam.team.models import get_data_dir
 
         for name in ["x", "y"]:
             inbox = get_data_dir() / "teams" / team_name / "inboxes" / name

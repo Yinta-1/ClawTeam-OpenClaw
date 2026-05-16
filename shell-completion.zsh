@@ -1,10 +1,10 @@
-#compdef clawteam
+#compdef agentteam
 
-# ClawTeam Zsh Completion
+# AgentTeam Zsh Completion
 # Installation: Add to ~/.zshrc:
 #   source /path/to/shell-completion.zsh
 
-_clawteam() {
+_agentteam() {
     local -a commands
     commands=(
         'team:Team management'
@@ -230,4 +230,4 @@ _clawteam() {
     esac
 }
 
-_clawteam "$@"
+_agentteam "$@"

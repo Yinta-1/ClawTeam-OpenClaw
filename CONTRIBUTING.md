@@ -1,6 +1,6 @@
-# Contributing to ClawTeam-OpenClaw
+# Contributing to AgentTeam-OpenClaw
 
-Thank you for your interest in contributing to ClawTeam-OpenClaw! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to AgentTeam-OpenClaw! This document provides guidelines and instructions for contributing.
 
 ---
 
@@ -25,11 +25,11 @@ By participating in this project, you agree to maintain a respectful and inclusi
 # Fork the repository on GitHub
 
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+git clone https://github.com/YOUR_USERNAME/AgentTeam-OpenClaw.git
+cd AgentTeam-OpenClaw
 
 # Add upstream remote
-git remote add upstream https://github.com/YintaTriss/ClawTeam-OpenClaw.git
+git remote add upstream https://github.com/YintaTriss/AgentTeam-OpenClaw.git
 ```
 
 ### Set Up Development Environment
@@ -58,11 +58,11 @@ pytest tests/
 pytest tests/test_team.py
 
 # Run with coverage
-pytest --cov=clawteam tests/
+pytest --cov=agentteam tests/
 
 # Run linting
-ruff check clawteam/
-ruff format --check clawteam/
+ruff check agentteam/
+ruff format --check agentteam/
 ```
 
 ---
@@ -113,14 +113,14 @@ pytest tests/test_my_feature.py -v
 pytest tests/ -v
 
 # Run with coverage
-pytest --cov=clawteam --cov-report=html tests/
+pytest --cov=agentteam --cov-report=html tests/
 
 # Run linting
-ruff check clawteam/
-ruff format --check clawteam/
+ruff check agentteam/
+ruff format --check agentteam/
 
 # Type checking
-pyright clawteam/
+pyright agentteam/
 ```
 
 ### 5. Commit Your Changes
@@ -153,7 +153,7 @@ git commit -m "fix(module): resolve issue with..."
 git push origin feature/my-new-feature
 
 # Create pull request on GitHub
-# Target: YintaTriss/ClawTeam-OpenClaw main branch
+# Target: YintaTriss/AgentTeam-OpenClaw main branch
 ```
 
 ---
@@ -189,8 +189,8 @@ Include in your PR description:
 ## Project Structure
 
 ```
-ClawTeam-OpenClaw/
-├── clawteam/           # Main source code
+AgentTeam-OpenClaw/
+├── agentteam/           # Main source code
 │   ├── api/           # REST API
 │   ├── board/         # Web dashboard
 │   ├── cli/           # CLI commands
@@ -258,7 +258,7 @@ def process_agent_message(
 ### Logging
 
 ```python
-from clawteam.utils.logger import get_logger
+from agentteam.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -300,7 +300,7 @@ If your changes add/modify API endpoints:
 
 ```python
 import pytest
-from clawteam.team.manager import TeamManager
+from agentteam.team.manager import TeamManager
 
 class TestTeamManager:
     """Tests for TeamManager class."""
@@ -441,7 +441,7 @@ Include:
 
 ## License
 
-By contributing to ClawTeam-OpenClaw, you agree that your contributions will be licensed under the MIT License.
+By contributing to AgentTeam-OpenClaw, you agree that your contributions will be licensed under the MIT License.
 
 ---
 

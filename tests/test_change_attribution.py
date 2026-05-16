@@ -5,14 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.tracker.change_attribution import (
+from agentteam.tracker.change_attribution import (
     ActiveSession,
     AttributionResult,
     ChangeAttributor,
     ChangeRecord,
     create_change_handler,
 )
-from clawteam.tracker.file_watcher import ChangeType, WatchEvent
+from agentteam.tracker.file_watcher import ChangeType, WatchEvent
 
 
 class TestChangeRecord:

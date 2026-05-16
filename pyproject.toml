@@ -1,12 +1,12 @@
 [project]
-name = "clawteam"
+name = "agentteam"
 version = "0.5.1"
 description = "Framework-agnostic multi-agent coordination CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "ClawTeam", email = "clawteam@example.com"}
+    {name = "AgentTeam", email = "agentteam@example.com"}
 ]
 keywords = ["ai", "agent", "multi-agent", "team", "coordination", "cli", "swarm"]
 classifiers = [
@@ -41,7 +41,7 @@ redis = [
 ]
 
 [project.scripts]
-clawteam = "clawteam.cli.commands:app"
+agentteam = "agentteam.cli.commands:app"
 
 [project.urls]
 Homepage = "https://github.com/win4r/ClawTeam-OpenClaw"
@@ -53,11 +53,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["clawteam"]
+packages = ["agentteam"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "clawteam/",
+    "agentteam/",
     "README.md",
     "LICENSE",
 ]

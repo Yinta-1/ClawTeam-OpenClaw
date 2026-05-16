@@ -4,7 +4,7 @@ Tests for the /api/chat endpoint
 import json
 import pytest
 from unittest.mock import patch, MagicMock
-from clawteam.board.server import BoardHandler
+from agentteam.board.server import BoardHandler
 
 
 class TestChatEndpoint:
@@ -63,7 +63,7 @@ class TestSimpleResponseGenerator:
 
     def test_greeting(self):
         """Test greeting responses"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         greetings = ["你好", "hi", "hello", "嗨"]
         for greeting in greetings:
@@ -72,7 +72,7 @@ class TestSimpleResponseGenerator:
 
     def test_help_request(self):
         """Test help request responses"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         help_requests = ["帮助", "help", "怎么"]
         for req in help_requests:
@@ -81,21 +81,21 @@ class TestSimpleResponseGenerator:
 
     def test_team_request(self):
         """Test team-related requests"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         response = _generate_simple_response("创建团队")
         assert "团队" in response or len(response) > 0
 
     def test_task_request(self):
         """Test task-related requests"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         response = _generate_simple_response("任务管理")
         assert "任务" in response or len(response) > 0
 
     def test_what_is_clawteam(self):
         """Test 'what is' questions about ClawTeam"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         response = _generate_simple_response("什么是ClawTeam")
         # Just verify it returns a non-empty string
@@ -103,7 +103,7 @@ class TestSimpleResponseGenerator:
 
     def test_default_response(self):
         """Test default fallback response"""
-        from clawteam.board.server import _generate_simple_response
+        from agentteam.board.server import _generate_simple_response
 
         # Should return one of the default responses
         responses = [

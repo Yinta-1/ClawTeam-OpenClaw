@@ -2,7 +2,7 @@
 
 import pytest
 
-from clawteam.alerts import (
+from agentteam.alerts import (
     Alert,
     AlertSeverity,
     AlertState,
@@ -107,7 +107,7 @@ def test_alert_rule_evaluation():
         severity=AlertSeverity.ERROR,
     )
     
-    from clawteam.alerts import get_alert_manager
+    from agentteam.alerts import get_alert_manager
     manager = get_alert_manager()
     manager.add_rule(rule)
     

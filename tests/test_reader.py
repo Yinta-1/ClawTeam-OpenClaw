@@ -4,7 +4,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from clawteam.reader import (
+from agentteam.reader import (
     OutputReaderManager, 
     OutputEvent, 
     OutputEventType,

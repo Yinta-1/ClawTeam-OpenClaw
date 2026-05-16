@@ -1,4 +1,4 @@
-# 🎉 ClawTeam-OpenClaw v0.4.0 发布说明
+# 🎉 AgentTeam-OpenClaw v0.4.0 发布说明
 
 **发布日期**: 2026-05-02  
 **版本**: v0.4.0-openclaw  
@@ -8,7 +8,7 @@
 
 ## 📣 公告
 
-ClawTeam-OpenClaw 是 [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam) 的生产级 fork，专注 OpenClaw 生态。
+AgentTeam-OpenClaw 是 [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam) 的生产级 fork，专注 OpenClaw 生态。
 
 > **这不是一个 demo。这是可以上线的生产软件。**
 
@@ -25,11 +25,11 @@ ClawTeam-OpenClaw 是 [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam) 的生
 - **端口**: `8080`（默认）
 - **标签页**: 看板 / 设计器 / 实时监控 / 工作流 / 设置
 - **实时刷新**: Agent 状态、任务进度、漂移预警一目了然
-- **一键启动**: `clawteam board serve --port 8080`
+- **一键启动**: `agentteam board serve --port 8080`
 
 ```bash
 # 启动 Web 看板
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 
 # 浏览器打开
 open http://127.0.0.1:8080
@@ -83,14 +83,14 @@ best_agent = router.route(
 - **事件类型**: SPAWN / TASK_UPDATE / INBOX_SEND / ALERT_TRIGGER 等
 - **字段**: event_id / event_type / actor / details / timestamp / team
 - **追加写入**: 历史事件永不修改
-- **查询 CLI**: `clawteam audit query <team> --action SPAWN --limit 100`
+- **查询 CLI**: `agentteam audit query <team> --action SPAWN --limit 100`
 
 ```bash
 # 查询团队审计日志
-clawteam audit query my-team --actor alice --json
+agentteam audit query my-team --actor alice --json
 
 # 审计活动摘要
-clawteam audit summary my-team
+agentteam audit summary my-team
 ```
 
 ---
@@ -110,13 +110,13 @@ clawteam audit summary my-team
 
 ```bash
 # 检查告警
-clawteam alert check --team my-team
+agentteam alert check --team my-team
 
 # 列出所有告警
-clawteam alert list --team my-team
+agentteam alert list --team my-team
 
 # 确认告警
-clawteam alert ack --alert-id <id>
+agentteam alert ack --alert-id <id>
 ```
 
 ---
@@ -143,7 +143,7 @@ clawteam alert ack --alert-id <id>
 - **统计**: 自动记录重试次数
 
 ```python
-from clawteam.utils.retry import retry
+from agentteam.utils.retry import retry
 
 @retry(max_attempts=3, delay=1.0, backoff=2.0)
 def deliver_message():
@@ -276,7 +276,7 @@ make clean
 
 ## 📈 升级路径
 
-### 从上游 ClawTeam 升级
+### 从上游 AgentTeam 升级
 
 ```bash
 # 1. 拉取最新代码
@@ -291,7 +291,7 @@ pip install -e .
 python -m pytest tests/ -v
 
 # 4. 启动 Web 看板验证
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 ```
 
 ### 从旧版本升级
@@ -304,8 +304,8 @@ git pull origin main
 pip install -e .
 
 # 3. 验证
-clawteam --version
-clawteam board serve --port 8080
+agentteam --version
+agentteam board serve --port 8080
 ```
 
 ---
@@ -320,7 +320,7 @@ clawteam board serve --port 8080
 
 ## 📞 联系我们
 
-- **GitHub Issues**: https://github.com/YOUR_USERNAME/ClawTeam-OpenClaw/issues
+- **GitHub Issues**: https://github.com/YOUR_USERNAME/AgentTeam-OpenClaw/issues
 - **Discord**: https://discord.com/invite/clawd
 - **文档**: https://docs.openclaw.ai
 
@@ -332,4 +332,4 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ---
 
-_ClawTeam-OpenClaw v0.4.0 — 2026-05-02_
+_AgentTeam-OpenClaw v0.4.0 — 2026-05-02_

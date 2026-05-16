@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.orchestrator.provider_availability import (
+from agentteam.orchestrator.provider_availability import (
     ProviderAvailability,
     ProviderConfig,
     check_all_providers_availability,
@@ -367,7 +367,7 @@ class TestClearAvailabilityCache:
         clear_availability_cache()
         
         # Cache should be empty
-        from clawteam.orchestrator.provider_availability import _cache
+        from agentteam.orchestrator.provider_availability import _cache
         assert len(_cache) == 0
 
     def test_clear_cache_forces_recheck(self):

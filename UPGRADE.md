@@ -1,4 +1,4 @@
-# ClawTeam 升级计划 v0.5.0
+# AgentTeam 升级计划 v0.5.0
 
 > 基于 SpectrAI 架构灵感，实现真正的多 Agent 协作框架
 
@@ -26,45 +26,45 @@
 
 | 模块 | 文件 | 功能 |
 |------|------|------|
-| **MailboxManager** | `clawteam/team/mailbox.py` | Agent 间消息传递，Transport 抽象 |
-| **P2P Transport** | `clawteam/transport/p2p.py` | ZeroMQ PUSH/PULL + 文件回退 |
-| **RoleStore** | `clawteam/team/roles.py` | 动态角色分配（developer/reviewer/tester/architect/coordinator） |
-| **BaseTaskStore** | `clawteam/store/base.py` | 任务存储抽象，文件锁并发控制 |
-| **WebSocketManager** | `clawteam/board/websocket.py` | WebSocket 连接管理 |
-| **Board Server** | `clawteam/board/server.py` | HTTP API + SSE 实时推送 |
-| **Transport 抽象** | `clawteam/transport/base.py` | File/P2P/Redis/ClaimedMessage |
-| **生命周期管理** | `clawteam/team/lifecycle.py` | Agent 生命周期状态机 |
-| **审计日志** | `clawteam/audit/` | 操作审计追溯 |
-| **告警系统** | `clawteam/alerts/` | 四级告警机制 |
-| **记忆系统** | `clawteam/memory/` | 分层记忆存储 |
-| **技能引擎** | `clawteam/skill/` | Skill 自动创建和执行 |
+| **MailboxManager** | `agentteam/team/mailbox.py` | Agent 间消息传递，Transport 抽象 |
+| **P2P Transport** | `agentteam/transport/p2p.py` | ZeroMQ PUSH/PULL + 文件回退 |
+| **RoleStore** | `agentteam/team/roles.py` | 动态角色分配（developer/reviewer/tester/architect/coordinator） |
+| **BaseTaskStore** | `agentteam/store/base.py` | 任务存储抽象，文件锁并发控制 |
+| **WebSocketManager** | `agentteam/board/websocket.py` | WebSocket 连接管理 |
+| **Board Server** | `agentteam/board/server.py` | HTTP API + SSE 实时推送 |
+| **Transport 抽象** | `agentteam/transport/base.py` | File/P2P/Redis/ClaimedMessage |
+| **生命周期管理** | `agentteam/team/lifecycle.py` | Agent 生命周期状态机 |
+| **审计日志** | `agentteam/audit/` | 操作审计追溯 |
+| **告警系统** | `agentteam/alerts/` | 四级告警机制 |
+| **记忆系统** | `agentteam/memory/` | 分层记忆存储 |
+| **技能引擎** | `agentteam/skill/` | Skill 自动创建和执行 |
 
 ### CLI 命令
 
 ```bash
 # 团队管理
-clawteam team create <team>           # 创建团队
-clawteam team status <team>           # 团队状态
-clawteam team members <team>          # 列出成员
+agentteam team create <team>           # 创建团队
+agentteam team status <team>           # 团队状态
+agentteam team members <team>          # 列出成员
 
 # 消息传递
-clawteam inbox send <team> <to> <msg> # 发送消息
-clawteam inbox peek <team>           # 查看消息
-clawteam inbox receive <team>        # 接收消息
+agentteam inbox send <team> <to> <msg> # 发送消息
+agentteam inbox peek <team>           # 查看消息
+agentteam inbox receive <team>        # 接收消息
 
 # 任务管理
-clawteam task create <team> <subject> # 创建任务
-clawteam task list <team>            # 列出任务
-clawteam task update <team> <id> --status completed  # 更新状态
+agentteam task create <team> <subject> # 创建任务
+agentteam task list <team>            # 列出任务
+agentteam task update <team> <id> --status completed  # 更新状态
 
 # 角色管理
-clawteam role assign <team> <agent> <role>  # 分配角色
+agentteam role assign <team> <agent> <role>  # 分配角色
 
 # Agent Spawn
-clawteam spawn <backend> --team <team> --agent-name <name>  # 生成 Agent
+agentteam spawn <backend> --team <team> --agent-name <name>  # 生成 Agent
 
 # 生命周期
-clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
+agentteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 ```
 
 ---
@@ -89,7 +89,7 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 
 ### P28: 工具注册增强 🔄
 
-**修改文件**: `clawteam/tools/registry.py`
+**修改文件**: `agentteam/tools/registry.py`
 
 目标：
 - 增强工具注册表
@@ -98,7 +98,7 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 
 ### P29: 协作增强 🔄
 
-**新增目录**: `clawteam/collaboration/`
+**新增目录**: `agentteam/collaboration/`
 
 目标功能：
 - Activity Feed（活动流）
@@ -119,8 +119,8 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 ### P34: Dashboard 监控面板 🔄
 
 **新增文件**:
-- `clawteam/api/monitor.py`
-- `clawteam/board/dashboard.py`
+- `agentteam/api/monitor.py`
+- `agentteam/board/dashboard.py`
 
 目标：
 - 实时会话监控
@@ -129,7 +129,7 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 
 ### P35: 事件追踪系统 🔄
 
-**新增目录**: `clawteam/events/`
+**新增目录**: `agentteam/events/`
 
 目标：
 - 40+ 事件类型
@@ -139,8 +139,8 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 ### P36: 实时 SSE 推送 🔄
 
 **修改文件**:
-- `clawteam/board/server.py`
-- `clawteam/board/static/index.html`
+- `agentteam/board/server.py`
+- `agentteam/board/static/index.html`
 
 目标：
 - Server-Sent Events
@@ -176,7 +176,7 @@ clawteam lifecycle on-exit --team <team> --agent <name>  # 退出时清理
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ClawTeam Framework                        │
+│                    AgentTeam Framework                        │
 ├─────────────────────────────────────────────────────────────┤
 │  CLI Layer                                                   │
 │  ├── team create/list/status                                 │

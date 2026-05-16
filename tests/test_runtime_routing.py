@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from clawteam.team.models import MessageType, TeamMessage
-from clawteam.team.runtime_router import RuntimeRouter
-from clawteam.team.routing_policy import DefaultRoutingPolicy, RuntimeEnvelope
-from clawteam.team.watcher import InboxWatcher
+from agentteam.team.models import MessageType, TeamMessage
+from agentteam.team.runtime_router import RuntimeRouter
+from agentteam.team.routing_policy import DefaultRoutingPolicy, RuntimeEnvelope
+from agentteam.team.watcher import InboxWatcher
 
 
 def _utc(hour: int, minute: int = 0, second: int = 0) -> datetime:

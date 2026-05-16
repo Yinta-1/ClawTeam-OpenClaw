@@ -13,7 +13,7 @@ import platform
 import time
 from unittest.mock import patch, MagicMock
 
-from clawteam.concurrency.guard import (
+from agentteam.concurrency.guard import (
     ConcurrencyGuard,
     ConcurrencyConfig,
     ResourceStatus

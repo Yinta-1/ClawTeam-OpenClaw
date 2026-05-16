@@ -1,4 +1,4 @@
-# ClawTeam-OpenClaw CLI Reference
+# AgentTeam-OpenClaw CLI Reference
 
 > **Version**: v0.5.4
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-ClawTeam CLI provides commands for team management, agent spawning, and system monitoring. All commands follow the pattern: `clawteam <resource> <action> [options]`
+AgentTeam CLI provides commands for team management, agent spawning, and system monitoring. All commands follow the pattern: `agentteam <resource> <action> [options]`
 
 ---
 
@@ -29,7 +29,7 @@ ClawTeam CLI provides commands for team management, agent spawning, and system m
 Create a new team.
 
 ```bash
-clawteam team create <team-name> [options]
+agentteam team create <team-name> [options]
 ```
 
 **Options:**
@@ -40,13 +40,13 @@ clawteam team create <team-name> [options]
 **Examples:**
 ```bash
 # Create team with default settings
-clawteam team create my-team
+agentteam team create my-team
 
 # Create team with tmux backend
-clawteam team create my-team --backend tmux
+agentteam team create my-team --backend tmux
 
 # Create from template
-clawteam team create ai-team --template research
+agentteam team create ai-team --template research
 ```
 
 ### team list / team discover
@@ -54,8 +54,8 @@ clawteam team create ai-team --template research
 List all teams.
 
 ```bash
-clawteam team list
-clawteam team discover
+agentteam team list
+agentteam team discover
 ```
 
 ### team status
@@ -63,7 +63,7 @@ clawteam team discover
 Show team status and members.
 
 ```bash
-clawteam team status <team-name>
+agentteam team status <team-name>
 ```
 
 ### team cleanup
@@ -71,7 +71,7 @@ clawteam team status <team-name>
 Delete a team and all its data.
 
 ```bash
-clawteam team cleanup <team-name> [options]
+agentteam team cleanup <team-name> [options]
 ```
 
 **Options:**
@@ -82,7 +82,7 @@ clawteam team cleanup <team-name> [options]
 Request to join a team.
 
 ```bash
-clawteam team request-join <team-name>
+agentteam team request-join <team-name>
 ```
 
 ### team approve-join
@@ -90,7 +90,7 @@ clawteam team request-join <team-name>
 Approve a join request.
 
 ```bash
-clawteam team approve-join <team-name> <agent-name>
+agentteam team approve-join <team-name> <agent-name>
 ```
 
 ### team reject-join
@@ -98,7 +98,7 @@ clawteam team approve-join <team-name> <agent-name>
 Reject a join request.
 
 ```bash
-clawteam team reject-join <team-name> <agent-name>
+agentteam team reject-join <team-name> <agent-name>
 ```
 
 ---
@@ -110,7 +110,7 @@ clawteam team reject-join <team-name> <agent-name>
 Spawn a new agent.
 
 ```bash
-clawteam spawn [options]
+agentteam spawn [options]
 ```
 
 **Options:**
@@ -126,14 +126,14 @@ clawteam spawn [options]
 **Examples:**
 ```bash
 # Spawn agent in default team
-clawteam spawn --agent-name worker --prompt "Do analysis"
+agentteam spawn --agent-name worker --prompt "Do analysis"
 
 # Spawn in specific team with parent
-clawteam spawn --team my-team --agent-name analyzer \
+agentteam spawn --team my-team --agent-name analyzer \
   --parent agent-1 --prompt "Analyze code"
 
 # Spawn with custom workspace
-clawteam spawn --agent-name coder --workspace /tmp/project \
+agentteam spawn --agent-name coder --workspace /tmp/project \
   --backend tmux
 ```
 
@@ -142,7 +142,7 @@ clawteam spawn --agent-name coder --workspace /tmp/project \
 List all agents.
 
 ```bash
-clawteam agents list [options]
+agentteam agents list [options]
 ```
 
 **Options:**
@@ -154,7 +154,7 @@ clawteam agents list [options]
 Send message to an agent.
 
 ```bash
-clawteam agent send <agent-name> <message> [options]
+agentteam agent send <agent-name> <message> [options]
 ```
 
 **Options:**
@@ -165,7 +165,7 @@ clawteam agent send <agent-name> <message> [options]
 View agent inbox messages.
 
 ```bash
-clawteam agent inbox <agent-name> [options]
+agentteam agent inbox <agent-name> [options]
 ```
 
 **Options:**
@@ -177,7 +177,7 @@ clawteam agent inbox <agent-name> [options]
 Terminate an agent.
 
 ```bash
-clawteam agent terminate <agent-name> [options]
+agentteam agent terminate <agent-name> [options]
 ```
 
 **Options:**
@@ -189,7 +189,7 @@ clawteam agent terminate <agent-name> [options]
 Terminate all child agents.
 
 ```bash
-clawteam agent terminate-children <agent-name> [options]
+agentteam agent terminate-children <agent-name> [options]
 ```
 
 **Options:**
@@ -200,7 +200,7 @@ clawteam agent terminate-children <agent-name> [options]
 List child agents.
 
 ```bash
-clawteam agent list-children <agent-name> [options]
+agentteam agent list-children <agent-name> [options]
 ```
 
 **Options:**
@@ -211,7 +211,7 @@ clawteam agent list-children <agent-name> [options]
 Show parent agent.
 
 ```bash
-clawteam agent show-parent <agent-name> [options]
+agentteam agent show-parent <agent-name> [options]
 ```
 
 **Options:**
@@ -222,7 +222,7 @@ clawteam agent show-parent <agent-name> [options]
 Register a child agent relationship.
 
 ```bash
-clawteam agent register-child <parent-name> <child-name> [options]
+agentteam agent register-child <parent-name> <child-name> [options]
 ```
 
 **Options:**
@@ -233,7 +233,7 @@ clawteam agent register-child <parent-name> <child-name> [options]
 Terminate entire agent tree (parent + all children).
 
 ```bash
-clawteam agent terminate-tree <agent-name> [options]
+agentteam agent terminate-tree <agent-name> [options]
 ```
 
 **Options:**
@@ -248,7 +248,7 @@ clawteam agent terminate-tree <agent-name> [options]
 Register lifecycle hook for agent exit.
 
 ```bash
-clawteam lifecycle on-exit --team <team> --agent <agent> <action>
+agentteam lifecycle on-exit --team <team> --agent <agent> <action>
 ```
 
 **Actions:**
@@ -265,7 +265,7 @@ clawteam lifecycle on-exit --team <team> --agent <agent> <action>
 Start the web board server.
 
 ```bash
-clawteam board serve [options]
+agentteam board serve [options]
 ```
 
 **Options:**
@@ -276,13 +276,13 @@ clawteam board serve [options]
 **Examples:**
 ```bash
 # Start board on default port
-clawteam board serve
+agentteam board serve
 
 # Start on custom port with auth
-clawteam board serve --port 9000 --auth my-secret-token
+agentteam board serve --port 9000 --auth my-secret-token
 
 # Bind to localhost only
-clawteam board serve --host 127.0.0.1
+agentteam board serve --host 127.0.0.1
 ```
 
 ### board status
@@ -290,7 +290,7 @@ clawteam board serve --host 127.0.0.1
 Show board status.
 
 ```bash
-clawteam board status
+agentteam board status
 ```
 
 ---
@@ -302,7 +302,7 @@ clawteam board status
 List all sessions.
 
 ```bash
-clawteam session list [options]
+agentteam session list [options]
 ```
 
 **Options:**
@@ -315,7 +315,7 @@ clawteam session list [options]
 Show session details.
 
 ```bash
-clawteam session show <session-id>
+agentteam session show <session-id>
 ```
 
 ### session send
@@ -323,7 +323,7 @@ clawteam session show <session-id>
 Send message to session.
 
 ```bash
-clawteam session send <session-id> <message>
+agentteam session send <session-id> <message>
 ```
 
 ### session terminate
@@ -331,7 +331,7 @@ clawteam session send <session-id> <message>
 Terminate a session.
 
 ```bash
-clawteam session terminate <session-id> [options]
+agentteam session terminate <session-id> [options]
 ```
 
 **Options:**
@@ -346,7 +346,7 @@ clawteam session terminate <session-id> [options]
 List inbox messages for current user.
 
 ```bash
-clawteam inbox list [options]
+agentteam inbox list [options]
 ```
 
 **Options:**
@@ -359,7 +359,7 @@ clawteam inbox list [options]
 Read a specific message.
 
 ```bash
-clawteam inbox read <message-id>
+agentteam inbox read <message-id>
 ```
 
 ### inbox reply
@@ -367,7 +367,7 @@ clawteam inbox read <message-id>
 Reply to a message.
 
 ```bash
-clawteam inbox reply <message-id> <content>
+agentteam inbox reply <message-id> <content>
 ```
 
 ### inbox delete
@@ -375,7 +375,7 @@ clawteam inbox reply <message-id> <content>
 Delete a message.
 
 ```bash
-clawteam inbox delete <message-id>
+agentteam inbox delete <message-id>
 ```
 
 ---
@@ -387,7 +387,7 @@ clawteam inbox delete <message-id>
 List events.
 
 ```bash
-clawteam events list [options]
+agentteam events list [options]
 ```
 
 **Options:**
@@ -401,7 +401,7 @@ clawteam events list [options]
 Stream events in real-time.
 
 ```bash
-clawteam events stream [options]
+agentteam events stream [options]
 ```
 
 **Options:**
@@ -416,7 +416,7 @@ clawteam events stream [options]
 Show current configuration.
 
 ```bash
-clawteam config show [options]
+agentteam config show [options]
 ```
 
 **Options:**
@@ -427,13 +427,13 @@ clawteam config show [options]
 Set a configuration value.
 
 ```bash
-clawteam config set <key> <value>
+agentteam config set <key> <value>
 ```
 
 **Examples:**
 ```bash
-clawteam config set agents.max_concurrent 10
-clawteam config set alerts.enabled true
+agentteam config set agents.max_concurrent 10
+agentteam config set alerts.enabled true
 ```
 
 ### config get
@@ -441,7 +441,7 @@ clawteam config set alerts.enabled true
 Get a configuration value.
 
 ```bash
-clawteam config get <key>
+agentteam config get <key>
 ```
 
 ---
@@ -453,7 +453,7 @@ clawteam config get <key>
 Show database status.
 
 ```bash
-clawteam db status
+agentteam db status
 ```
 
 ### db backup
@@ -461,7 +461,7 @@ clawteam db status
 Create database backup.
 
 ```bash
-clawteam db backup [options]
+agentteam db backup [options]
 ```
 
 **Options:**
@@ -472,7 +472,7 @@ clawteam db backup [options]
 Restore from backup.
 
 ```bash
-clawteam db restore <backup-file>
+agentteam db restore <backup-file>
 ```
 
 ---
@@ -484,7 +484,7 @@ clawteam db restore <backup-file>
 Show token usage statistics.
 
 ```bash
-clawteam monitor usage [options]
+agentteam monitor usage [options]
 ```
 
 **Options:**
@@ -496,7 +496,7 @@ clawteam monitor usage [options]
 Show cost breakdown.
 
 ```bash
-clawteam monitor costs [options]
+agentteam monitor costs [options]
 ```
 
 **Options:**
@@ -512,14 +512,14 @@ clawteam monitor costs [options]
 Start the agent daemon (`agentd`) in the background. The daemon manages persistent agent sessions and allows agents to stay alive between tasks.
 
 ```bash
-clawteam daemon start
+agentteam daemon start
 ```
 
 **Details:**
 - Runs `agentd.py` as a background subprocess
 - On Windows: uses TCP socket at `127.0.0.1:18792`
-- On Unix/Linux/macOS: uses Unix domain socket at `~/.clawteam/agentd.sock`
-- Saves PID to `~/.clawteam/agentd.pid`
+- On Unix/Linux/macOS: uses Unix domain socket at `~/.agentteam/agentd.sock`
+- Saves PID to `~/.agentteam/agentd.pid`
 - Automatically restores previously running agents on restart
 
 ### daemon stop
@@ -527,7 +527,7 @@ clawteam daemon start
 Stop the running agent daemon and all managed agents.
 
 ```bash
-clawteam daemon stop
+agentteam daemon stop
 ```
 
 **Details:**
@@ -540,11 +540,11 @@ clawteam daemon stop
 Check whether the daemon is currently running.
 
 ```bash
-clawteam daemon status
+agentteam daemon status
 ```
 
 **Details:**
-- Checks if `~/.clawteam/agentd.pid` exists
+- Checks if `~/.agentteam/agentd.pid` exists
 - Verifies the process is alive via OS API
 - Reports stale PID file if process is dead
 
@@ -553,7 +553,7 @@ clawteam daemon status
 List all agents currently managed by the daemon.
 
 ```bash
-clawteam daemon list
+agentteam daemon list
 ```
 
 **Output:**
@@ -569,7 +569,7 @@ clawteam daemon list
 Spawn a new persistent agent through the daemon. The agent stays alive and awaits further tasks.
 
 ```bash
-clawteam daemon spawn --team <team> --agent-name <name> --prompt <task> [options]
+agentteam daemon spawn --team <team> --agent-name <name> --prompt <task> [options]
 ```
 
 **Required Options:**
@@ -583,11 +583,11 @@ clawteam daemon spawn --team <team> --agent-name <name> --prompt <task> [options
 **Examples:**
 ```bash
 # Spawn a persistent specialist agent
-clawteam daemon spawn --team my-team --agent-name doc-writer \
+agentteam daemon spawn --team my-team --agent-name doc-writer \
   --prompt "Update the API documentation"
 
 # Spawn with custom type
-clawteam daemon spawn --team ai-team --agent-name researcher \
+agentteam daemon spawn --team ai-team --agent-name researcher \
   --agent-type research --prompt "Analyze competition"
 ```
 
@@ -600,7 +600,7 @@ clawteam daemon spawn --team ai-team --agent-name researcher \
 Show recent logs.
 
 ```bash
-clawteam debug logs [options]
+agentteam debug logs [options]
 ```
 
 **Options:**
@@ -613,7 +613,7 @@ clawteam debug logs [options]
 Test connection to remote services.
 
 ```bash
-clawteam debug test-connection
+agentteam debug test-connection
 ```
 
 ### debug doctor
@@ -621,7 +621,7 @@ clawteam debug test-connection
 Run diagnostics.
 
 ```bash
-clawteam debug doctor
+agentteam debug doctor
 ```
 
 ---
@@ -633,8 +633,8 @@ clawteam debug doctor
 Show general help or help for specific command.
 
 ```bash
-clawteam help
-clawteam help <command>
+agentteam help
+agentteam help <command>
 ```
 
 ### version
@@ -642,7 +642,7 @@ clawteam help <command>
 Show version information.
 
 ```bash
-clawteam version
+agentteam version
 ```
 
 ---
@@ -653,21 +653,21 @@ clawteam version
 
 ```bash
 # Add to ~/.bashrc
-eval "$(clawteam --completion bash)"
+eval "$(agentteam --completion bash)"
 ```
 
 ### zsh
 
 ```bash
 # Add to ~/.zshrc
-eval "$(clawteam --completion zsh)"
+eval "$(agentteam --completion zsh)"
 ```
 
 ### fish
 
 ```bash
 # Add to ~/.config/fish/config.fish
-clawteam --completion fish | source
+agentteam --completion fish | source
 ```
 
 ---
@@ -691,7 +691,7 @@ agents:
 # Logging
 logging:
   level: info
-  file: logs/clawteam.log
+  file: logs/agentteam.log
 
 # Alerts
 alerts:

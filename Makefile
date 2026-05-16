@@ -1,11 +1,11 @@
-# ClawTeam Makefile
+# AgentTeam Makefile
 # Common development commands
 
 .PHONY: help install test lint format clean docker-build docker-run docker-stop
 
 # Default target
 help:
-	@echo "ClawTeam Development Commands"
+	@echo "AgentTeam Development Commands"
 	@echo ""
 	@echo "  make install        Install dependencies"
 	@echo "  make test           Run tests"
@@ -26,15 +26,15 @@ test:
 
 # Run tests with coverage
 test-cov:
-	poetry run pytest tests/ --cov=clawteam --cov-report=html
+	poetry run pytest tests/ --cov=agentteam --cov-report=html
 
 # Run linters
 lint:
-	poetry run ruff check clawteam/
+	poetry run ruff check agentteam/
 
 # Format code
 format:
-	poetry run ruff format clawteam/
+	poetry run ruff format agentteam/
 
 # Clean temporary files
 clean:
@@ -46,11 +46,11 @@ clean:
 
 # Build Docker image
 docker-build:
-	docker build -t clawteam .
+	docker build -t agentteam .
 
 # Run Docker container (foreground)
 docker-run:
-	docker run -p 8080:8080 --env-file .env clawteam
+	docker run -p 8080:8080 --env-file .env agentteam
 
 # Run Docker Compose
 docker-up:

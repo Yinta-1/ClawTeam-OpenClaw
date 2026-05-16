@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.tracker.file_watcher import (
+from agentteam.tracker.file_watcher import (
     ChangeType,
     FileWatcher,
     WatchEvent,

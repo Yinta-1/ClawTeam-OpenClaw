@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from clawteam.store.file import FileTaskStore
-from clawteam.team.models import TaskPriority, TaskStatus
+from agentteam.store.file import FileTaskStore
+from agentteam.team.models import TaskPriority, TaskStatus
 
 
 @pytest.fixture()

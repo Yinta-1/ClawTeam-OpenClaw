@@ -1,4 +1,4 @@
-# ClawTeam-OpenClaw 平台兼容性报告
+# AgentTeam-OpenClaw 平台兼容性报告
 
 > **更新时间**: 2026-05-04
 
@@ -44,7 +44,7 @@
 | 测试套件 | 结果 | 详情 |
 |----------|------|------|
 | pytest | ✅ 595 passed | 14 skipped, 6 warnings |
-| ruff format | ✅ 1 file reformatted | clawteam/workspace/git.py |
+| ruff format | ✅ 1 file reformatted | agentteam/workspace/git.py |
 | ruff check | ✅ | |
 | pyright | ⚠️ | 历史累积问题，设为 non-blocking |
 
@@ -58,7 +58,7 @@
 
 1. **tmux Backend 不支持**
    - **解决**: 使用 `openclaw_sdk` backend 替代
-   - **配置**: `clawteam team create <team> --backend auto` (自动检测)
+   - **配置**: `agentteam team create <team> --backend auto` (自动检测)
 
 2. **Git Worktree 分支检测**
    - **解决**: 改用 `git symbolic-ref --short HEAD` 而非 `git branch --show-current`
@@ -159,10 +159,10 @@ brew install redis
 pip install -e .
 
 # 创建团队（自动使用 openclaw_sdk backend）
-clawteam team create my-team
+agentteam team create my-team
 
 # 或手动指定
-clawteam team create my-team --backend openclaw_sdk
+agentteam team create my-team --backend openclaw_sdk
 ```
 
 ### Linux
@@ -172,7 +172,7 @@ clawteam team create my-team --backend openclaw_sdk
 pip install -e .
 
 # 创建团队（默认使用 tmux backend）
-clawteam team create my-team
+agentteam team create my-team
 ```
 
 ### macOS
@@ -182,7 +182,7 @@ clawteam team create my-team
 pip install -e .
 
 # 创建团队
-clawteam team create my-team
+agentteam team create my-team
 ```
 
 ---
@@ -196,10 +196,10 @@ clawteam team create my-team
 **解决**:
 ```bash
 # 使用 openclaw_sdk backend
-clawteam team create my-team --backend openclaw_sdk
+agentteam team create my-team --backend openclaw_sdk
 
 # 或使用 auto 检测
-clawteam team create my-team --backend auto
+agentteam team create my-team --backend auto
 ```
 
 ### Windows: Git worktree error
@@ -220,7 +220,7 @@ clawteam team create my-team --backend auto
 redis-server
 
 # 或使用 File Transport
-clawteam team create my-team --transport file
+agentteam team create my-team --transport file
 ```
 
 ---

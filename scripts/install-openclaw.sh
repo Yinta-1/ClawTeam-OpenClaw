@@ -63,32 +63,32 @@ else
     ok "openclaw found: $(openclaw --version 2>/dev/null || echo 'installed')"
 fi
 
-# ─── 4. Install clawteam ─────────────────────────────────────────────────────
-info "Installing clawteam..."
+# ─── 4. Install agentteam ─────────────────────────────────────────────────────
+info "Installing agentteam..."
 
 # Determine the script's own directory and the repo root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-if [[ -f "$REPO_ROOT/pyproject.toml" ]] && grep -q 'name.*=.*"clawteam"' "$REPO_ROOT/pyproject.toml" 2>/dev/null; then
+if [[ -f "$REPO_ROOT/pyproject.toml" ]] && grep -q 'name.*=.*"agentteam"' "$REPO_ROOT/pyproject.toml" 2>/dev/null; then
     info "Installing from local repo: $REPO_ROOT"
     pip install -e "$REPO_ROOT" --quiet 2>&1 | tail -3 || pip install "$REPO_ROOT" --quiet 2>&1 | tail -3
 else
     info "Installing from PyPI..."
-    pip install clawteam --quiet 2>&1 | tail -3
+    pip install agentteam --quiet 2>&1 | tail -3
 fi
-ok "clawteam installed."
+ok "agentteam installed."
 
-# ─── 5. Find clawteam binary location ────────────────────────────────────────
-info "Locating clawteam binary..."
+# ─── 5. Find agentteam binary location ────────────────────────────────────────
+info "Locating agentteam binary..."
 CLAWTEAM_BIN=""
 
 # Guard: detect npm name-squatting package (a9logic/clawteam on npm)
-if command -v clawteam &>/dev/null; then
-    _CANDIDATE="$(command -v clawteam)"
+if command -v agentteam &>/dev/null; then
+    _CANDIDATE="$(command -v agentteam)"
     if head -1 "$_CANDIDATE" 2>/dev/null | grep -q node; then
         warn "Found $_CANDIDATE but it is the npm name-squatting package (not the real ClawTeam)."
-        warn "Remove it with: npm uninstall -g clawteam"
+        warn "Remove it with: npm uninstall -g agentteam"
         # Don't use it — fall through to pip-based detection
     else
         CLAWTEAM_BIN="$_CANDIDATE"
@@ -97,7 +97,7 @@ fi
 
 # Method 2: pip show + Scripts/bin dir
 if [[ -z "$CLAWTEAM_BIN" ]]; then
-    SITE_PKG="$(pip show clawteam 2>/dev/null | grep -i '^Location:' | awk '{print $2}')"
+    SITE_PKG="$(pip show agentteam 2>/dev/null | grep -i '^Location:' | awk '{print $2}')"
     if [[ -n "$SITE_PKG" ]]; then
         # Typical bin is one level up from site-packages, in a bin/ directory
         CANDIDATE="$(dirname "$(dirname "$SITE_PKG")")/bin/clawteam"
@@ -126,9 +126,9 @@ if [[ -z "$CLAWTEAM_BIN" ]]; then
 fi
 
 if [[ -z "$CLAWTEAM_BIN" ]]; then
-    fail "Could not locate the clawteam binary. Ensure pip's bin directory is in your PATH."
+    fail "Could not locate the agentteam binary. Ensure pip's bin directory is in your PATH."
 fi
-ok "clawteam binary found at: $CLAWTEAM_BIN"
+ok "agentteam binary found at: $CLAWTEAM_BIN"
 
 # ─── 6. Create symlink at ~/bin/clawteam ──────────────────────────────────────
 info "Setting up ~/bin/clawteam symlink..."
@@ -180,7 +180,7 @@ info "Configuring exec approvals for ClawTeam..."
 APPROVALS_FILE="$HOME/.openclaw/exec-approvals.json"
 if [[ -f "$APPROVALS_FILE" ]]; then
     # Ensure security is "allowlist" (not "full") so spawned agents don't get
-    # stuck on interactive permission prompts when running clawteam commands.
+    # stuck on interactive permission prompts when running agentteam commands.
     CURRENT_SECURITY=$(python3 -c "import json; d=json.load(open('$APPROVALS_FILE')); print(d.get('defaults',{}).get('security',''))" 2>/dev/null || echo "")
     if [[ "$CURRENT_SECURITY" == "full" ]]; then
         python3 -c "
@@ -195,23 +195,23 @@ with open('$APPROVALS_FILE', 'w') as f:
     else
         ok "Exec approvals security already: ${CURRENT_SECURITY:-default}"
     fi
-    # Add clawteam to the allowlist for all agents
+    # Add agentteam to the allowlist for all agents
     if command -v openclaw &>/dev/null; then
         openclaw approvals allowlist add --agent "*" "$CLAWTEAM_BIN" &>/dev/null 2>&1 && \
-            ok "Added clawteam to exec approvals allowlist" || \
-            warn "Could not add clawteam to allowlist (gateway may not be running)"
+            ok "Added agentteam to exec approvals allowlist" || \
+            warn "Could not add agentteam to allowlist (gateway may not be running)"
     fi
 else
     warn "exec-approvals.json not found — run openclaw once first, then re-run this script"
 fi
 
-# ─── 10. Verify clawteam --version ───────────────────────────────────────────
+# ─── 10. Verify agentteam --version ───────────────────────────────────────────
 info "Verifying installation..."
 if "$CLAWTEAM_BIN" --version &>/dev/null; then
     CT_VERSION="$("$CLAWTEAM_BIN" --version 2>&1)"
-    ok "clawteam --version: $CT_VERSION"
+    ok "agentteam --version: $CT_VERSION"
 else
-    warn "clawteam --version did not return cleanly, but the binary exists."
+    warn "agentteam --version did not return cleanly, but the binary exists."
 fi
 
 # ─── 11. Success ─────────────────────────────────────────────────────────────
@@ -223,4 +223,4 @@ cat << 'MSG'
   ╚═══════════════════════════════════════════════════╝
 MSG
 printf "${NC}\n"
-info "Run 'clawteam --help' to get started."
+info "Run 'agentteam --help' to get started."

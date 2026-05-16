@@ -4,18 +4,18 @@ import time
 
 import pytest
 
-from clawteam.spawn.registry import (
+from agentteam.spawn.registry import (
     AgentHealth,
     HealthState,
     get_agent_health,
     get_all_health,
     record_outcome,
 )
-from clawteam.team.costs import CostEvent, CostStore, CostSummary
-from clawteam.team.mailbox import MailboxManager
-from clawteam.team.manager import TeamManager
-from clawteam.team.models import TaskItem, TeamMessage
-from clawteam.templates import AgentDef, RetryConfig
+from agentteam.team.costs import CostEvent, CostStore, CostSummary
+from agentteam.team.mailbox import MailboxManager
+from agentteam.team.manager import TeamManager
+from agentteam.team.models import TaskItem, TeamMessage
+from agentteam.templates import AgentDef, RetryConfig
 
 
 def _create_team(name: str) -> None:
@@ -52,7 +52,7 @@ class TestIdempotencyKeyModels:
 
 class TestIdempotencyKeyTaskStore:
     def test_create_with_key_returns_same_task(self, team_name):
-        from clawteam.store.file import FileTaskStore
+        from agentteam.store.file import FileTaskStore
 
         store = FileTaskStore(team_name)
         t1 = store.create(subject="do X", idempotency_key="idem-1")
@@ -61,7 +61,7 @@ class TestIdempotencyKeyTaskStore:
         assert t1.subject == t2.subject
 
     def test_create_without_key_creates_distinct_tasks(self, team_name):
-        from clawteam.store.file import FileTaskStore
+        from agentteam.store.file import FileTaskStore
 
         store = FileTaskStore(team_name)
         t1 = store.create(subject="task A")
@@ -69,7 +69,7 @@ class TestIdempotencyKeyTaskStore:
         assert t1.id != t2.id
 
     def test_different_keys_create_different_tasks(self, team_name):
-        from clawteam.store.file import FileTaskStore
+        from agentteam.store.file import FileTaskStore
 
         store = FileTaskStore(team_name)
         t1 = store.create(subject="X", idempotency_key="k1")
@@ -289,7 +289,7 @@ class TestRetryConfig:
 
 class TestSpawnWithRetry:
     def test_success_on_first_try(self):
-        from clawteam.spawn import spawn_with_retry
+        from agentteam.spawn import spawn_with_retry
 
         class FakeBackend:
             def spawn(self, **kwargs):
@@ -303,7 +303,7 @@ class TestSpawnWithRetry:
         assert result == "Agent spawned"
 
     def test_retries_on_error(self):
-        from clawteam.spawn import spawn_with_retry
+        from agentteam.spawn import spawn_with_retry
 
         call_count = 0
 
@@ -324,7 +324,7 @@ class TestSpawnWithRetry:
         assert call_count == 3
 
     def test_gives_up_after_max_retries(self):
-        from clawteam.spawn import spawn_with_retry
+        from agentteam.spawn import spawn_with_retry
 
         class AlwaysFail:
             def spawn(self, **kwargs):
@@ -340,7 +340,7 @@ class TestSpawnWithRetry:
     def test_exponential_backoff_timing(self):
         from unittest.mock import patch
 
-        from clawteam.spawn import spawn_with_retry
+        from agentteam.spawn import spawn_with_retry
 
         call_count = 0
 
@@ -352,7 +352,7 @@ class TestSpawnWithRetry:
                     return "Error: fail"
                 return "OK"
 
-        with patch("clawteam.spawn.time.sleep") as mock_sleep:
+        with patch("agentteam.spawn.time.sleep") as mock_sleep:
             spawn_with_retry(
                 TimingBackend(), max_retries=3, backoff_base=0.05, backoff_max=1.0,
                 command=["test"], agent_name="w1", agent_id="id", agent_type="gp",

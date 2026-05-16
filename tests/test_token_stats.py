@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.tracker.token_stats import (
+from agentteam.tracker.token_stats import (
     DailyUsage,
     ProviderUsageStats,
     SessionUsage,

@@ -1,11 +1,11 @@
-"""Tests for clawteam.team.tasks — TaskStore CRUD + dependency tracking."""
+"""Tests for agentteam.team.tasks — TaskStore CRUD + dependency tracking."""
 
 from unittest.mock import patch
 
 import pytest
 
-from clawteam.team.models import TaskItem, TaskStatus
-from clawteam.team.tasks import TaskLockError, TaskStore
+from agentteam.team.models import TaskItem, TaskStatus
+from agentteam.team.tasks import TaskLockError, TaskStore
 
 
 @pytest.fixture
@@ -56,7 +56,7 @@ class TestTaskUpdate:
     def test_update_status(self, store):
         t = store.create("wip")
         # need to mock is_agent_alive for the lock logic
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="agent-1")
         assert updated.status == TaskStatus.in_progress
 
@@ -93,7 +93,7 @@ class TestTaskUpdate:
 
     def test_complete_clears_lock(self, store):
         t = store.create("locked")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             store.update(t.id, status=TaskStatus.in_progress, caller="agent-1")
         completed = store.update(t.id, status=TaskStatus.completed)
         assert completed.locked_by == ""
@@ -175,13 +175,13 @@ class TestTaskLocking:
     def test_lock_acquired_on_in_progress(self, store):
         t = store.create("lockable")
         # mock is_agent_alive to return None (unknown) so lock logic proceeds
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=None):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=None):
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="agent-a")
         assert updated.locked_by == "agent-a"
 
     def test_same_agent_can_relock(self, store):
         t = store.create("lockable")
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=None):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=None):
             store.update(t.id, status=TaskStatus.in_progress, caller="agent-a")
             # same agent again, no error
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="agent-a")
@@ -189,14 +189,14 @@ class TestTaskLocking:
 
     def test_different_agent_blocked_by_lock(self, store):
         t = store.create("contested")
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=True):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=True):
             store.update(t.id, status=TaskStatus.in_progress, caller="agent-a")
             with pytest.raises(TaskLockError):
                 store.update(t.id, status=TaskStatus.in_progress, caller="agent-b")
 
     def test_force_overrides_lock(self, store):
         t = store.create("force-me")
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=True):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=True):
             store.update(t.id, status=TaskStatus.in_progress, caller="agent-a")
             updated = store.update(
                 t.id, status=TaskStatus.in_progress, caller="agent-b", force=True
@@ -205,11 +205,11 @@ class TestTaskLocking:
 
     def test_dead_agent_lock_is_released(self, store):
         t = store.create("stale-lock")
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=None):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=None):
             store.update(t.id, status=TaskStatus.in_progress, caller="dead-agent")
 
         # now dead-agent is dead, another agent should be able to take over
-        with patch("clawteam.spawn.registry.is_agent_alive", return_value=False):
+        with patch("agentteam.spawn.registry.is_agent_alive", return_value=False):
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="live-agent")
         assert updated.locked_by == "live-agent"
 
@@ -221,24 +221,24 @@ class TestDurationTracking:
         t = store.create("timed task")
         assert t.started_at == ""
 
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="a")
         assert updated.started_at != ""
 
     def test_started_at_not_overwritten_on_second_in_progress(self, store):
         """If a task goes in_progress twice, keep the original start time."""
         t = store.create("double start")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             updated = store.update(t.id, status=TaskStatus.in_progress, caller="a")
         first_start = updated.started_at
 
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             updated2 = store.update(t.id, status=TaskStatus.in_progress, caller="a")
         assert updated2.started_at == first_start
 
     def test_duration_computed_on_completion(self, store):
         t = store.create("will complete")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             store.update(t.id, status=TaskStatus.in_progress, caller="a")
 
         completed = store.update(t.id, status=TaskStatus.completed)
@@ -254,7 +254,7 @@ class TestDurationTracking:
 
     def test_started_at_persists_through_serialization(self, store):
         t = store.create("persist check")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             store.update(t.id, status=TaskStatus.in_progress, caller="a")
 
         reloaded = store.get(t.id)
@@ -287,7 +287,7 @@ class TestGetStats:
 
     def test_stats_with_timed_tasks(self, store):
         t = store.create("timed")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             store.update(t.id, status=TaskStatus.in_progress, caller="a")
         store.update(t.id, status=TaskStatus.completed)
 
@@ -299,7 +299,7 @@ class TestGetStats:
         """Tasks completed without going through in_progress shouldn't affect avg."""
         # one task goes through the full flow
         t1 = store.create("full flow")
-        with patch("clawteam.team.tasks.TaskStore._acquire_lock"):
+        with patch("agentteam.team.tasks.TaskStore._acquire_lock"):
             store.update(t1.id, status=TaskStatus.in_progress, caller="a")
         store.update(t1.id, status=TaskStatus.completed)
 

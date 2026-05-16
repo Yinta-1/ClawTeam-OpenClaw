@@ -1,4 +1,4 @@
-from clawteam.spawn.prompt import build_agent_prompt
+from agentteam.spawn.prompt import build_agent_prompt
 
 
 def test_openclaw_prompt_mentions_allowlisted_absolute_clawteam_path():

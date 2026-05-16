@@ -1,4 +1,4 @@
-"""Tests for clawteam.fileutil — atomic writes and advisory file locking."""
+"""Tests for agentteam.fileutil — atomic writes and advisory file locking."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.fileutil import atomic_write_text, file_locked
+from agentteam.fileutil import atomic_write_text, file_locked
 
 
 class TestAtomicWriteText:

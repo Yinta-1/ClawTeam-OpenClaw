@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.tracker.diff_tracker import (
+from agentteam.tracker.diff_tracker import (
     DiffEntry,
     DiffStore,
     DiffTracker,

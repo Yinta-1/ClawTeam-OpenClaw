@@ -10,13 +10,13 @@ When all spawned agents use OpenClaw as the backend, there is no way to assign d
 
 ## Solution
 
-Add per-agent model selection at the ClawTeam layer, passed to OpenClaw via a new `--model` CLI flag. Models can be specified explicitly per agent, per template, via cost tiers, or via an automatic role-based strategy.
+Add per-agent model selection at the AgentTeam layer, passed to OpenClaw via a new `--model` CLI flag. Models can be specified explicitly per agent, per template, via cost tiers, or via an automatic role-based strategy.
 
 ## Approach
 
 **Approach B** (selected over two alternatives):
 - **A (agent profile mapping)** was rejected — requires manual OpenClaw agent profile setup, not portable.
-- **B (add --model flag to OpenClaw + plumb through ClawTeam)** — selected. Clean, portable, model is first-class.
+- **B (add --model flag to OpenClaw + plumb through AgentTeam)** — selected. Clean, portable, model is first-class.
 - **C (dynamic config mutation)** was rejected — fragile, race conditions, hacky.
 
 ## Design
@@ -315,7 +315,7 @@ Environment variable map addition:
 
 ### 9. Model Resolution Function
 
-New function in `clawteam/model_resolution.py` (new file — named to avoid collision with existing `clawteam/team/models.py`):
+New function in `agentteam/model_resolution.py` (new file — named to avoid collision with existing `agentteam/team/models.py`):
 
 ```python
 DEFAULT_TIERS = {
@@ -387,13 +387,13 @@ Add `--model` flag to `openclaw tui` and `openclaw agent` CLI commands:
 
 This is a small, self-contained change in the OpenClaw CLI layer.
 
-**Dependency ordering:** The OpenClaw `--model` PR must be merged and available before the ClawTeam feature is usable. If ClawTeam passes `--model` to an older OpenClaw that doesn't support it, the command will fail. To handle this gracefully, ClawTeam should log a warning if the resolved model is non-None but the backend command is not known to support `--model`.
+**Dependency ordering:** The OpenClaw `--model` PR must be merged and available before the AgentTeam feature is usable. If AgentTeam passes `--model` to an older OpenClaw that doesn't support it, the command will fail. To handle this gracefully, AgentTeam should log a warning if the resolved model is non-None but the backend command is not known to support `--model`.
 
 ### 11. Scope: Non-OpenClaw Backends
 
 This feature is **primarily scoped to OpenClaw**. When `command = ["claude"]` or `command = ["codex"]`:
 
-- Claude Code already supports `--model` — ClawTeam can inject it for `_is_claude_command()` as well.
+- Claude Code already supports `--model` — AgentTeam can inject it for `_is_claude_command()` as well.
 - Codex CLI model selection mechanism should be checked; if it supports `--model`, inject similarly.
 - If a backend does not support `--model`, the resolved model string is still set in `CLAWTEAM_MODEL` env var for introspection, but no CLI flag is injected. A debug log message is emitted.
 
@@ -433,17 +433,17 @@ for agent in all_agents:
 
 | File | Change | Size |
 |------|--------|------|
-| `clawteam/templates/__init__.py` | Add `model`, `model_tier` to `AgentDef` with validators; `model`, `model_strategy` to `TemplateDef` with validators; update `_parse_toml()` to forward new fields | S |
-| `clawteam/model_resolution.py` | New file: `resolve_model()` function, tier defaults, auto role map | S |
-| `clawteam/team/models.py` | Add `model_name` field to `TeamMember` | XS |
-| `clawteam/identity.py` | Add `model` field to `AgentIdentity`, read from `CLAWTEAM_MODEL` | XS |
-| `clawteam/config.py` | Add `default_model`, `model_tiers` to `ClawTeamConfig` | XS |
-| `clawteam/cli/commands.py` | Add `--model` to `spawn_agent` and `launch_team`; call `resolve_model()` | M |
-| `clawteam/spawn/base.py` | Add `model` param to `spawn()` signature | XS |
-| `clawteam/spawn/tmux_backend.py` | Pass `--model` to OpenClaw; propagate `CLAWTEAM_MODEL` env var | S |
-| `clawteam/spawn/subprocess_backend.py` | Same as tmux backend | S |
-| `clawteam/spawn/prompt.py` | Include model info in agent prompt (optional) | XS |
-| `clawteam/templates/*.toml` | Add example model assignments to all 4 templates | S |
+| `agentteam/templates/__init__.py` | Add `model`, `model_tier` to `AgentDef` with validators; `model`, `model_strategy` to `TemplateDef` with validators; update `_parse_toml()` to forward new fields | S |
+| `agentteam/model_resolution.py` | New file: `resolve_model()` function, tier defaults, auto role map | S |
+| `agentteam/team/models.py` | Add `model_name` field to `TeamMember` | XS |
+| `agentteam/identity.py` | Add `model` field to `AgentIdentity`, read from `CLAWTEAM_MODEL` | XS |
+| `agentteam/config.py` | Add `default_model`, `model_tiers` to `ClawTeamConfig` | XS |
+| `agentteam/cli/commands.py` | Add `--model` to `spawn_agent` and `launch_team`; call `resolve_model()` | M |
+| `agentteam/spawn/base.py` | Add `model` param to `spawn()` signature | XS |
+| `agentteam/spawn/tmux_backend.py` | Pass `--model` to OpenClaw; propagate `CLAWTEAM_MODEL` env var | S |
+| `agentteam/spawn/subprocess_backend.py` | Same as tmux backend | S |
+| `agentteam/spawn/prompt.py` | Include model info in agent prompt (optional) | XS |
+| `agentteam/templates/*.toml` | Add example model assignments to all 4 templates | S |
 | **OpenClaw repo (separate PR)** | Add `--model` flag to `tui` and `agent` commands | S |
 
 ## Backward Compatibility
@@ -454,6 +454,6 @@ All new fields are optional with `None` or empty defaults. Existing templates an
 
 - Unit tests for `resolve_model()` covering all 7 priority levels
 - Unit tests for TOML parsing with new fields
-- Integration test: `clawteam spawn --model opus` passes `--model opus` to OpenClaw
-- Integration test: `clawteam launch code-review` with model-annotated template spawns agents with correct models
+- Integration test: `agentteam spawn --model opus` passes `--model opus` to OpenClaw
+- Integration test: `agentteam launch code-review` with model-annotated template spawns agents with correct models
 - Verify backward compatibility: existing templates without model fields work unchanged

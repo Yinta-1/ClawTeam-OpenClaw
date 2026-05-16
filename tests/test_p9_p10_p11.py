@@ -22,7 +22,7 @@ class TestProviderCapabilityRegistry:
     
     def test_get_capability(self):
         """测试获取 Provider 能力"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         # 测试已知 Provider
         cap = ProviderCapabilityRegistry.get("claude-code")
@@ -33,14 +33,14 @@ class TestProviderCapabilityRegistry:
         
     def test_get_unknown_capability(self):
         """测试获取未知 Provider"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         cap = ProviderCapabilityRegistry.get("unknown-provider")
         assert cap is None
     
     def test_get_all_capabilities(self):
         """测试获取所有能力"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         caps = ProviderCapabilityRegistry.get_all()
         assert len(caps) > 0
@@ -48,7 +48,7 @@ class TestProviderCapabilityRegistry:
     
     def test_get_mcp_capability(self):
         """测试获取 MCP 能力"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         mcp = ProviderCapabilityRegistry.get_mcp_capability("claude-code")
         assert mcp.native
@@ -59,7 +59,7 @@ class TestProviderCapabilityRegistry:
     
     def test_get_skill_capability(self):
         """测试获取 Skill 能力"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         skill = ProviderCapabilityRegistry.get_skill_capability("claude-code")
         assert skill.slash_commands
@@ -67,21 +67,21 @@ class TestProviderCapabilityRegistry:
     
     def test_supports_native_mcp(self):
         """测试原生 MCP 支持"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         assert ProviderCapabilityRegistry.supports_native_mcp("claude-code")
         assert not ProviderCapabilityRegistry.supports_native_mcp("codex")
     
     def test_supports_mcp_fallback(self):
         """测试 MCP 降级支持"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         assert ProviderCapabilityRegistry.supports_mcp_fallback("codex")
         assert not ProviderCapabilityRegistry.supports_mcp_fallback("claude-code")
     
     def test_get_registered_ids(self):
         """测试获取已注册 ID"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         ids = ProviderCapabilityRegistry.get_registered_ids()
         assert "claude-code" in ids
@@ -89,7 +89,7 @@ class TestProviderCapabilityRegistry:
     
     def test_register_new_capability(self):
         """测试动态注册新能力"""
-        from clawteam.orchestrator.provider_capability import (
+        from agentteam.orchestrator.provider_capability import (
             ProviderCapabilityRegistry,
             ProviderCapability,
             ProviderMcpCapability,
@@ -111,7 +111,7 @@ class TestProviderCapabilityRegistry:
     
     def test_get_summary(self):
         """测试获取摘要"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
         
         summary = ProviderCapabilityRegistry.get_summary()
         assert "totalProviders" in summary
@@ -123,7 +123,7 @@ class TestProviderAvailability:
     
     def test_check_provider_availability(self):
         """测试检测 Provider 可用性"""
-        from clawteam.orchestrator.provider_availability import check_provider_availability
+        from agentteam.orchestrator.provider_availability import check_provider_availability
         
         # 测试一个可能存在的命令
         result = check_provider_availability("claude-code")
@@ -132,7 +132,7 @@ class TestProviderAvailability:
     
     def test_check_unknown_provider(self):
         """测试检测未知 Provider"""
-        from clawteam.orchestrator.provider_availability import check_provider_availability
+        from agentteam.orchestrator.provider_availability import check_provider_availability
         
         result = check_provider_availability("unknown-provider")
         assert not result.available
@@ -140,7 +140,7 @@ class TestProviderAvailability:
     
     def test_get_availability_summary(self):
         """测试获取可用性摘要"""
-        from clawteam.orchestrator.provider_availability import get_availability_summary
+        from agentteam.orchestrator.provider_availability import get_availability_summary
         
         summary = get_availability_summary()
         assert "totalProviders" in summary
@@ -149,7 +149,7 @@ class TestProviderAvailability:
     
     def test_clear_cache(self):
         """测试清除缓存"""
-        from clawteam.orchestrator.provider_availability import (
+        from agentteam.orchestrator.provider_availability import (
             check_provider_availability,
             clear_availability_cache,
         )
@@ -166,7 +166,7 @@ class TestProviderAutoSwitchManager:
     
     def test_init(self):
         """测试初始化"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager
         
         manager = ProviderAutoSwitchManager("test-team")
         assert manager.team_name == "test-team"
@@ -174,7 +174,7 @@ class TestProviderAutoSwitchManager:
     
     def test_get_current_provider(self):
         """测试获取当前 Provider"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager
         
         manager = ProviderAutoSwitchManager("test-team")
         assert manager.get_current_provider() is None
@@ -184,7 +184,7 @@ class TestProviderAutoSwitchManager:
     
     def test_handle_quota_exceeded(self):
         """测试处理额度不足"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager, TaskType
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager, TaskType
         
         manager = ProviderAutoSwitchManager("test-team")
         
@@ -199,7 +199,7 @@ class TestProviderAutoSwitchManager:
     
     def test_get_switch_summary(self):
         """测试获取切换摘要"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager
         
         manager = ProviderAutoSwitchManager("test-team")
         summary = manager.get_switch_summary()
@@ -209,7 +209,7 @@ class TestProviderAutoSwitchManager:
     
     def test_get_status_report(self):
         """测试获取状态报告"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager
         
         manager = ProviderAutoSwitchManager("test-team")
         report = manager.get_status_report()
@@ -242,14 +242,14 @@ class TestGitWorktreeService:
     
     def test_is_git_repo(self, mock_repo):
         """测试检查 Git 仓库"""
-        from clawteam.workspace.worktree import GitWorktreeService
+        from agentteam.workspace.worktree import GitWorktreeService
         
         service = GitWorktreeService(mock_repo)
         assert service.is_git_repo()
     
     def test_get_current_branch(self, mock_repo):
         """测试获取当前分支"""
-        from clawteam.workspace.worktree import GitWorktreeService
+        from agentteam.workspace.worktree import GitWorktreeService
         
         service = GitWorktreeService(mock_repo)
         branch = service.get_current_branch()
@@ -258,7 +258,7 @@ class TestGitWorktreeService:
     
     def test_list_worktrees(self, mock_repo):
         """测试列出 worktrees"""
-        from clawteam.workspace.worktree import GitWorktreeService
+        from agentteam.workspace.worktree import GitWorktreeService
         
         service = GitWorktreeService(mock_repo)
         worktrees = service.list_worktrees()
@@ -269,7 +269,7 @@ class TestGitWorktreeService:
     
     def test_slugify_branch(self, mock_repo):
         """测试分支名转换"""
-        from clawteam.workspace.worktree import GitWorktreeService
+        from agentteam.workspace.worktree import GitWorktreeService
         
         service = GitWorktreeService(mock_repo)
         
@@ -283,7 +283,7 @@ class TestGitWorktreeService:
     
     def test_get_summary(self, mock_repo):
         """测试获取摘要"""
-        from clawteam.workspace.worktree import GitWorktreeService
+        from agentteam.workspace.worktree import GitWorktreeService
         
         service = GitWorktreeService(mock_repo)
         summary = service.get_summary()
@@ -310,14 +310,14 @@ class TestWorktreeManager:
     
     def test_init(self, mock_repo):
         """测试初始化"""
-        from clawteam.workspace.worktree import WorktreeManager
+        from agentteam.workspace.worktree import WorktreeManager
         
         manager = WorktreeManager(mock_repo)
         assert manager.repo_path == mock_repo.resolve()
     
     def test_get_all_worktrees(self, mock_repo):
         """测试获取所有 worktrees"""
-        from clawteam.workspace.worktree import WorktreeManager
+        from agentteam.workspace.worktree import WorktreeManager
         
         manager = WorktreeManager(mock_repo)
         worktrees = manager.get_all_worktrees()
@@ -325,7 +325,7 @@ class TestWorktreeManager:
     
     def test_get_summary(self, mock_repo):
         """测试获取摘要"""
-        from clawteam.workspace.worktree import WorktreeManager
+        from agentteam.workspace.worktree import WorktreeManager
         
         manager = WorktreeManager(mock_repo)
         summary = manager.get_summary()
@@ -339,7 +339,7 @@ class TestWorktreeDataClasses:
     
     def test_worktree_info_to_dict(self):
         """测试 WorktreeInfo 序列化"""
-        from clawteam.workspace.worktree import WorktreeInfo, WorktreeStatus
+        from agentteam.workspace.worktree import WorktreeInfo, WorktreeStatus
         
         info = WorktreeInfo(
             path="/test/path",
@@ -357,7 +357,7 @@ class TestWorktreeDataClasses:
     
     def test_merge_check_result_to_dict(self):
         """测试 MergeCheckResult 序列化"""
-        from clawteam.workspace.worktree import MergeCheckResult
+        from agentteam.workspace.worktree import MergeCheckResult
         
         result = MergeCheckResult(
             can_merge=True,
@@ -372,7 +372,7 @@ class TestWorktreeDataClasses:
     
     def test_merge_result_to_dict(self):
         """测试 MergeResult 序列化"""
-        from clawteam.workspace.worktree import MergeResult
+        from agentteam.workspace.worktree import MergeResult
         
         result = MergeResult(
             success=True,
@@ -394,7 +394,7 @@ class TestUsageEstimator:
     
     def test_estimate_tokens_ascii(self):
         """测试 ASCII 文本估算"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         
@@ -406,7 +406,7 @@ class TestUsageEstimator:
     
     def test_estimate_tokens_chinese(self):
         """测试中文文本估算"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         
@@ -418,7 +418,7 @@ class TestUsageEstimator:
     
     def test_accumulate_usage(self):
         """测试累加用量"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         
@@ -431,7 +431,7 @@ class TestUsageEstimator:
     
     def test_record_request(self):
         """测试记录请求"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         
@@ -440,7 +440,7 @@ class TestUsageEstimator:
     
     def test_get_summary(self):
         """测试获取汇总"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         estimator.accumulate_usage("session-1", "Test text", "claude")
@@ -452,7 +452,7 @@ class TestUsageEstimator:
     
     def test_get_trend(self):
         """测试获取趋势"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         estimator.accumulate_usage("session-1", "Test text", "claude")
@@ -463,7 +463,7 @@ class TestUsageEstimator:
     
     def test_get_provider_stats(self):
         """测试获取 Provider 统计"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         estimator.accumulate_usage("session-1", "Test text", "claude")
@@ -475,7 +475,7 @@ class TestUsageEstimator:
     
     def test_mark_session_ended(self):
         """测试标记会话结束"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         estimator.accumulate_usage("session-1", "Test text", "claude")
@@ -487,7 +487,7 @@ class TestUsageEstimator:
     
     def test_get_web_ui_data(self):
         """测试获取 Web UI 数据"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         estimator.accumulate_usage("session-1", "Test text", "claude")
@@ -503,7 +503,7 @@ class TestTokenStatsDataClasses:
     
     def test_usage_summary_to_dict(self):
         """测试 UsageSummary 序列化"""
-        from clawteam.tracker.token_stats import UsageSummary
+        from agentteam.tracker.token_stats import UsageSummary
         
         summary = UsageSummary(
             total_tokens=1000,
@@ -521,7 +521,7 @@ class TestTokenStatsDataClasses:
     
     def test_daily_usage_to_dict(self):
         """测试 DailyUsage 序列化"""
-        from clawteam.tracker.token_stats import DailyUsage
+        from agentteam.tracker.token_stats import DailyUsage
         
         daily = DailyUsage(
             date="2024-01-01",
@@ -537,7 +537,7 @@ class TestTokenStatsDataClasses:
     
     def test_trend_analysis_to_dict(self):
         """测试 TrendAnalysis 序列化"""
-        from clawteam.tracker.token_stats import TrendAnalysis, DailyUsage
+        from agentteam.tracker.token_stats import TrendAnalysis, DailyUsage
         
         trend = TrendAnalysis(
             daily_data=[DailyUsage(date="2024-01-01", tokens=100)],
@@ -559,14 +559,14 @@ class TestTokenStatsConvenienceFunctions:
     
     def test_get_usage_summary(self):
         """测试获取用量汇总"""
-        from clawteam.tracker.token_stats import get_usage_summary
+        from agentteam.tracker.token_stats import get_usage_summary
         
         summary = get_usage_summary()
         assert summary is not None
     
     def test_get_usage_trend(self):
         """测试获取趋势"""
-        from clawteam.tracker.token_stats import get_usage_trend
+        from agentteam.tracker.token_stats import get_usage_trend
         
         trend = get_usage_trend(7)
         assert trend is not None
@@ -574,14 +574,14 @@ class TestTokenStatsConvenienceFunctions:
     
     def test_accumulate_usage(self):
         """测试累加用量"""
-        from clawteam.tracker.token_stats import accumulate_usage
+        from agentteam.tracker.token_stats import accumulate_usage
         
         tokens = accumulate_usage("test-session", "Test text", "claude")
         assert tokens > 0
     
     def test_record_request(self):
         """测试记录请求"""
-        from clawteam.tracker.token_stats import record_request
+        from agentteam.tracker.token_stats import record_request
         
         total = record_request("test-session", 100, 50, "claude")
         assert total == 150
@@ -596,8 +596,8 @@ class TestP9P10P11Integration:
     
     def test_provider_capability_and_availability(self):
         """测试 Provider 能力和可用性集成"""
-        from clawteam.orchestrator.provider_capability import ProviderCapabilityRegistry
-        from clawteam.orchestrator.provider_availability import check_provider_availability
+        from agentteam.orchestrator.provider_capability import ProviderCapabilityRegistry
+        from agentteam.orchestrator.provider_availability import check_provider_availability
         
         # 获取能力
         cap = ProviderCapabilityRegistry.get("claude-code")
@@ -610,7 +610,7 @@ class TestP9P10P11Integration:
     
     def test_token_stats_with_provider(self):
         """测试 Token 统计与 Provider 集成"""
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.tracker.token_stats import UsageEstimator
         
         estimator = UsageEstimator()
         
@@ -628,8 +628,8 @@ class TestP9P10P11Integration:
     
     def test_full_workflow(self):
         """测试完整工作流"""
-        from clawteam.orchestrator.provider_selector import ProviderAutoSwitchManager, TaskType
-        from clawteam.tracker.token_stats import UsageEstimator
+        from agentteam.orchestrator.provider_selector import ProviderAutoSwitchManager, TaskType
+        from agentteam.tracker.token_stats import UsageEstimator
         
         # 初始化
         manager = ProviderAutoSwitchManager("test-team")

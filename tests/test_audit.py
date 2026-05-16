@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from clawteam.audit import (
+from agentteam.audit import (
     AuditEvent,
     AuditEventType,
     get_audit_summary,
@@ -22,7 +22,7 @@ def temp_team_data():
     """Create a temporary team data directory."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Mock get_data_dir from team.models to use our temp directory
-        with patch("clawteam.team.models.get_data_dir", return_value=Path(tmpdir)):
+        with patch("agentteam.team.models.get_data_dir", return_value=Path(tmpdir)):
             yield tmpdir
 
 
@@ -189,7 +189,7 @@ def test_log_audit_event_with_optional_fields(temp_team_data):
 
 def test_audit_log_path_validation(temp_team_data):
     """Test that audit log paths are properly validated."""
-    from clawteam.paths import validate_identifier
+    from agentteam.paths import validate_identifier
     
     # Valid team name
     valid_team = "my-team_123"

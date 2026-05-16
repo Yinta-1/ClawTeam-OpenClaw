@@ -16,7 +16,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from clawteam.spawn.openclaw_sdk_backend import (
+from agentteam.spawn.openclaw_sdk_backend import (
     OpenClawSDKBackend,
     OCAProcess,
 )
@@ -166,28 +166,28 @@ class TestContinuousRunningMode:
 
     def test_continuous_mode_block_generated(self):
         """Test continuous running block is included in prompt."""
-        from clawteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
+        from agentteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
         
         assert "Continuous Running Mode" in _CONTINUOUS_RUN_BLOCK
         assert "Do NOT exit after completing a task" in _CONTINUOUS_RUN_BLOCK
 
     def test_shutdown_detection_in_block(self):
         """Test shutdown detection is in continuous mode block."""
-        from clawteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
+        from agentteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
         
         # Should detect shutdown command
         assert "shutdown" in _CONTINUOUS_RUN_BLOCK.lower()
 
     def test_inbox_check_in_block(self):
         """Test inbox checking is in continuous mode block."""
-        from clawteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
+        from agentteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
         
         # Should check inbox
         assert "inbox" in _CONTINUOUS_RUN_BLOCK.lower()
 
     def test_await_new_tasks_in_block(self):
         """Test block mentions awaiting new tasks."""
-        from clawteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
+        from agentteam.spawn.openclaw_sdk_backend import _CONTINUOUS_RUN_BLOCK
         
         assert "await" in _CONTINUOUS_RUN_BLOCK.lower()
 

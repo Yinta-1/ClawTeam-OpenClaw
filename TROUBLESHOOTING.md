@@ -1,10 +1,10 @@
-# ClawTeam Troubleshooting Guide
+# AgentTeam Troubleshooting Guide
 
 ## Common Issues
 
 ### Installation Issues
 
-#### `ModuleNotFoundError: No module named 'clawteam'`
+#### `ModuleNotFoundError: No module named 'agentteam'`
 
 **Cause**: Package not installed or not installed in editable mode.
 
@@ -12,7 +12,7 @@
 ```bash
 pip install -e .
 # or
-pip install clawteam
+pip install agentteam
 ```
 
 ---
@@ -45,7 +45,7 @@ netstat -ano | findstr :8080
 taskkill /PID <pid> /F
 
 # Or use a different port
-clawteam board serve --port 8081
+agentteam board serve --port 8081
 ```
 
 ---
@@ -58,11 +58,11 @@ clawteam board serve --port 8081
 1. Check server logs
 2. Restart the server:
 ```bash
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 ```
 3. Try with debug mode:
 ```bash
-clawteam board serve --debug
+agentteam board serve --debug
 ```
 
 ---
@@ -72,7 +72,7 @@ clawteam board serve --debug
 **Cause**: BoardCollector failing to gather data.
 
 **Solution**:
-1. Check if teams exist: `clawteam team list`
+1. Check if teams exist: `agentteam team list`
 2. Check file permissions on data directory
 3. Restart the board server
 
@@ -105,15 +105,15 @@ git status
 **Solution**:
 1. Kill the stuck agent:
 ```bash
-clawteam agent kill <agent_id>
+agentteam agent kill <agent_id>
 ```
 2. Increase timeout:
 ```bash
-clawteam spawn --timeout 3600 ...  # 1 hour
+agentteam spawn --timeout 3600 ...  # 1 hour
 ```
 3. Check agent logs:
 ```bash
-clawteam agent logs <agent_id>
+agentteam agent logs <agent_id>
 ```
 
 ---
@@ -125,11 +125,11 @@ clawteam agent logs <agent_id>
 **Solution**:
 1. Check task status:
 ```bash
-clawteam task list <team_name>
+agentteam task list <team_name>
 ```
 2. Monitor agent activity:
 ```bash
-clawteam agent status <agent_id>
+agentteam agent status <agent_id>
 ```
 3. Check if there are any blocking operations in the task
 
@@ -159,7 +159,7 @@ ls -la /path/to/worktree/parent
 **Solution**:
 ```bash
 # Manual cleanup
-clawteam worktree cleanup --force
+agentteam worktree cleanup --force
 
 # Check existing worktrees
 git worktree list
@@ -176,15 +176,15 @@ git worktree list
 **Solution**:
 1. Check mailbox size:
 ```bash
-clawteam mailbox status <team_name>
+agentteam mailbox status <team_name>
 ```
 2. Clear old messages:
 ```bash
-clawteam mailbox clear <team_name> --older-than 24h
+agentteam mailbox clear <team_name> --older-than 24h
 ```
 3. Check transport status:
 ```bash
-clawteam transport status
+agentteam transport status
 ```
 
 ---
@@ -213,7 +213,7 @@ mailbox:
 **Solution**:
 1. Check for stuck processes:
 ```bash
-ps aux | grep clawteam
+ps aux | grep agentteam
 ```
 2. Kill extra processes
 3. If using SQLite, enable WAL mode:
@@ -230,11 +230,11 @@ conn.execute("PRAGMA journal_mode=WAL")
 **Solution**:
 1. Backup current database:
 ```bash
-cp clawteam.db clawteam.db.bak
+cp agentteam.db agentteam.db.bak
 ```
 2. Run integrity check:
 ```bash
-sqlite3 clawteam.db "PRAGMA integrity_check;"
+sqlite3 agentteam.db "PRAGMA integrity_check;"
 ```
 3. If corrupted, restore from backup or reinitialize
 
@@ -249,11 +249,11 @@ sqlite3 clawteam.db "PRAGMA integrity_check;"
 **Solution**:
 1. Check number of running agents:
 ```bash
-clawteam agent list --running
+agentteam agent list --running
 ```
 2. Kill idle agents:
 ```bash
-clawteam agent kill --idle
+agentteam agent kill --idle
 ```
 3. Set memory limits in config:
 ```yaml
@@ -290,7 +290,7 @@ Enable debug mode for detailed logging:
 export CLAWTEAM_DEBUG=1
 
 # Or CLI flag
-clawteam --debug board serve
+agentteam --debug board serve
 
 # JSON logging for parsing
 export CLAWTEAM_LOG_JSON=1
@@ -301,39 +301,39 @@ export CLAWTEAM_LOG_JSON=1
 ### Check Version
 
 ```bash
-clawteam --version
+agentteam --version
 ```
 
 ### Check Configuration
 
 ```bash
-clawteam config show
+agentteam config show
 ```
 
 ### Check System Status
 
 ```bash
-clawteam status
+agentteam status
 ```
 
 ### View Full Logs
 
 ```bash
 # All logs
-clawteam logs
+agentteam logs
 
 # Recent logs
-clawteam logs --tail 100
+agentteam logs --tail 100
 
 # Filter by level
-clawteam logs --level ERROR
+agentteam logs --level ERROR
 ```
 
 ## Report Issues
 
 When reporting issues, include:
 
-1. **Version**: `clawteam --version`
+1. **Version**: `agentteam --version`
 2. **OS**: Windows/Linux/macOS + version
 3. **Python version**: `python --version`
 4. **Command**: Exact command that failed

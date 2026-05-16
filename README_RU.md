@@ -12,7 +12,7 @@
   <a href="README_PT-BR.md">Português (Brasil)</a>
 </p>
 
-<h1 align="center">🦞ClawTeam-OpenClaw</h1>
+<h1 align="center">🦞AgentTeam-OpenClaw</h1>
 
 <p align="center">
   <strong>Координация мультиагентного роя для CLI-агентов программирования — <a href="https://openclaw.ai">OpenClaw</a> по умолчанию</strong>
@@ -39,11 +39,11 @@
 
 ---
 
-## Почему ClawTeam?
+## Почему AgentTeam?
 
-Современные ИИ-агенты мощны, но работают **изолированно**. ClawTeam позволяет агентам самоорганизовываться в команды — разделять работу, общаться и объединять результаты без ручного микроменеджмента.
+Современные ИИ-агенты мощны, но работают **изолированно**. AgentTeam позволяет агентам самоорганизовываться в команды — разделять работу, общаться и объединять результаты без ручного микроменеджмента.
 
-| | ClawTeam | Другие мультиагентные фреймворки |
+| | AgentTeam | Другие мультиагентные фреймворки |
 |---|---------|----------------------------|
 | **Кто использует** | Сами ИИ-агенты | Люди, пишущие код оркестрации |
 | **Настройка** | `pip install` + один промпт | Docker, облачные API, YAML-конфиги |
@@ -60,10 +60,10 @@
 <td width="33%">
 
 ### Агенты порождают агентов
-Лидер вызывает `clawteam spawn` для создания рабочих. Каждый получает свой **git worktree**, **окно tmux** и **идентичность**.
+Лидер вызывает `agentteam spawn` для создания рабочих. Каждый получает свой **git worktree**, **окно tmux** и **идентичность**.
 
 ```bash
-clawteam spawn --team my-team \
+agentteam spawn --team my-team \
   --agent-name worker1 \
   --task "Implement auth module"
 ```
@@ -75,8 +75,8 @@ clawteam spawn --team my-team \
 Рабочие проверяют входящие, обновляют задачи и сообщают результаты — всё через CLI-команды, **автоматически внедрённые** в их промпт.
 
 ```bash
-clawteam task list my-team --owner me
-clawteam inbox send my-team leader \
+agentteam task list my-team --owner me
+agentteam inbox send my-team leader \
   "Auth done. All tests passing."
 ```
 
@@ -87,9 +87,9 @@ clawteam inbox send my-team leader \
 Отслеживайте рой через мозаичное представление tmux или веб-интерфейс. Лидер занимается координацией.
 
 ```bash
-clawteam board attach my-team
+agentteam board attach my-team
 # Or web dashboard
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 ```
 
 </td>
@@ -102,38 +102,38 @@ clawteam board serve --port 8080
 
 ### Вариант 1: Пусть агент ведёт (Рекомендуется)
 
-Установите ClawTeam, затем дайте промпт вашему агенту:
+Установите AgentTeam, затем дайте промпт вашему агенту:
 
 ```
-"Build a web app. Use clawteam to split the work across multiple agents."
+"Build a web app. Use agentteam to split the work across multiple agents."
 ```
 
-Агент автоматически создаёт команду, порождает рабочих, назначает задачи и координирует — всё через CLI `clawteam`.
+Агент автоматически создаёт команду, порождает рабочих, назначает задачи и координирует — всё через CLI `agentteam`.
 
 ### Вариант 2: Управляйте вручную
 
 ```bash
 # Create a team
-clawteam team spawn-team my-team -d "Build the auth module" -n leader
+agentteam team spawn-team my-team -d "Build the auth module" -n leader
 
 # Spawn workers — each gets a git worktree + tmux window
-clawteam spawn --team my-team --agent-name alice --task "Implement OAuth2 flow"
-clawteam spawn --team my-team --agent-name bob   --task "Write unit tests for auth"
+agentteam spawn --team my-team --agent-name alice --task "Implement OAuth2 flow"
+agentteam spawn --team my-team --agent-name bob   --task "Write unit tests for auth"
 
 # Watch them work
-clawteam board attach my-team
+agentteam board attach my-team
 ```
 
 ### Поддерживаемые агенты
 
 | Агент | Команда порождения | Статус |
 |-------|--------------|--------|
-| [OpenClaw](https://openclaw.ai) | `clawteam spawn tmux openclaw --team ...` | **По умолчанию** |
-| [Claude Code](https://claude.ai/claude-code) | `clawteam spawn tmux claude --team ...` | Полная поддержка |
-| [Codex](https://openai.com/codex) | `clawteam spawn tmux codex --team ...` | Полная поддержка |
-| [nanobot](https://github.com/HKUDS/nanobot) | `clawteam spawn tmux nanobot --team ...` | Полная поддержка |
-| [Cursor](https://cursor.com) | `clawteam spawn subprocess cursor --team ...` | Экспериментально |
-| Пользовательские скрипты | `clawteam spawn subprocess python --team ...` | Полная поддержка |
+| [OpenClaw](https://openclaw.ai) | `agentteam spawn tmux openclaw --team ...` | **По умолчанию** |
+| [Claude Code](https://claude.ai/claude-code) | `agentteam spawn tmux claude --team ...` | Полная поддержка |
+| [Codex](https://openai.com/codex) | `agentteam spawn tmux codex --team ...` | Полная поддержка |
+| [nanobot](https://github.com/HKUDS/nanobot) | `agentteam spawn tmux nanobot --team ...` | Полная поддержка |
+| [Cursor](https://cursor.com) | `agentteam spawn subprocess cursor --team ...` | Экспериментально |
+| Пользовательские скрипты | `agentteam spawn subprocess python --team ...` | Полная поддержка |
 
 ---
 
@@ -141,7 +141,7 @@ clawteam board attach my-team
 
 ### Шаг 1: Предварительные требования
 
-ClawTeam требует **Python 3.10+**, **tmux** и хотя бы один CLI-агент для программирования (OpenClaw, Claude Code, Codex и т.д.).
+AgentTeam требует **Python 3.10+**, **tmux** и хотя бы один CLI-агент для программирования (OpenClaw, Claude Code, Codex и т.д.).
 
 **Проверьте, что у вас уже установлено:**
 
@@ -161,18 +161,18 @@ openclaw --version  # Or: claude --version / codex --version
 
 > Если вы используете Claude Code или Codex вместо OpenClaw, установите их согласно их документации. OpenClaw используется по умолчанию, но не является строго обязательным.
 
-### Шаг 2: Установка ClawTeam
+### Шаг 2: Установка AgentTeam
 
-> **⚠️ НЕ выполняйте `pip install clawteam` или `npm install -g clawteam` напрямую:**
-> - `pip install clawteam` установит версию из основного репозитория PyPI, которая по умолчанию использует `claude` и не содержит адаптаций для OpenClaw.
-> - `npm install -g clawteam` установит постороннюю пакет-сквоттер (издатель `a9logic`). Если `clawteam --version` показывает "Coming Soon", установлен неправильный пакет. Сначала выполните `npm uninstall -g clawteam`.
+> **⚠️ НЕ выполняйте `pip install agentteam` или `npm install -g agentteam` напрямую:**
+> - `pip install agentteam` установит версию из основного репозитория PyPI, которая по умолчанию использует `claude` и не содержит адаптаций для OpenClaw.
+> - `npm install -g agentteam` установит постороннюю пакет-сквоттер (издатель `a9logic`). Если `agentteam --version` показывает "Coming Soon", установлен неправильный пакет. Сначала выполните `npm uninstall -g agentteam`.
 >
 > **Используйте три команды ниже — `pip install -e .` после клонирования обязателен. Он устанавливает из локального репозитория, а не из PyPI.**
 
 ```bash
 git clone https://github.com/win4r/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
-pip install -e .    # ← Обязательно! Установка из локального репозитория, НЕ то же самое что pip install clawteam
+cd AgentTeam-OpenClaw
+pip install -e .    # ← Обязательно! Установка из локального репозитория, НЕ то же самое что pip install agentteam
 ```
 
 Опционально — P2P-транспорт (ZeroMQ):
@@ -183,14 +183,14 @@ pip install -e ".[p2p]"
 
 ### Шаг 3: Создание символической ссылки `~/bin/clawteam`
 
-Порождённые агенты запускаются в чистых оболочках, которые могут не иметь директорию pip в PATH. Символическая ссылка в `~/bin` гарантирует, что `clawteam` всегда доступен:
+Порождённые агенты запускаются в чистых оболочках, которые могут не иметь директорию pip в PATH. Символическая ссылка в `~/bin` гарантирует, что `agentteam` всегда доступен:
 
 ```bash
 mkdir -p ~/bin
-ln -sf "$(which clawteam)" ~/bin/clawteam
+ln -sf "$(which agentteam)" ~/bin/clawteam
 ```
 
-Если `which clawteam` ничего не возвращает, найдите бинарный файл вручную:
+Если `which agentteam` ничего не возвращает, найдите бинарный файл вручную:
 
 ```bash
 # Common locations:
@@ -198,7 +198,7 @@ ln -sf "$(which clawteam)" ~/bin/clawteam
 # /opt/homebrew/bin/clawteam
 # /usr/local/bin/clawteam
 # /Library/Frameworks/Python.framework/Versions/3.*/bin/clawteam
-find / -name clawteam -type f 2>/dev/null | head -5
+find / -name agentteam -type f 2>/dev/null | head -5
 ```
 
 Затем убедитесь, что `~/bin` включён в PATH — добавьте следующее в `~/.zshrc` или `~/.bashrc`, если ещё не добавлено:
@@ -209,7 +209,7 @@ export PATH="$HOME/bin:$PATH"
 
 ### Шаг 4: Установка навыка OpenClaw (только для пользователей OpenClaw)
 
-Файл навыка обучает агентов OpenClaw работе с ClawTeam через естественный язык. Пропустите этот шаг, если вы не используете OpenClaw.
+Файл навыка обучает агентов OpenClaw работе с AgentTeam через естественный язык. Пропустите этот шаг, если вы не используете OpenClaw.
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills/clawteam
@@ -218,7 +218,7 @@ cp skills/openclaw/SKILL.md ~/.openclaw/workspace/skills/clawteam/SKILL.md
 
 ### Шаг 5: Настройка разрешений на выполнение (только для пользователей OpenClaw)
 
-Порождённым агентам OpenClaw требуется разрешение на выполнение команд `clawteam`. Без этого агенты будут блокироваться на интерактивных запросах разрешений.
+Порождённым агентам OpenClaw требуется разрешение на выполнение команд `agentteam`. Без этого агенты будут блокироваться на интерактивных запросах разрешений.
 
 ```bash
 # Ensure security mode is "allowlist" (not "full")
@@ -234,8 +234,8 @@ else:
     print('exec-approvals.json not found — run openclaw once first, then re-run this step')
 "
 
-# Add clawteam to the allowlist (use the absolute path — OpenClaw 4.2+ requires it)
-openclaw approvals allowlist add --agent "*" "$(which clawteam)"
+# Add agentteam to the allowlist (use the absolute path — OpenClaw 4.2+ requires it)
+openclaw approvals allowlist add --agent "*" "$(which agentteam)"
 ```
 
 > Если `openclaw approvals` не работает, шлюз OpenClaw может быть не запущен. Сначала запустите его, затем повторите попытку.
@@ -243,14 +243,14 @@ openclaw approvals allowlist add --agent "*" "$(which clawteam)"
 ### Шаг 6: Проверка
 
 ```bash
-clawteam --version          # Should print version
-clawteam config health      # Should show all green
+agentteam --version          # Should print version
+agentteam config health      # Should show all green
 ```
 
 Если вы используете OpenClaw, также проверьте, что навык загружен:
 
 ```bash
-openclaw skills list | grep clawteam
+openclaw skills list | grep agentteam
 ```
 
 ### Автоматический установщик
@@ -259,7 +259,7 @@ openclaw skills list | grep clawteam
 
 ```bash
 git clone https://github.com/win4r/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+cd AgentTeam-OpenClaw
 bash scripts/install-openclaw.sh
 ```
 
@@ -267,13 +267,13 @@ bash scripts/install-openclaw.sh
 
 | Проблема | Причина | Решение |
 |---------|-------|-----|
-| `clawteam: command not found` | Директория pip не в PATH | Выполните Шаг 3 (символическая ссылка + PATH) |
-| Порождённые агенты не находят `clawteam` | Агенты запускаются в чистых оболочках без PATH pip | Убедитесь, что символическая ссылка `~/bin/clawteam` существует и `~/bin` в PATH |
+| `agentteam: command not found` | Директория pip не в PATH | Выполните Шаг 3 (символическая ссылка + PATH) |
+| Порождённые агенты не находят `agentteam` | Агенты запускаются в чистых оболочках без PATH pip | Убедитесь, что символическая ссылка `~/bin/clawteam` существует и `~/bin` в PATH |
 | `openclaw approvals` не работает | Шлюз не запущен | Сначала запустите `openclaw gateway`, затем повторите Шаг 5 |
 | `exec-approvals.json not found` | OpenClaw ни разу не запускался | Запустите `openclaw` один раз для генерации конфигурации, затем повторите Шаг 5 |
 | Агенты блокируются на запросах разрешений | Режим безопасности exec approvals — "full" | Выполните Шаг 5 для переключения на "allowlist" |
 | `pip install -e .` не работает | Отсутствуют зависимости сборки | Сначала выполните `pip install hatchling` |
-| `clawteam --version` показывает "Coming Soon" | Установлен npm-пакет-сквоттер (`a9logic`, не связан с этим проектом) | `npm uninstall -g clawteam`, затем переустановить по шагу 2 |
+| `agentteam --version` показывает "Coming Soon" | Установлен npm-пакет-сквоттер (`a9logic`, не связан с этим проектом) | `npm uninstall -g agentteam`, затем переустановить по шагу 2 |
 
 ---
 
@@ -314,7 +314,7 @@ Leader agent:
 TOML-шаблон порождает полноценную инвестиционную команду из 7 агентов одной командой:
 
 ```bash
-clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 2026"
+agentteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 2026"
 ```
 
 5 агентов-аналитиков (стоимость, рост, технический анализ, фундаментальный анализ, настроения рынка) работают параллельно. Риск-менеджер синтезирует все сигналы. Портфельный управляющий принимает итоговые решения.
@@ -339,7 +339,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 - Каждый агент получает свой **git worktree**
 - Никаких конфликтов слияния между параллельными агентами
 - Команды для создания контрольных точек, слияния и очистки
-- Именование веток: `clawteam/{team}/{agent}`
+- Именование веток: `agentteam/{team}/{agent}`
 
 ### Отслеживание задач с зависимостями
 - Общая канбан-доска: `pending` → `in_progress` → `completed` / `blocked`
@@ -362,7 +362,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ### Шаблоны команд
 - TOML-файлы определяют архетипы команд (роли, задачи, промпты)
-- Одна команда: `clawteam launch <template>`
+- Одна команда: `agentteam launch <template>`
 - Подстановка переменных: `{goal}`, `{team_name}`, `{agent_name}`
 - **Назначение модели для каждого агента** (предварительная версия): назначайте разные модели разным ролям — см. [ниже](#назначение-модели-для-каждого-агента-предварительная-версия)
 
@@ -376,9 +376,9 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ## Интеграция с OpenClaw
 
-Этот форк делает [OpenClaw](https://openclaw.ai) **агентом по умолчанию**. Без ClawTeam каждый агент OpenClaw работает изолированно. ClawTeam превращает его в мультиагентную платформу.
+Этот форк делает [OpenClaw](https://openclaw.ai) **агентом по умолчанию**. Без AgentTeam каждый агент OpenClaw работает изолированно. AgentTeam превращает его в мультиагентную платформу.
 
-| Возможность | OpenClaw в одиночку | OpenClaw + ClawTeam |
+| Возможность | OpenClaw в одиночку | OpenClaw + AgentTeam |
 |-----------|---------------|-------------------|
 | **Назначение задач** | Ручная отправка сообщений каждому агенту | Лидер автономно разбивает, назначает, отслеживает |
 | **Параллельная разработка** | Общая рабочая директория | Изолированные git worktrees для каждого агента |
@@ -391,29 +391,29 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 | Что вы говорите | Что происходит |
 |-------------|-------------|
 | "Создай команду из 5 агентов для создания веб-приложения" | Создаётся команда, задачи, порождаются 5 агентов в tmux |
-| "Запусти аналитическую команду хедж-фонда" | `clawteam launch hedge-fund` с 7 агентами |
-| "Покажи статус моей команды агентов" | `clawteam board show` с выводом канбан-доски |
+| "Запусти аналитическую команду хедж-фонда" | `agentteam launch hedge-fund` с 7 агентами |
+| "Покажи статус моей команды агентов" | `agentteam board show` с выводом канбан-доски |
 
 ```
   You (Telegram/Discord/TUI)
          │
          ▼
   ┌──────────────────┐
-  │  OpenClaw Gateway │  ← activates clawteam skill
+  │  OpenClaw Gateway │  ← activates agentteam skill
   └────────┬─────────┘
            │
            ▼
-  ┌──────────────────┐     clawteam spawn     ┌─────────────────┐
+  ┌──────────────────┐     agentteam spawn     ┌─────────────────┐
   │  Leader Agent    │ ─────────────────────► │  openclaw tui   │
   │  (openclaw)      │ ──┐                    │  (tmux window)  │
   │                  │   │                    │  git worktree   │
   │  Manages swarm   │   ├──────────────────► ├─────────────────┤
-  │  via clawteam    │   │                    │  openclaw tui   │
+  │  via agentteam    │   │                    │  openclaw tui   │
   │  CLI             │   ├──────────────────► ├─────────────────┤
   └──────────────────┘   │                    │  openclaw tui   │
                          └──────────────────► └─────────────────┘
                                                All coordinate via
-                                               ~/.clawteam/ (tasks, inboxes)
+                                               ~/.agentteam/ (tasks, inboxes)
 ```
 
 ---
@@ -424,7 +424,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
   Human: "Optimize this LLM"
          │
          ▼
-  ┌──────────────┐     clawteam spawn     ┌──────────────┐
+  ┌──────────────┐     agentteam spawn     ┌──────────────┐
   │  Leader      │ ──────────────────────► │  Worker      │
   │  (any agent) │ ──────┐                │  git worktree │
   │              │       ├──────────────► │  tmux window  │
@@ -436,7 +436,7 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
                                                  │
                                                  ▼
                                       ┌─────────────────────┐
-                                      │    ~/.clawteam/     │
+                                      │    ~/.agentteam/     │
                                       │ ├── teams/   (who) │
                                       │ ├── tasks/   (what)│
                                       │ ├── inboxes/ (talk)│
@@ -444,11 +444,11 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
                                       └─────────────────────┘
 ```
 
-Всё состояние хранится в `~/.clawteam/` в виде файлов JSON. Без базы данных, без сервера. Атомарная запись с файловой блокировкой `fcntl` обеспечивает устойчивость к сбоям.
+Всё состояние хранится в `~/.agentteam/` в виде файлов JSON. Без базы данных, без сервера. Атомарная запись с файловой блокировкой `fcntl` обеспечивает устойчивость к сбоям.
 
 | Параметр | Переменная окружения | По умолчанию |
 |---------|---------|---------|
-| Директория данных | `CLAWTEAM_DATA_DIR` | `~/.clawteam` |
+| Директория данных | `CLAWTEAM_DATA_DIR` | `~/.agentteam` |
 | Транспорт | `CLAWTEAM_TRANSPORT` | `file` |
 | Режим рабочего пространства | `CLAWTEAM_WORKSPACE` | `auto` |
 | Бэкенд порождения | `CLAWTEAM_DEFAULT_BACKEND` | `tmux` |
@@ -462,32 +462,32 @@ clawteam launch hedge-fund --team fund1 --goal "Analyze AAPL, MSFT, NVDA for Q2 
 
 ```bash
 # Team lifecycle
-clawteam team spawn-team <team> -d "description" -n <leader>
-clawteam team discover                    # List all teams
-clawteam team status <team>               # Show members
-clawteam team cleanup <team> --force      # Delete team
+agentteam team spawn-team <team> -d "description" -n <leader>
+agentteam team discover                    # List all teams
+agentteam team status <team>               # Show members
+agentteam team cleanup <team> --force      # Delete team
 
 # Spawn agents
-clawteam spawn --team <team> --agent-name <name> --task "do this"
-clawteam spawn tmux codex --team <team> --agent-name <name> --task "do this"
+agentteam spawn --team <team> --agent-name <name> --task "do this"
+agentteam spawn tmux codex --team <team> --agent-name <name> --task "do this"
 
 # Task management
-clawteam task create <team> "subject" -o <owner> --blocked-by <id1>,<id2>
-clawteam task update <team> <id> --status completed   # auto-unblocks dependents
-clawteam task list <team> --status blocked --owner worker1
-clawteam task wait <team> --timeout 300
+agentteam task create <team> "subject" -o <owner> --blocked-by <id1>,<id2>
+agentteam task update <team> <id> --status completed   # auto-unblocks dependents
+agentteam task list <team> --status blocked --owner worker1
+agentteam task wait <team> --timeout 300
 
 # Messaging
-clawteam inbox send <team> <to> "message"
-clawteam inbox broadcast <team> "message"
-clawteam inbox receive <team>             # consume messages
-clawteam inbox peek <team>                # read without consuming
+agentteam inbox send <team> <to> "message"
+agentteam inbox broadcast <team> "message"
+agentteam inbox receive <team>             # consume messages
+agentteam inbox peek <team>                # read without consuming
 
 # Monitoring
-clawteam board show <team>                # terminal kanban
-clawteam board live <team> --interval 3   # auto-refresh
-clawteam board attach <team>              # tiled tmux view
-clawteam board serve --port 8080          # web UI
+agentteam board show <team>                # terminal kanban
+agentteam board live <team> --interval 3   # auto-refresh
+agentteam board attach <team>              # tiled tmux view
+agentteam board serve --port 8080          # web UI
 ```
 
 </details>
@@ -497,29 +497,29 @@ clawteam board serve --port 8080          # web UI
 
 ```bash
 # Workspace (git worktree management)
-clawteam workspace list <team>
-clawteam workspace checkpoint <team> <agent>    # auto-commit
-clawteam workspace merge <team> <agent>         # merge back to main
-clawteam workspace cleanup <team> <agent>       # remove worktree
+agentteam workspace list <team>
+agentteam workspace checkpoint <team> <agent>    # auto-commit
+agentteam workspace merge <team> <agent>         # merge back to main
+agentteam workspace cleanup <team> <agent>       # remove worktree
 
 # Plan approval
-clawteam plan submit <team> <agent> "plan" --summary "TL;DR"
-clawteam plan approve <team> <plan-id> <agent> --feedback "LGTM"
-clawteam plan reject <team> <plan-id> <agent> --feedback "Revise X"
+agentteam plan submit <team> <agent> "plan" --summary "TL;DR"
+agentteam plan approve <team> <plan-id> <agent> --feedback "LGTM"
+agentteam plan reject <team> <plan-id> <agent> --feedback "Revise X"
 
 # Lifecycle
-clawteam lifecycle request-shutdown <team> <agent> --reason "done"
-clawteam lifecycle approve-shutdown <team> <request-id> <agent>
-clawteam lifecycle idle <team>
+agentteam lifecycle request-shutdown <team> <agent> --reason "done"
+agentteam lifecycle approve-shutdown <team> <request-id> <agent>
+agentteam lifecycle idle <team>
 
 # Templates
-clawteam launch <template> --team <name> --goal "Build X"
-clawteam template list
+agentteam launch <template> --team <name> --goal "Build X"
+agentteam template list
 
 # Config
-clawteam config show
-clawteam config set transport p2p
-clawteam config health
+agentteam config show
+agentteam config set transport p2p
+agentteam config health
 ```
 
 </details>
@@ -536,7 +536,7 @@ clawteam config health
 
 ```bash
 # Install from the feature branch
-pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=clawteam"
+pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
 ```
 
 **Назначение модели в шаблонах:**
@@ -558,9 +558,9 @@ model_tier = "cheap"              # cost tiers: strong / balanced / cheap
 
 **Флаги CLI:**
 ```bash
-clawteam spawn --model opus                          # single agent
-clawteam launch my-template --model gpt-5.4          # override all agents
-clawteam launch my-template --model-strategy auto     # auto-assign by role
+agentteam spawn --model opus                          # single agent
+agentteam launch my-template --model gpt-5.4          # override all agents
+agentteam launch my-template --model-strategy auto     # auto-assign by role
 ```
 
 Подробности см. в [issue #1](https://github.com/win4r/ClawTeam-OpenClaw/issues/1) — полное описание функции и обсуждение.
@@ -608,6 +608,6 @@ MIT — свободное использование, модификация и
 
 <div align="center">
 
-**ClawTeam** — *Интеллект агентного роя.*
+**AgentTeam** — *Интеллект агентного роя.*
 
 </div>

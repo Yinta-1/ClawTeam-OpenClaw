@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from clawteam.git import WorktreeManager, WorktreeInfo, WorktreeStatus, GitCommandError
+from agentteam.git import WorktreeManager, WorktreeInfo, WorktreeStatus, GitCommandError
 
 
 @pytest.fixture
@@ -107,7 +107,7 @@ class TestWorktreeManager:
         mock_run.stdout = "/fake/repo\n"
 
         monkeypatch.setattr(
-            "clawteam.git.worktree.subprocess.run",
+            "agentteam.git.worktree.subprocess.run",
             lambda *args, **kwargs: mock_run,
         )
 
@@ -241,7 +241,7 @@ class TestWorktreeManager:
         result = worktree_manager.remove_worktree("non-existent-id")
         assert result is False
 
-    @patch("clawteam.git.worktree.subprocess.run")
+    @patch("agentteam.git.worktree.subprocess.run")
     def test_merge_worktree_success(self, mock_run, worktree_manager):
         """Test merging worktree successfully."""
         # Mock git commands
@@ -266,7 +266,7 @@ class TestWorktreeManager:
             assert result["merged"] is True
             assert result["worktree_id"] == "test-merge"
 
-    @patch("clawteam.git.worktree.subprocess.run")
+    @patch("agentteam.git.worktree.subprocess.run")
     def test_merge_worktree_failure(self, mock_run, worktree_manager):
         """Test merging worktree with conflict."""
         # Mock git command to fail

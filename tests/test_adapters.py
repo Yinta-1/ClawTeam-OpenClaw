@@ -1,8 +1,8 @@
-"""Tests for clawteam.spawn.adapters — CLI detection and command preparation."""
+"""Tests for agentteam.spawn.adapters — CLI detection and command preparation."""
 
 from __future__ import annotations
 
-from clawteam.spawn.adapters import (
+from agentteam.spawn.adapters import (
     NativeCliAdapter,
     command_basename,
     is_interactive_cli,

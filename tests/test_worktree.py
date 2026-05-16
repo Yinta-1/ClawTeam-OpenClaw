@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from clawteam.workspace.worktree import (
+from agentteam.workspace.worktree import (
     GitError,
     GitWorktreeService,
     MergeCheckResult,

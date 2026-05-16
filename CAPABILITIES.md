@@ -1,8 +1,8 @@
-# ClawTeam-OpenClaw 完整能力清单
+# AgentTeam-OpenClaw 完整能力清单
 
 > **版本**: v0.7.0 | **测试**: 675 passed, 14 skipped | **状态**: 生产就绪
 
-本文档详细记录 ClawTeam-OpenClaw 的所有功能模块和实现状态。
+本文档详细记录 AgentTeam-OpenClaw 的所有功能模块和实现状态。
 
 ---
 
@@ -28,27 +28,27 @@
 
 | 模块 | 路径 | 功能 | 状态 |
 |------|------|------|------|
-| team | `clawteam/team/` | Agent 生命周期、角色、邮箱、任务 | ✅ |
-| transport | `clawteam/transport/` | 消息传输抽象 | ✅ |
-| spawn | `clawteam/spawn/` | Agent 生成（6种backend） | ✅ |
-| orchestrator | `clawteam/orchestrator/` | 任务编排、模型路由 | ✅ |
-| board | `clawteam/board/` | Web UI、HTTP API、SSE | ✅ |
-| api | `clawteam/api/` | REST API | ✅ |
-| cli | `clawteam/cli/` | 命令行工具 | ✅ |
-| database | `clawteam/database/` | SQLite + 连接池 | ✅ |
-| events | `clawteam/events/` | 事件追踪 | ✅ |
-| store | `clawteam/store/` | 任务存储 | ✅ |
-| collaboration | `clawteam/collaboration/` | Activity/Presence/Mentions | ✅ |
-| notification | `clawteam/notification/` | 通知系统 | ✅ |
-| metrics | `clawteam/metrics/` | 指标收集 | ✅ |
-| security | `clawteam/security/` | 安全模块 | ✅ |
-| learnings | `clawteam/learnings/` | 经验学习 | ✅ |
-| memory | `clawteam/memory/` | 记忆管理 | ✅ |
-| insights | `clawteam/insights/` | 洞察分析 | ✅ |
-| alerts | `clawteam/alerts/` | 告警系统 | ✅ |
-| concurrency | `clawteam/concurrency/` | 并发控制 | ✅ |
-| parser | `clawteam/parser/` | 消息解析 | ✅ |
-| daemon | `clawteam/daemon/` | 持久Agent守护进程 | ✅ |
+| team | `agentteam/team/` | Agent 生命周期、角色、邮箱、任务 | ✅ |
+| transport | `agentteam/transport/` | 消息传输抽象 | ✅ |
+| spawn | `agentteam/spawn/` | Agent 生成（6种backend） | ✅ |
+| orchestrator | `agentteam/orchestrator/` | 任务编排、模型路由 | ✅ |
+| board | `agentteam/board/` | Web UI、HTTP API、SSE | ✅ |
+| api | `agentteam/api/` | REST API | ✅ |
+| cli | `agentteam/cli/` | 命令行工具 | ✅ |
+| database | `agentteam/database/` | SQLite + 连接池 | ✅ |
+| events | `agentteam/events/` | 事件追踪 | ✅ |
+| store | `agentteam/store/` | 任务存储 | ✅ |
+| collaboration | `agentteam/collaboration/` | Activity/Presence/Mentions | ✅ |
+| notification | `agentteam/notification/` | 通知系统 | ✅ |
+| metrics | `agentteam/metrics/` | 指标收集 | ✅ |
+| security | `agentteam/security/` | 安全模块 | ✅ |
+| learnings | `agentteam/learnings/` | 经验学习 | ✅ |
+| memory | `agentteam/memory/` | 记忆管理 | ✅ |
+| insights | `agentteam/insights/` | 洞察分析 | ✅ |
+| alerts | `agentteam/alerts/` | 告警系统 | ✅ |
+| concurrency | `agentteam/concurrency/` | 并发控制 | ✅ |
+| parser | `agentteam/parser/` | 消息解析 | ✅ |
+| daemon | `agentteam/daemon/` | 持久Agent守护进程 | ✅ |
 
 ---
 
@@ -63,11 +63,11 @@
 ### 1.2 Parent-Child 关系 (`team/parent_child.py`)
 - **P26**: Parent-Child 生命周期管理 ✅
 - **CLI 命令**:
-  - `clawteam terminate-children <agent>` - 终止子 Agent
-  - `clawteam terminate-tree <agent>` - 终止整个树
-  - `clawteam list-children <agent>` - 列出子 Agent
-  - `clawteam show-parent <agent>` - 显示父 Agent
-  - `clawteam register-child <parent> <child>` - 注册关系
+  - `agentteam terminate-children <agent>` - 终止子 Agent
+  - `agentteam terminate-tree <agent>` - 终止整个树
+  - `agentteam list-children <agent>` - 列出子 Agent
+  - `agentteam show-parent <agent>` - 显示父 Agent
+  - `agentteam register-child <parent> <child>` - 注册关系
 
 ### 1.3 角色管理 (`team/roles.py`)
 - **动态角色**: developer, reviewer, tester, architect, coordinator
@@ -202,7 +202,7 @@ class Transport(ABC):
 - **P36**: SSE 实时推送 ✅
 - **HTTP API**
 - **CORS 支持**
-- **Board Monitor**: `clawteam board monitor` 实时监控 agent 活动 ✅
+- **Board Monitor**: `agentteam board monitor` 实时监控 agent 活动 ✅
   - `GET /api/agents/events` SSE 端点
   - 支持 team/agent 过滤
   - 彩色终端输出
@@ -314,7 +314,7 @@ MESSAGE_SENT, MESSAGE_RECEIVED
   - TASK_TIMEOUT
   - AGENT_FAILURE_RATE_HIGH
   - TEAM_INACTIVITY
-- **CLI**: `clawteam alert check/list/ack`
+- **CLI**: `agentteam alert check/list/ack`
 
 ### 9.3 漂移检测 (`team/drift.py`)
 - **Jaccard 相似度**
@@ -444,8 +444,8 @@ v0.5.4 核心功能，允许 Agent 持续运行并响应后续任务。
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     ClawTeam CLI                            │
-│  clawteam daemon start / spawn / send-task                 │
+│                     AgentTeam CLI                            │
+│  agentteam daemon start / spawn / send-task                 │
 └─────────────────────┬───────────────────────────────────────┘
                       │ TCP Socket (Windows) / Unix Socket
 ┌─────────────────────▼───────────────────────────────────────┐
@@ -464,7 +464,7 @@ v0.5.4 核心功能，允许 Agent 持续运行并响应后续任务。
 ┌─────────────────────▼───────────────────────────────────────┐
 │              OpenClaw Agent (Session)                       │
 │  - 持续活跃，等待新任务                                     │
-│  - 通过 clawteam inbox 与 leader 通信                       │
+│  - 通过 agentteam inbox 与 leader 通信                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -472,11 +472,11 @@ v0.5.4 核心功能，允许 Agent 持续运行并响应后续任务。
 
 | 命令 | 说明 |
 |------|------|
-| `clawteam daemon start` | 启动守护进程 |
-| `clawteam daemon stop` | 停止守护进程 |
-| `clawteam daemon status` | 查看状态 |
-| `clawteam daemon list` | 列出运行中的 Agent |
-| `clawteam daemon spawn` | Spawn Agent |
+| `agentteam daemon start` | 启动守护进程 |
+| `agentteam daemon stop` | 停止守护进程 |
+| `agentteam daemon status` | 查看状态 |
+| `agentteam daemon list` | 列出运行中的 Agent |
+| `agentteam daemon spawn` | Spawn Agent |
 
 ### SDK 集成
 
@@ -503,8 +503,8 @@ send_command("send_task", {
 
 ### 持久化
 
-- PID 文件: `~/.clawteam/agentd.pid`
-- 运行中 Agent: `~/.clawteam/running_agents.json`
+- PID 文件: `~/.agentteam/agentd.pid`
+- 运行中 Agent: `~/.agentteam/running_agents.json`
 - 自动恢复: Daemon 重启时恢复所有运行中的 Agent
 
 ---

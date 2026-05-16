@@ -1,6 +1,6 @@
-"""Tests for clawteam.spawn.prompt — build_agent_prompt."""
+"""Tests for agentteam.spawn.prompt — build_agent_prompt."""
 
-from clawteam.spawn.prompt import build_agent_prompt
+from agentteam.spawn.prompt import build_agent_prompt
 
 
 class TestBuildAgentPrompt:
@@ -25,11 +25,11 @@ class TestBuildAgentPrompt:
             agent_name="w", agent_id="id", agent_type="t",
             team_name="team", leader_name="lead", task="do stuff",
         )
-        assert "clawteam task list" in prompt
-        assert "clawteam task update" in prompt
-        assert "clawteam inbox send" in prompt
-        assert "clawteam cost report" in prompt
-        assert "clawteam session save" in prompt
+        assert "agentteam task list" in prompt
+        assert "agentteam task update" in prompt
+        assert "agentteam inbox send" in prompt
+        assert "agentteam cost report" in prompt
+        assert "agentteam session save" in prompt
 
     def test_prompt_includes_user_when_provided(self):
         prompt = build_agent_prompt(
@@ -71,9 +71,9 @@ class TestBuildAgentPrompt:
             agent_name="dev", agent_id="id", agent_type="t",
             team_name="my-team", leader_name="boss", task="task",
         )
-        assert "clawteam task list my-team --owner dev" in prompt
-        assert "clawteam inbox send my-team boss" in prompt
-        assert "clawteam cost report my-team" in prompt
+        assert "agentteam task list my-team --owner dev" in prompt
+        assert "agentteam inbox send my-team boss" in prompt
+        assert "agentteam cost report my-team" in prompt
 
     # --- Intent-based prompt (Auftragstaktik) ---
 

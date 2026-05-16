@@ -15,7 +15,7 @@ class TestRedisTransportMailboxIntegration:
 
     def test_mailbox_uses_redis_transport_when_configured(self, tmp_path):
         """Test that MailboxManager uses RedisTransport when CLAWTEAM_TRANSPORT=redis."""
-        from clawteam.team.mailbox import MailboxManager
+        from agentteam.team.mailbox import MailboxManager
 
         os.environ["CLAWTEAM_TRANSPORT"] = "redis"
         os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
@@ -26,15 +26,15 @@ class TestRedisTransportMailboxIntegration:
         mock_client.scan.return_value = (0, [])
 
         def mock_get_transport(name, team_name, **kwargs):
-            from clawteam.transport.redis import RedisTransport
+            from agentteam.transport.redis import RedisTransport
             transport = RedisTransport(team_name)
             transport._client = mock_client
             return transport
 
-        with patch("clawteam.transport.get_transport", mock_get_transport):
-            with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.get_transport", mock_get_transport):
+            with patch("agentteam.transport.redis.RedisTransport._connect"):
                 mailbox = MailboxManager("test-team")
-                from clawteam.transport.redis import RedisTransport
+                from agentteam.transport.redis import RedisTransport
                 assert isinstance(mailbox._transport, RedisTransport)
 
         del os.environ["CLAWTEAM_TRANSPORT"]
@@ -43,8 +43,8 @@ class TestRedisTransportMailboxIntegration:
 
     def test_send_message_via_redis(self, tmp_path):
         """Test sending a message through RedisTransport."""
-        from clawteam.team.mailbox import MailboxManager
-        from clawteam.team.models import MessageType
+        from agentteam.team.mailbox import MailboxManager
+        from agentteam.team.models import MessageType
 
         os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
 
@@ -52,8 +52,8 @@ class TestRedisTransportMailboxIntegration:
         mock_client.ping.return_value = True
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
-            from clawteam.transport.redis import RedisTransport
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
+            from agentteam.transport.redis import RedisTransport
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -74,8 +74,8 @@ class TestRedisTransportMailboxIntegration:
 
     def test_receive_message_via_redis(self, tmp_path):
         """Test receiving messages through RedisTransport."""
-        from clawteam.team.mailbox import MailboxManager
-        from clawteam.team.models import TeamMessage, MessageType
+        from agentteam.team.mailbox import MailboxManager
+        from agentteam.team.models import TeamMessage, MessageType
 
         os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
 
@@ -95,8 +95,8 @@ class TestRedisTransportMailboxIntegration:
         mock_client.ping.return_value = True
         mock_client.rpop.side_effect = [envelope, None]
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
-            from clawteam.transport.redis import RedisTransport
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
+            from agentteam.transport.redis import RedisTransport
             transport = RedisTransport("test-team")
             transport._client = mock_client
 
@@ -115,8 +115,8 @@ class TestRedisMixedMode:
 
     def test_mixed_mode_messages_redis_tasks_file(self, tmp_path):
         """Test that messages go through Redis while tasks use FileTaskStore."""
-        from clawteam.team.tasks import TaskStore
-        from clawteam.team.mailbox import MailboxManager
+        from agentteam.team.tasks import TaskStore
+        from agentteam.team.mailbox import MailboxManager
 
         os.environ["CLAWTEAM_TRANSPORT"] = "redis"
         os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
@@ -127,19 +127,19 @@ class TestRedisMixedMode:
         mock_client.scan.return_value = (0, [])
 
         def mock_get_transport(name, team_name, **kwargs):
-            from clawteam.transport.redis import RedisTransport
+            from agentteam.transport.redis import RedisTransport
             transport = RedisTransport(team_name)
             transport._client = mock_client
             return transport
 
-        with patch("clawteam.transport.get_transport", mock_get_transport):
-            with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.get_transport", mock_get_transport):
+            with patch("agentteam.transport.redis.RedisTransport._connect"):
                 mailbox = MailboxManager("test-team")
                 task_store = TaskStore("test-team")
                 task = task_store.create(subject="Test task", description="Mixed mode test")
 
                 assert task.id is not None
-                from clawteam.transport.redis import RedisTransport
+                from agentteam.transport.redis import RedisTransport
                 assert isinstance(mailbox._transport, RedisTransport)
 
         del os.environ["CLAWTEAM_TRANSPORT"]
@@ -152,12 +152,12 @@ class TestRedisReconnection:
 
     def test_reconnect_on_ping_failure(self):
         """Test that transport attempts reconnection when ping fails."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.side_effect = [Exception("Connection lost"), True]
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport._reconnect_on_error()
@@ -165,13 +165,13 @@ class TestRedisReconnection:
 
     def test_deliver_after_reconnect(self):
         """Test that deliver works after reconnection."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.side_effect = [Exception("Connection lost"), True]
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport.deliver("agent1", b"test message")
@@ -183,13 +183,13 @@ class TestRedisDeadLetterQueue:
 
     def test_quarantine_malformed_message(self):
         """Test quarantining a malformed message."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.lpush.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport.quarantine("agent1", b"bad data", "Invalid JSON format")
@@ -197,7 +197,7 @@ class TestRedisDeadLetterQueue:
 
     def test_get_dead_letters(self):
         """Test retrieving dead letters."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         dead_entry = json.dumps({
             "timestamp": 1000,
@@ -210,7 +210,7 @@ class TestRedisDeadLetterQueue:
         mock_client.ping.return_value = True
         mock_client.lrange.return_value = [dead_entry]
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             letters = transport.get_dead_letters("agent1", limit=10)
@@ -223,13 +223,13 @@ class TestRedisPeerManagement:
 
     def test_register_peer(self):
         """Test registering a peer."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.hset.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport.register_peer("agent1", {"host": "192.168.1.100"})
@@ -237,13 +237,13 @@ class TestRedisPeerManagement:
 
     def test_send_heartbeat(self):
         """Test sending heartbeat."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
         mock_client.hset.return_value = 1
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             transport._client = mock_client
             transport.send_heartbeat("agent1")
@@ -255,11 +255,11 @@ class TestRedisEnvironmentConfig:
 
     def test_redis_url_from_env(self):
         """Test Redis URL configuration from environment."""
-        from clawteam.transport.redis import RedisTransport
+        from agentteam.transport.redis import RedisTransport
 
         os.environ["CLAWTEAM_REDIS_URL"] = "redis://custom-host:7000"
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             assert transport._redis_url == "redis://custom-host:7000"
 
@@ -267,9 +267,9 @@ class TestRedisEnvironmentConfig:
 
     def test_transport_factory_redis(self):
         """Test get_transport factory with redis."""
-        from clawteam.transport import get_transport
+        from agentteam.transport import get_transport
 
-        with patch("clawteam.transport.redis.RedisTransport._connect"):
+        with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = get_transport("redis", "test-team")
-            from clawteam.transport.redis import RedisTransport
+            from agentteam.transport.redis import RedisTransport
             assert isinstance(transport, RedisTransport)

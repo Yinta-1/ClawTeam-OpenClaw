@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10-slim
 
-LABEL maintainer="ClawTeam"
+LABEL maintainer="AgentTeam"
 LABEL description="Multi-agent swarm coordination for CLI coding agents"
 
 # Install system dependencies
@@ -27,16 +27,16 @@ RUN pip install --no-cache-dir poetry && \
 COPY . .
 
 # Create non-root user for security
-RUN useradd -m -u 1000 clawteam && \
-    chown -R clawteam:clawteam /app
-USER clawteam
+RUN useradd -m -u 1000 agentteam && \
+    chown -R agentteam:agentteam /app
+USER agentteam
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
-ENV CLAWTEAM_HOME=/app
+ENV AGENTEAM_HOME=/app
 
 # Default command - start the board server
-CMD ["python", "-m", "clawteam.board.server"]
+CMD ["python", "-m", "agentteam.board.server"]
 
 # Expose default ports
 EXPOSE 8080

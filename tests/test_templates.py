@@ -1,8 +1,8 @@
-"""Tests for clawteam.templates — loading, parsing, and variable substitution."""
+"""Tests for agentteam.templates — loading, parsing, and variable substitution."""
 
 import pytest
 
-from clawteam.templates import (
+from agentteam.templates import (
     AgentDef,
     TaskDef,
     TemplateDef,
@@ -122,8 +122,8 @@ class TestLoadTemplateNotFound:
 
 class TestUserTemplateOverride:
     def test_user_template_takes_priority(self, tmp_path, monkeypatch):
-        """User templates in ~/.clawteam/templates/ override builtins."""
-        user_tpl_dir = tmp_path / ".clawteam" / "templates"
+        """User templates in ~/.agentteam/templates/ override builtins."""
+        user_tpl_dir = tmp_path / ".agentteam" / "templates"
         user_tpl_dir.mkdir(parents=True)
 
         toml_content = """\
@@ -138,7 +138,7 @@ type = "custom-leader"
         (user_tpl_dir / "custom.toml").write_text(toml_content)
 
         # patch the module-level _USER_DIR
-        import clawteam.templates as tmod
+        import agentteam.templates as tmod
 
         monkeypatch.setattr(tmod, "_USER_DIR", user_tpl_dir)
 

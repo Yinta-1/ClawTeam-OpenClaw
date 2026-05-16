@@ -1,10 +1,10 @@
-"""Tests for clawteam.team.roles — dynamic role assignment."""
+"""Tests for agentteam.team.roles — dynamic role assignment."""
 
 from datetime import datetime, timezone, timedelta
 
 import pytest
 
-from clawteam.team.roles import (
+from agentteam.team.roles import (
     AgentRole,
     RoleAssignment,
     RoleStore,
@@ -15,7 +15,7 @@ from clawteam.team.roles import (
     suggest_role,
     unassign_role,
 )
-from clawteam.team.models import TaskItem, TaskPriority, TaskStatus
+from agentteam.team.models import TaskItem, TaskPriority, TaskStatus
 
 
 class TestAgentRole:

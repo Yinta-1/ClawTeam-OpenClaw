@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, timezone
 from unittest.mock import Mock
 
-from clawteam.orchestrator.supervisor import (
+from agentteam.orchestrator.supervisor import (
     SupervisorEngine,
     TaskPlan,
     ExecutionResult,
@@ -14,13 +14,13 @@ from clawteam.orchestrator.supervisor import (
     DEFAULT_RULES,
     get_supervisor,
 )
-from clawteam.orchestrator.provider_selector import (
+from agentteam.orchestrator.provider_selector import (
     ProviderSelector,
     ProviderStatus,
     TaskType,
     SelectionResult,
 )
-from clawteam.team.models import TaskItem, TaskStatus, TaskPriority
+from agentteam.team.models import TaskItem, TaskStatus, TaskPriority
 
 
 @pytest.fixture

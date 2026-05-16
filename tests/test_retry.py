@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from clawteam.utils.retry import (
+from agentteam.utils.retry import (
     RetryConfig,
     _calculate_delay,
     retry,

@@ -1,4 +1,4 @@
-# ClawTeam-OpenClaw v0.5.5 待办事项
+# AgentTeam-OpenClaw v0.5.5 待办事项
 
 > **目标**: SDK Agent 消息路由修复、文档完善
 
@@ -9,7 +9,7 @@
 ### SDK Agent 消息路由修复
 - [x] Smart Routing - inbox send 直接通过 Gateway API 发送消息给 running agent ✅
 - [x] Activity 广播 - task_assigned 事件实时推送到 Board 服务器 ✅
-- [x] Board Monitor - clawteam board monitor 实时显示 agent 活动 ✅
+- [x] Board Monitor - agentteam board monitor 实时显示 agent 活动 ✅
 - [x] Agent Shutdown - prompt 新增 shutdown 检测逻辑 ✅
 - [x] Release v0.5.5 创建 ✅
 
@@ -40,10 +40,10 @@
 ## 🧪 测试增强
 
 ### 测试覆盖
-- [ ] `clawteam/collaboration/` - 协作模块测试
-- [ ] `clawteam/notification/` - 通知模块测试
-- [ ] `clawteam/insights/` - 洞察模块测试
-- [ ] `clawteam/learnings/` - 学习模块测试
+- [ ] `agentteam/collaboration/` - 协作模块测试
+- [ ] `agentteam/notification/` - 通知模块测试
+- [ ] `agentteam/insights/` - 洞察模块测试
+- [ ] `agentteam/learnings/` - 学习模块测试
 
 ### 测试质量
 - [ ] 提升覆盖率至 80%+

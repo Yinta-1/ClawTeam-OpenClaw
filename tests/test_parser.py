@@ -6,7 +6,7 @@ import pytest
 import time
 from pathlib import Path
 
-from clawteam.parser import (
+from agentteam.parser import (
     OutputParser,
     ActivityEvent,
     ActivityEventType,
@@ -15,9 +15,9 @@ from clawteam.parser import (
     ConfirmationDetector,
     UsageEstimator,
 )
-from clawteam.parser.types import ConfirmationDetection, UsageSummary
-from clawteam.parser.confirmation_detector import detect_confirmation
-from clawteam.parser.output_parser import get_parser, parse_output
+from agentteam.parser.types import ConfirmationDetection, UsageSummary
+from agentteam.parser.confirmation_detector import detect_confirmation
+from agentteam.parser.output_parser import get_parser, parse_output
 
 
 class TestActivityEvent:
@@ -358,7 +358,7 @@ class TestAnsiStripping:
     
     def test_strip_ansi(self):
         """Test stripping ANSI escape codes."""
-        from clawteam.parser.output_parser import _strip_ansi
+        from agentteam.parser.output_parser import _strip_ansi
         
         text_with_ansi = "\x1b[32mSuccess\x1b[0m"
         clean = _strip_ansi(text_with_ansi)

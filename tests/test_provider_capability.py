@@ -2,7 +2,7 @@
 
 import pytest
 
-from clawteam.orchestrator.provider_capability import (
+from agentteam.orchestrator.provider_capability import (
     ProviderCapability,
     ProviderCapabilityRegistry,
     ProviderMcpCapability,

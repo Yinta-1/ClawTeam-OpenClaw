@@ -1,0 +1,432 @@
+"""File-based task store: each task is a JSON file on disk."""
+
+from __future__ import annotations
+
+import json
+import os
+import sys
+import tempfile
+from contextlib import contextmanager
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
+
+from agentteam.paths import ensure_within_root, validate_identifier
+from agentteam.store.base import BaseTaskStore, TaskLockError
+from agentteam.team.models import TaskItem, TaskPriority, TaskStatus, get_data_dir
+from agentteam.utils.retry import RetryConfig, retry
+
+# Default retry config for file operations
+_FILE_RETRY_CONFIG = RetryConfig(
+    max_retries=3,
+    base_delay=0.1,
+    max_delay=5.0,
+    retryable_exceptions=(OSError, IOError, PermissionError),
+)
+
+
+def _tasks_root(team_name: str) -> Path:
+    d = ensure_within_root(
+        get_data_dir() / "tasks",
+        validate_identifier(team_name, "team name"),
+    )
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def _task_path(team_name: str, task_id: str) -> Path:
+    return _tasks_root(team_name) / f"task-{task_id}.json"
+
+
+def _tasks_lock_path(team_name: str) -> Path:
+    return _tasks_root(team_name) / ".tasks.lock"
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+class FileTaskStore(BaseTaskStore):
+    """Task store backed by the local filesystem.
+
+    Each task is stored as a separate JSON file:
+    ``{data_dir}/tasks/{team}/task-{id}.json``
+
+    Concurrent access is serialised with an OS-specific advisory lock.
+    """
+
+    @contextmanager
+    def _write_lock(self):
+        lock_path = _tasks_lock_path(self.team_name)
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open("a+", encoding="utf-8") as lock_file:
+            if sys.platform == "win32":
+                pos = lock_file.tell()
+                lock_file.seek(0)
+                msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+                lock_file.seek(pos)
+            else:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                if sys.platform == "win32":
+                    pos = lock_file.tell()
+                    lock_file.seek(0)
+                    msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+                    lock_file.seek(pos)
+                else:
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+    def create(
+        self,
+        subject: str,
+        description: str = "",
+        owner: str = "",
+        priority: TaskPriority | None = None,
+        blocks: list[str] | None = None,
+        blocked_by: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
+        idempotency_key: str | None = None,
+    ) -> TaskItem:
+        task = TaskItem(
+            subject=subject,
+            description=description,
+            owner=owner,
+            priority=priority or TaskPriority.medium,
+            blocks=blocks or [],
+            blocked_by=blocked_by or [],
+            metadata=metadata or {},
+            idempotency_key=idempotency_key,
+        )
+        self._validate_blocked_by_unlocked(task.id, task.blocked_by)
+        if task.blocked_by:
+            task.status = TaskStatus.blocked
+        with self._write_lock():
+            # Idempotency check inside lock to prevent TOCTOU race
+            if idempotency_key:
+                existing = self._find_by_idempotency_key(idempotency_key)
+                if existing is not None:
+                    return existing
+            self._save_unlocked(task)
+        return task
+
+    def _find_by_idempotency_key(self, key: str) -> TaskItem | None:
+        """Return existing task with matching idempotency key, if any."""
+        root = _tasks_root(self.team_name)
+        for f in root.glob("task-*.json"):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                task = TaskItem.model_validate(data)
+                if task.idempotency_key == key:
+                    return task
+            except Exception:
+                continue
+        return None
+
+    def get(self, task_id: str) -> TaskItem | None:
+        return self._get_unlocked(task_id)
+
+    def _get_unlocked(self, task_id: str) -> TaskItem | None:
+        path = _task_path(self.team_name, task_id)
+        if not path.exists():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return TaskItem.model_validate(data)
+        except Exception:
+            return None
+
+    def update(
+        self,
+        task_id: str,
+        status: TaskStatus | None = None,
+        owner: str | None = None,
+        subject: str | None = None,
+        description: str | None = None,
+        priority: TaskPriority | None = None,
+        add_blocks: list[str] | None = None,
+        add_blocked_by: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
+        caller: str = "",
+        force: bool = False,
+    ) -> TaskItem | None:
+        with self._write_lock():
+            task = self._get_unlocked(task_id)
+            if not task:
+                return None
+
+            prev_status = task.status
+
+            if status == TaskStatus.in_progress:
+                self._acquire_lock(task, caller, force)
+                if not task.started_at:
+                    task.started_at = _now_iso()
+
+            if status in (TaskStatus.completed, TaskStatus.pending):
+                task.locked_by = ""
+                task.locked_at = ""
+
+            # duration tracking
+            if status == TaskStatus.completed and task.started_at:
+                try:
+                    start = datetime.fromisoformat(task.started_at)
+                    duration_secs = (datetime.now(timezone.utc) - start).total_seconds()
+                    task.metadata["duration_seconds"] = round(duration_secs, 2)
+                except (ValueError, TypeError):
+                    pass
+
+            if status is not None:
+                task.status = status
+            if owner is not None:
+                task.owner = owner
+            if subject is not None:
+                task.subject = subject
+            if description is not None:
+                task.description = description
+            if priority is not None:
+                task.priority = priority
+            if add_blocks:
+                for b in add_blocks:
+                    if b not in task.blocks:
+                        task.blocks.append(b)
+            if add_blocked_by:
+                proposed_blocked_by = list(task.blocked_by)
+                for b in add_blocked_by:
+                    if b not in proposed_blocked_by:
+                        proposed_blocked_by.append(b)
+                self._validate_blocked_by_unlocked(task.id, proposed_blocked_by)
+                task.blocked_by = proposed_blocked_by
+                if task.blocked_by and task.status == TaskStatus.pending:
+                    task.status = TaskStatus.blocked
+            if metadata:
+                task.metadata.update(metadata)
+            task.updated_at = _now_iso()
+
+            # ── P1 Drift Detection ──────────────────────────────────
+            # Trigger when task transitions to completed
+            if status == TaskStatus.completed and prev_status != TaskStatus.completed:
+                self._run_drift_detection_unlocked(task)
+
+            # ── P1 Intelligent Routing ───────────────────────────────
+            # Update routing profiles when task transitions to completed
+            if status == TaskStatus.completed and prev_status != TaskStatus.completed:
+                try:
+                    from agentteam.team.router import get_router
+
+                    router = get_router(self.team_name)
+                    router.update_profile(task)
+                except Exception:
+                    pass  # Don't fail task completion if routing update fails
+
+            if task.status == TaskStatus.completed:
+                self._resolve_dependents_unlocked(task_id)
+
+            self._save_unlocked(task)
+
+            # Emit TASK_STATUS_CHANGED event for board auto-update (Task 2: 任务状态机)
+            if status is not None and status != prev_status:
+                self._emit_task_status_event(task, prev_status, status)
+
+            return task
+
+    def _run_drift_detection_unlocked(self, task: TaskItem) -> None:
+        """Run drift detection when a task is completed.
+
+        Extracts the actual output from metadata (if available) and compares
+        it against the original task intent (subject + description).
+        Results are appended to task.drift_alerts.
+        """
+        from agentteam.team.drift import detect_drift
+
+        # Actual output may be stored in metadata by the agent
+        actual_output = (
+            task.metadata.get("output", "")
+            or task.metadata.get("result", "")
+            or task.metadata.get("completion_text", "")
+        )
+        if not actual_output:
+            return
+
+        alert = detect_drift(task, actual_output)
+        if alert is not None:
+            task.drift_alerts.append(alert)
+
+    def _acquire_lock(self, task: TaskItem, caller: str, force: bool) -> None:
+        if task.locked_by and task.locked_by != caller and not force:
+            from agentteam.spawn.registry import is_agent_alive
+
+            alive = is_agent_alive(self.team_name, task.locked_by)
+            if alive is not False:
+                raise TaskLockError(
+                    f"Task '{task.id}' is locked by '{task.locked_by}' "
+                    f"(since {task.locked_at}). Use --force to override."
+                )
+        task.locked_by = caller or ""
+        task.locked_at = _now_iso() if caller else ""
+
+    def release_stale_locks(self) -> list[str]:
+        from agentteam.spawn.registry import is_agent_alive
+
+        released = []
+        with self._write_lock():
+            for task in self._list_tasks_unlocked():
+                if not task.locked_by:
+                    continue
+                alive = is_agent_alive(self.team_name, task.locked_by)
+                if alive is False:
+                    task.locked_by = ""
+                    task.locked_at = ""
+                    task.updated_at = _now_iso()
+                    self._save_unlocked(task)
+                    released.append(task.id)
+        return released
+
+    def list_tasks(
+        self,
+        status: TaskStatus | None = None,
+        owner: str | None = None,
+        priority: TaskPriority | None = None,
+        sort_by_priority: bool = False,
+    ) -> list[TaskItem]:
+        return self._list_tasks_unlocked(
+            status=status,
+            owner=owner,
+            priority=priority,
+            sort_by_priority=sort_by_priority,
+        )
+
+    def _list_tasks_unlocked(
+        self,
+        status: TaskStatus | None = None,
+        owner: str | None = None,
+        priority: TaskPriority | None = None,
+        sort_by_priority: bool = False,
+    ) -> list[TaskItem]:
+        root = _tasks_root(self.team_name)
+        tasks = []
+        for f in sorted(root.glob("task-*.json")):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                task = TaskItem.model_validate(data)
+                if status and task.status != status:
+                    continue
+                if owner and task.owner != owner:
+                    continue
+                if priority and task.priority != priority:
+                    continue
+                tasks.append(task)
+            except Exception:
+                continue
+        if sort_by_priority:
+            priority_order = {
+                TaskPriority.urgent: 0,
+                TaskPriority.high: 1,
+                TaskPriority.medium: 2,
+                TaskPriority.low: 3,
+            }
+            tasks.sort(key=lambda task: (priority_order.get(task.priority, 2), task.created_at, task.id))
+        return tasks
+
+    def _validate_blocked_by_unlocked(self, task_id: str, blocked_by: list[str]) -> None:
+        if task_id in blocked_by:
+            raise ValueError(f"Task '{task_id}' cannot be blocked by itself")
+
+        graph: dict[str, list[str]] = {task.id: list(task.blocked_by) for task in self._list_tasks_unlocked()}
+        graph[task_id] = list(blocked_by)
+
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def _visit(node: str) -> bool:
+            if node in visiting:
+                return True
+            if node in visited:
+                return False
+            visiting.add(node)
+            for dep in graph.get(node, []):
+                if dep in graph and _visit(dep):
+                    return True
+            visiting.remove(node)
+            visited.add(node)
+            return False
+
+        for node in graph:
+            if _visit(node):
+                raise ValueError("Task dependencies cannot contain cycles")
+
+    @retry(config=_FILE_RETRY_CONFIG)
+    def _save_unlocked(self, task: TaskItem) -> None:
+        path = _task_path(self.team_name, task.id)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp_name = tempfile.mkstemp(
+            dir=path.parent,
+            prefix=f"{path.stem}-",
+            suffix=".tmp",
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as tmp_file:
+                tmp_file.write(task.model_dump_json(indent=2, by_alias=True))
+            Path(tmp_name).replace(path)
+        except BaseException:
+            Path(tmp_name).unlink(missing_ok=True)
+            raise
+
+    def _resolve_dependents_unlocked(self, completed_task_id: str) -> None:
+        root = _tasks_root(self.team_name)
+        for f in root.glob("task-*.json"):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                task = TaskItem.model_validate(data)
+                if completed_task_id in task.blocked_by:
+                    task.blocked_by.remove(completed_task_id)
+                    if not task.blocked_by and task.status == TaskStatus.blocked:
+                        task.status = TaskStatus.pending
+                    task.updated_at = _now_iso()
+                    self._save_unlocked(task)
+            except Exception:
+                continue
+
+    def _emit_task_status_event(
+        self,
+        task: TaskItem,
+        prev_status: TaskStatus,
+        new_status: TaskStatus,
+    ) -> None:
+        """Emit TASK_STATUS_CHANGED event for board auto-update (Task 2: 任务状态机).
+
+        This event is picked up by the board's SSE subscriber and broadcasts
+        to all connected WebSocket clients for real-time UI updates.
+        """
+        try:
+            from agentteam.events.models import (
+                EventCategory,
+                EventType,
+                create_task_event,
+            )
+            from agentteam.events.tracker import track_event
+
+            event = create_task_event(
+                event_type=EventType.TASK_STATUS_CHANGED,
+                task_id=task.id,
+                team_name=self.team_name,
+                agent_name=task.owner or None,
+                message=f"Task '{task.subject}' status changed: {prev_status.value} → {new_status.value}",
+                data={
+                    "task_id": task.id,
+                    "subject": task.subject,
+                    "prev_status": prev_status.value,
+                    "new_status": new_status.value,
+                    "owner": task.owner,
+                    "priority": task.priority.value,
+                },
+            )
+            track_event(event)
+        except Exception:
+            # Don't fail task update if event tracking fails
+            pass

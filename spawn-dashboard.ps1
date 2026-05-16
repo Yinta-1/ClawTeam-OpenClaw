@@ -1,12 +1,12 @@
 cd C:\Users\31683\.openclaw\workspace\ClawTeam-OpenClaw
 $task = @"
-Implement ClawTeam Command Center Web Dashboard (SpectrAI-inspired):
+Implement AgentTeam Command Center Web Dashboard (SpectrAI-inspired):
 
 ## 任务
-1. Create clawteam/board/dashboard.py with CommandCenterDashboard class
-2. Create clawteam/api/monitor.py with REST API endpoints
-3. Create clawteam/board/templates/dashboard.html with dark theme UI
-4. Integrate into clawteam/board/server.py
+1. Create agentteam/board/dashboard.py with CommandCenterDashboard class
+2. Create agentteam/api/monitor.py with REST API endpoints
+3. Create agentteam/board/templates/dashboard.html with dark theme UI
+4. Integrate into agentteam/board/server.py
 
 ## Dashboard UI Requirements
 - Global KPI cards: Sessions count, Token consumption, Risk sessions
@@ -27,4 +27,4 @@ Report to leader when done.
 "@
 
 $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($task))
-clawteam spawn openclaw_sdk --team monitor-squad --agent-name arch-dashboard --agent-type developer --task "$($encoded)" 2>&1
+agentteam spawn openclaw_sdk --team monitor-squad --agent-name arch-dashboard --agent-type developer --task "$($encoded)" 2>&1

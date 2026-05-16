@@ -10,9 +10,9 @@ from unittest.mock import MagicMock
 
 def _make_tmux_mocks(monkeypatch, captured: dict, *, tmux_ok: bool = True, agent_flag_supported: bool = True):
     """Patch tmux, shutil.which, register_agent, and time.sleep for TmuxBackend tests."""
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", lambda name: "/usr/bin/tmux" if name == "tmux" else None)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", lambda name, path=None: f"/usr/bin/{name}")
-    monkeypatch.setattr("clawteam.spawn.tmux_backend._openclaw_supports_agent_flag", lambda: agent_flag_supported)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", lambda name: "/usr/bin/tmux" if name == "tmux" else None)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", lambda name, path=None: f"/usr/bin/{name}")
+    monkeypatch.setattr("agentteam.spawn.tmux_backend._openclaw_supports_agent_flag", lambda: agent_flag_supported)
 
     def fake_run(cmd, **kwargs):
         result = MagicMock()
@@ -25,15 +25,15 @@ def _make_tmux_mocks(monkeypatch, captured: dict, *, tmux_ok: bool = True, agent
             captured["spawn_cmd"] = cmd
         return result
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted", lambda *a, **kw: False)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted", lambda *a, **kw: False)
 
 
 def test_tmux_backend_includes_agent_flag_when_openclaw_agent_set(monkeypatch, capsys):
     """tmux_backend.spawn() with openclaw_agent='researcher' should include --agent researcher in command."""
-    from clawteam.spawn.tmux_backend import TmuxBackend
+    from agentteam.spawn.tmux_backend import TmuxBackend
 
     captured: dict = {}
     _make_tmux_mocks(monkeypatch, captured, agent_flag_supported=True)
@@ -60,7 +60,7 @@ def test_tmux_backend_includes_agent_flag_when_openclaw_agent_set(monkeypatch, c
 
 def test_tmux_backend_excludes_agent_flag_when_not_set(monkeypatch):
     """tmux_backend.spawn() without openclaw_agent should not include --agent in the openclaw command."""
-    from clawteam.spawn.tmux_backend import TmuxBackend
+    from agentteam.spawn.tmux_backend import TmuxBackend
 
     captured: dict = {}
     _make_tmux_mocks(monkeypatch, captured)
@@ -93,7 +93,7 @@ def test_tmux_backend_excludes_agent_flag_when_not_set(monkeypatch):
 
 def test_tmux_backend_drops_agent_flag_when_unsupported(monkeypatch, capsys):
     """When openclaw tui doesn't support --agent, the flag should be silently dropped."""
-    from clawteam.spawn.tmux_backend import TmuxBackend
+    from agentteam.spawn.tmux_backend import TmuxBackend
 
     captured: dict = {}
     _make_tmux_mocks(monkeypatch, captured, agent_flag_supported=False)
@@ -127,7 +127,7 @@ def test_tmux_backend_drops_agent_flag_when_unsupported(monkeypatch, capsys):
 
 def test_tmux_backend_sets_openclaw_workspace_env(monkeypatch):
     """Spawning openclaw should set OPENCLAW_WORKSPACE for workspace isolation."""
-    from clawteam.spawn.tmux_backend import TmuxBackend
+    from agentteam.spawn.tmux_backend import TmuxBackend
 
     captured: dict = {}
     _make_tmux_mocks(monkeypatch, captured)
@@ -157,7 +157,7 @@ def test_subprocess_backend_raises_with_openclaw_agent(monkeypatch):
     """subprocess_backend.spawn() with openclaw_agent should raise NotImplementedError."""
     import pytest
 
-    from clawteam.spawn.subprocess_backend import SubprocessBackend
+    from agentteam.spawn.subprocess_backend import SubprocessBackend
 
     backend = SubprocessBackend()
     with pytest.raises(NotImplementedError, match="subprocess backend"):

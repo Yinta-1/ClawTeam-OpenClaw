@@ -6,7 +6,7 @@ import os
 import pytest
 import time
 
-from clawteam.auth import (
+from agentteam.auth import (
     AuthManager,
     TokenPayload,
     auth_manager,

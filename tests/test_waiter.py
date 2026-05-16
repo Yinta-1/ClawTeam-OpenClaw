@@ -1,4 +1,4 @@
-"""Tests for clawteam.team.waiter — TaskWaiter blocking + completion logic."""
+"""Tests for agentteam.team.waiter — TaskWaiter blocking + completion logic."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from clawteam.team.models import TaskItem, TaskStatus, TeamMessage
-from clawteam.team.waiter import TaskWaiter, WaitResult
+from agentteam.team.models import TaskItem, TaskStatus, TeamMessage
+from agentteam.team.waiter import TaskWaiter, WaitResult
 
 
 def _make_task(
@@ -284,11 +284,11 @@ class TestDeadAgentRecovery:
         )
 
         with patch(
-            "clawteam.team.waiter.list_dead_agents",
+            "agentteam.team.waiter.list_dead_agents",
             return_value=["dead-worker"],
             create=True,
         ), patch(
-            "clawteam.spawn.registry.list_dead_agents",
+            "agentteam.spawn.registry.list_dead_agents",
             return_value=["dead-worker"],
         ):
             result = waiter.wait()
@@ -319,7 +319,7 @@ class TestDeadAgentRecovery:
         )
 
         with patch(
-            "clawteam.spawn.registry.list_dead_agents",
+            "agentteam.spawn.registry.list_dead_agents",
             return_value=["flaky"],
         ):
             waiter.wait()
@@ -339,7 +339,7 @@ class TestDeadAgentRecovery:
             poll_interval=0.01,
         )
         with patch(
-            "clawteam.team.waiter.list_dead_agents",
+            "agentteam.team.waiter.list_dead_agents",
             side_effect=ImportError,
             create=True,
         ):

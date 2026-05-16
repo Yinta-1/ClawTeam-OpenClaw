@@ -9,7 +9,7 @@
 import pytest
 from abc import ABC
 
-from clawteam.memory import MemoryProvider, FTS5MemoryProvider
+from agentteam.memory import MemoryProvider, FTS5MemoryProvider
 
 
 class TestMemoryProviderAbstract:

@@ -8,16 +8,16 @@ import sys
 
 import pytest
 
-from clawteam.spawn.cli_env import build_spawn_path, resolve_clawteam_executable
-from clawteam.spawn.subprocess_backend import SubprocessBackend
-from clawteam.spawn.tmux_backend import (
+from agentteam.spawn.cli_env import build_spawn_path, resolve_clawteam_executable
+from agentteam.spawn.subprocess_backend import SubprocessBackend
+from agentteam.spawn.tmux_backend import (
     TmuxBackend,
     _confirm_workspace_trust_if_prompted,
     _dismiss_codex_update_prompt_if_present,
     _inject_prompt_via_buffer,
     _wait_for_cli_ready,
 )
-from clawteam.team.routing_policy import RuntimeEnvelope
+from agentteam.team.routing_policy import RuntimeEnvelope
 
 # Platform-specific PATH separator
 PATH_SEP = ";" if sys.platform == "win32" else ":"
@@ -33,7 +33,7 @@ class DummyProcess:
 
 def test_subprocess_backend_prepends_current_clawteam_bin_to_path(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -46,11 +46,11 @@ def test_subprocess_backend_prepends_current_clawteam_bin_to_path(monkeypatch, t
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/codex" if name == "codex" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -74,7 +74,7 @@ def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry
     monkeypatch, tmp_path
 ):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -93,11 +93,11 @@ def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry
         registered.update(kwargs)
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/codex" if name == "codex" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", fake_register_agent)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", fake_register_agent)
 
     backend = SubprocessBackend()
     result = backend.spawn(
@@ -135,7 +135,7 @@ def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_pat
     monkeypatch.setenv("CLAWTEAM_DATA_DIR", "/tmp/clawteam-data")
     monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "demo-project")
     monkeypatch.setenv("PROGRAMFILES(X86)", "should-not-be-exported")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -165,24 +165,24 @@ def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_pat
             return "/usr/bin/codex"
         return original_which(name, path=path)
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
+        "agentteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
         lambda *_, **__: False,
     )
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._dismiss_codex_update_prompt_if_present",
+        "agentteam.spawn.tmux_backend._dismiss_codex_update_prompt_if_present",
         lambda *_, **__: False,
     )
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._wait_for_cli_ready",
+        "agentteam.spawn.tmux_backend._wait_for_cli_ready",
         lambda *_, **__: True,
     )
-    monkeypatch.setattr("clawteam.spawn.tmux_backend._inject_prompt_via_buffer", lambda *_, **__: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend._inject_prompt_via_buffer", lambda *_, **__: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -198,7 +198,7 @@ def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_pat
 
     new_session = next(call for call in run_calls if call[:3] == ["tmux", "new-session", "-d"])
     full_cmd = new_session[-1]
-    # Check that PATH is exported with clawteam bin directory prepended
+    # Check that PATH is exported with agentteam bin directory prepended
     # The exact format may vary on Windows (uses os.pathsep)
     assert "export PATH=" in full_cmd
     assert str(clawteam_bin.parent) in full_cmd or clawteam_bin.parent.name in full_cmd
@@ -213,10 +213,10 @@ def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_pat
 
 
 def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeypatch, tmp_path):
-    from clawteam.config import ClawTeamConfig
+    from agentteam.config import ClawTeamConfig
 
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -252,16 +252,16 @@ def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeyp
             return "/usr/bin/codex"
         return original_which(name, path=path)
 
-    monkeypatch.setattr("clawteam.config.load_config", lambda: ClawTeamConfig(spawn_ready_timeout=42.0))
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.config.load_config", lambda: ClawTeamConfig(spawn_ready_timeout=42.0))
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
+        "agentteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
         fake_confirm,
     )
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -283,7 +283,7 @@ def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeyp
 
 def test_tmux_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -299,8 +299,8 @@ def test_tmux_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
         run_calls.append(args)
         raise AssertionError("tmux should not be invoked when the command is missing")
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
 
     backend = TmuxBackend()
     result = backend.spawn(
@@ -323,7 +323,7 @@ def test_tmux_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
 
 def test_subprocess_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -335,7 +335,7 @@ def test_subprocess_backend_returns_error_when_command_missing(monkeypatch, tmp_
         popen_called = True
         raise AssertionError("Popen should not be called when the command is missing")
 
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
 
     backend = SubprocessBackend()
     result = backend.spawn(
@@ -358,7 +358,7 @@ def test_subprocess_backend_returns_error_when_command_missing(monkeypatch, tmp_
 
 def test_tmux_backend_normalizes_bare_nanobot_to_agent(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -386,11 +386,11 @@ def test_tmux_backend_normalizes_bare_nanobot_to_agent(monkeypatch, tmp_path):
             return "/usr/bin/nanobot"
         return None
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -435,8 +435,8 @@ def test_tmux_backend_confirms_claude_workspace_trust_prompt(monkeypatch):
             return Result(stdout="")
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
 
     confirmed = _confirm_workspace_trust_if_prompted("demo:agent", ["claude"])
 
@@ -465,8 +465,8 @@ def test_tmux_backend_confirms_claude_skip_permissions_prompt(monkeypatch):
             )
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
 
     confirmed = _confirm_workspace_trust_if_prompted("demo:agent", ["claude"])
 
@@ -495,8 +495,8 @@ def test_tmux_backend_confirms_codex_workspace_trust_prompt(monkeypatch):
             )
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
 
     confirmed = _confirm_workspace_trust_if_prompted("demo:agent", ["codex"])
 
@@ -531,9 +531,9 @@ def test_dismiss_codex_update_prompt_sends_enter(monkeypatch):
             return Result(stdout=">_ OpenAI Codex (v0.113.0)\n")
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
 
     dismissed = _dismiss_codex_update_prompt_if_present(
         "demo:agent",
@@ -547,10 +547,10 @@ def test_dismiss_codex_update_prompt_sends_enter(monkeypatch):
 
 
 def test_tmux_backend_waits_for_pane_before_declaring_failure(monkeypatch, tmp_path):
-    from clawteam.config import ClawTeamConfig
+    from agentteam.config import ClawTeamConfig
 
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -585,22 +585,22 @@ def test_tmux_backend_waits_for_pane_before_declaring_failure(monkeypatch, tmp_p
             return "/usr/bin/claude"
         return None
 
-    monkeypatch.setattr("clawteam.config.load_config", lambda: ClawTeamConfig())
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
+    monkeypatch.setattr("agentteam.config.load_config", lambda: ClawTeamConfig())
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
+        "agentteam.spawn.tmux_backend._confirm_workspace_trust_if_prompted",
         lambda *_, **__: False,
     )
     monkeypatch.setattr(
-        "clawteam.spawn.tmux_backend._wait_for_cli_ready",
+        "agentteam.spawn.tmux_backend._wait_for_cli_ready",
         lambda *_, **__: True,
     )
-    monkeypatch.setattr("clawteam.spawn.tmux_backend._inject_prompt_via_buffer", lambda *_, **__: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend._inject_prompt_via_buffer", lambda *_, **__: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     result = backend.spawn(
@@ -647,9 +647,9 @@ def test_dismiss_codex_update_prompt_sends_enter_versioned(monkeypatch):
             return Result(stdout=">_ OpenAI Codex (v0.113.0)\n")
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
 
     dismissed = _dismiss_codex_update_prompt_if_present(
         "demo:agent",
@@ -664,7 +664,7 @@ def test_dismiss_codex_update_prompt_sends_enter_versioned(monkeypatch):
 
 def test_subprocess_backend_normalizes_nanobot_and_uses_message_flag(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -677,11 +677,11 @@ def test_subprocess_backend_normalizes_nanobot_and_uses_message_flag(monkeypatch
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/nanobot" if name == "nanobot" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -701,7 +701,7 @@ def test_subprocess_backend_normalizes_nanobot_and_uses_message_flag(monkeypatch
 def test_tmux_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
     """Gemini gets --yolo for permissions and -p for prompt."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -729,11 +729,11 @@ def test_tmux_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
             return "/usr/bin/gemini"
         return None
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -755,7 +755,7 @@ def test_tmux_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
 def test_subprocess_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
     """Gemini subprocess uses --yolo and -p flags."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -767,11 +767,11 @@ def test_subprocess_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/gemini" if name == "gemini" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -808,8 +808,8 @@ def test_tmux_backend_confirms_gemini_workspace_trust_prompt(monkeypatch):
             )
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
 
     confirmed = _confirm_workspace_trust_if_prompted("demo:agent", ["gemini"])
 
@@ -820,7 +820,7 @@ def test_tmux_backend_confirms_gemini_workspace_trust_prompt(monkeypatch):
 def test_tmux_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tmp_path):
     """Kimi gets --yolo, -w for workspace, and --print -p for prompt."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -848,11 +848,11 @@ def test_tmux_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tm
             return "/usr/bin/kimi"
         return None
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = TmuxBackend()
     backend.spawn(
@@ -874,7 +874,7 @@ def test_tmux_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tm
 def test_subprocess_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tmp_path):
     """Kimi subprocess uses --yolo, -w, and --print -p flags."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -886,11 +886,11 @@ def test_subprocess_backend_kimi_skip_permissions_workspace_and_prompt(monkeypat
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/kimi" if name == "kimi" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -910,12 +910,12 @@ def test_subprocess_backend_kimi_skip_permissions_workspace_and_prompt(monkeypat
 def test_resolve_clawteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_path):
     unrelated = tmp_path / "not-clawteam-review"
     unrelated.write_text("#!/bin/sh\n")
-    resolved_bin = tmp_path / "bin" / "clawteam"
+    resolved_bin = tmp_path / "bin" / "agentteam"
     resolved_bin.parent.mkdir(parents=True)
     resolved_bin.write_text("#!/bin/sh\n")
 
     monkeypatch.setattr(sys, "argv", [str(unrelated)])
-    monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
+    monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
     assert resolve_clawteam_executable() == str(resolved_bin)
     # Use platform-specific PATH separator
@@ -925,15 +925,15 @@ def test_resolve_clawteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_pa
 def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_exists(
     monkeypatch, tmp_path
 ):
-    local_shadow = tmp_path / "clawteam"
+    local_shadow = tmp_path / "agentteam"
     local_shadow.write_text("#!/bin/sh\n")
-    resolved_bin = tmp_path / "venv" / "bin" / "clawteam"
+    resolved_bin = tmp_path / "venv" / "bin" / "agentteam"
     resolved_bin.parent.mkdir(parents=True)
     resolved_bin.write_text("#!/bin/sh\n")
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(sys, "argv", ["clawteam"])
-    monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
+    monkeypatch.setattr(sys, "argv", ["agentteam"])
+    monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
     assert resolve_clawteam_executable() == str(resolved_bin)
     # Use platform-specific PATH separator
@@ -943,16 +943,16 @@ def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_e
 def test_resolve_clawteam_executable_accepts_relative_path_with_explicit_directory(
     monkeypatch, tmp_path
 ):
-    relative_bin = tmp_path / ".venv" / "bin" / "clawteam"
+    relative_bin = tmp_path / ".venv" / "bin" / "agentteam"
     relative_bin.parent.mkdir(parents=True)
     relative_bin.write_text("#!/bin/sh\n")
-    fallback_bin = tmp_path / "fallback" / "clawteam"
+    fallback_bin = tmp_path / "fallback" / "agentteam"
     fallback_bin.parent.mkdir(parents=True)
     fallback_bin.write_text("#!/bin/sh\n")
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["./.venv/bin/clawteam"])
-    monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(fallback_bin))
+    monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(fallback_bin))
 
     assert resolve_clawteam_executable() == str(relative_bin.resolve())
     # Use platform-specific PATH separator
@@ -988,27 +988,27 @@ class TestWaitForCliReady:
 
     def test_detects_prompt_indicator(self, monkeypatch):
         fake = self._fake_run_factory(["Loading...\n", "❯ \n"])
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake)
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
 
         assert _wait_for_cli_ready("t:a", timeout_seconds=10) is True
 
     def test_detects_content_stabilisation(self, monkeypatch):
         stable = "Welcome to MyAgent v1\nReady.\n"
         fake = self._fake_run_factory(["Booting...\n", stable, stable, stable])
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake)
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", iter(range(100)).__next__)
 
         assert _wait_for_cli_ready("t:a", timeout_seconds=10) is True
 
     def test_times_out_on_empty_pane(self, monkeypatch):
         fake = self._fake_run_factory(["", "", ""])
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake)
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake)
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
         counter = iter([0, 0.5, 1.0, 1.5, 2.0, 999])
-        monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", lambda: next(counter))
+        monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", lambda: next(counter))
 
         assert _wait_for_cli_ready("t:a", timeout_seconds=2) is False
 
@@ -1030,14 +1030,14 @@ def test_inject_prompt_via_buffer_uses_load_and_paste(monkeypatch, tmp_path):
         run_calls.append(args)
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.tempfile.NamedTemporaryFile",
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.tempfile.NamedTemporaryFile",
                         lambda **kw: open(tmp_path / "prompt.txt", kw.get("mode", "w")))
     # NamedTemporaryFile mock won't have .name → use real tempfile
     monkeypatch.undo()  # just use real functions
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda _: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda _: None)
 
     _inject_prompt_via_buffer("sess:win", "worker1", "hello world")
 
@@ -1060,8 +1060,8 @@ def test_tmux_backend_runtime_injection_returns_false_when_target_missing(monkey
             return Result(returncode=1, stderr="can't find session")
         return Result()
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", lambda *_args, **_kwargs: "/usr/bin/tmux")
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", lambda *_args, **_kwargs: "/usr/bin/tmux")
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
 
     ok, reason = TmuxBackend().inject_runtime_message(
         team="demo",
@@ -1081,7 +1081,7 @@ def test_tmux_backend_runtime_injection_returns_false_when_target_missing(monkey
 def _make_tmux_spawn_harness(monkeypatch, tmp_path, cli_name):
     """Shared harness for tmux spawn tests of new CLIs."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -1109,12 +1109,12 @@ def _make_tmux_spawn_harness(monkeypatch, tmp_path, cli_name):
             return f"/usr/bin/{cli_name}"
         return None
 
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.command_validation.shutil.which", fake_which)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.subprocess.run", fake_run)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.sleep", lambda *_: None)
-    monkeypatch.setattr("clawteam.spawn.tmux_backend.time.monotonic", lambda: 0)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.sleep", lambda *_: None)
+    monkeypatch.setattr("agentteam.spawn.tmux_backend.time.monotonic", lambda: 0)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     return run_calls
 
@@ -1163,7 +1163,7 @@ def test_tmux_backend_opencode_skip_permissions_and_prompt(monkeypatch, tmp_path
 
 def test_subprocess_backend_qwen_skip_permissions_and_prompt(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -1175,11 +1175,11 @@ def test_subprocess_backend_qwen_skip_permissions_and_prompt(monkeypatch, tmp_pa
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/qwen" if name == "qwen" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -1198,7 +1198,7 @@ def test_subprocess_backend_qwen_skip_permissions_and_prompt(monkeypatch, tmp_pa
 
 def test_subprocess_backend_opencode_skip_permissions_and_prompt(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "clawteam"
+    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
     clawteam_bin.parent.mkdir(parents=True)
     clawteam_bin.write_text("#!/bin/sh\n")
     monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
@@ -1210,11 +1210,11 @@ def test_subprocess_backend_opencode_skip_permissions_and_prompt(monkeypatch, tm
         return DummyProcess()
 
     monkeypatch.setattr(
-        "clawteam.spawn.command_validation.shutil.which",
+        "agentteam.spawn.command_validation.shutil.which",
         lambda name, path=None: "/usr/bin/opencode" if name == "opencode" else None,
     )
-    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
-    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+    monkeypatch.setattr("agentteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("agentteam.spawn.registry.register_agent", lambda **_: None)
 
     backend = SubprocessBackend()
     backend.spawn(
@@ -1238,7 +1238,7 @@ def test_propagate_openclaw_gateway_token_reads_config(tmp_path, monkeypatch):
     """Token from openclaw.json should be set in env vars."""
     import json
 
-    from clawteam.spawn.cli_env import propagate_openclaw_gateway_token
+    from agentteam.spawn.cli_env import propagate_openclaw_gateway_token
 
     config_dir = tmp_path / ".openclaw"
     config_dir.mkdir()
@@ -1246,7 +1246,7 @@ def test_propagate_openclaw_gateway_token_reads_config(tmp_path, monkeypatch):
     config_file.write_text(json.dumps({
         "gateway": {"auth": {"token": "test-secret-token"}}
     }))
-    monkeypatch.setattr("clawteam.spawn.cli_env.Path.home", lambda: tmp_path)
+    monkeypatch.setattr("agentteam.spawn.cli_env.Path.home", lambda: tmp_path)
 
     env = {}
     propagate_openclaw_gateway_token(env)
@@ -1255,7 +1255,7 @@ def test_propagate_openclaw_gateway_token_reads_config(tmp_path, monkeypatch):
 
 def test_propagate_openclaw_gateway_token_skips_if_already_set(tmp_path, monkeypatch):
     """User-provided env var should not be overwritten."""
-    from clawteam.spawn.cli_env import propagate_openclaw_gateway_token
+    from agentteam.spawn.cli_env import propagate_openclaw_gateway_token
 
     env = {"OPENCLAW_GATEWAY_TOKEN": "user-provided"}
     propagate_openclaw_gateway_token(env)
@@ -1264,9 +1264,9 @@ def test_propagate_openclaw_gateway_token_skips_if_already_set(tmp_path, monkeyp
 
 def test_propagate_openclaw_gateway_token_no_config(tmp_path, monkeypatch):
     """Should be no-op when config file doesn't exist."""
-    from clawteam.spawn.cli_env import propagate_openclaw_gateway_token
+    from agentteam.spawn.cli_env import propagate_openclaw_gateway_token
 
-    monkeypatch.setattr("clawteam.spawn.cli_env.Path.home", lambda: tmp_path)
+    monkeypatch.setattr("agentteam.spawn.cli_env.Path.home", lambda: tmp_path)
 
     env = {}
     propagate_openclaw_gateway_token(env)
@@ -1277,13 +1277,13 @@ def test_propagate_openclaw_gateway_token_no_token_key(tmp_path, monkeypatch):
     """Should be no-op when config exists but has no token."""
     import json
 
-    from clawteam.spawn.cli_env import propagate_openclaw_gateway_token
+    from agentteam.spawn.cli_env import propagate_openclaw_gateway_token
 
     config_dir = tmp_path / ".openclaw"
     config_dir.mkdir()
     config_file = config_dir / "openclaw.json"
     config_file.write_text(json.dumps({"gateway": {"url": "http://localhost"}}))
-    monkeypatch.setattr("clawteam.spawn.cli_env.Path.home", lambda: tmp_path)
+    monkeypatch.setattr("agentteam.spawn.cli_env.Path.home", lambda: tmp_path)
 
     env = {}
     propagate_openclaw_gateway_token(env)

@@ -1,7 +1,7 @@
 """Tests for terminal buffer."""
 
 import pytest
-from clawteam.spawn.terminal_buffer import HeadlessTerminalBuffer, ScreenUpdateInfo
+from agentteam.spawn.terminal_buffer import HeadlessTerminalBuffer, ScreenUpdateInfo
 
 
 @pytest.fixture

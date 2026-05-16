@@ -1,14 +1,14 @@
-# ClawTeam Developer Guide
+# AgentTeam Developer Guide
 
 ## Overview
 
-This guide covers development setup, architecture, and contribution guidelines for ClawTeam-OpenClaw.
+This guide covers development setup, architecture, and contribution guidelines for AgentTeam-OpenClaw.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      ClawTeam Core                          │
+│                      AgentTeam Core                          │
 ├─────────────────────────────────────────────────────────────┤
 │  orchestrator/     │  supervisor.py  │ Provider selection   │
 │                    │  provider_*.py  │ Load balancing       │
@@ -44,8 +44,8 @@ This guide covers development setup, architecture, and contribution guidelines f
 ### Clone and Install
 
 ```bash
-git clone https://github.com/your-repo/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+git clone https://github.com/your-repo/AgentTeam-OpenClaw.git
+cd AgentTeam-OpenClaw
 pip install -e .
 ```
 
@@ -66,7 +66,7 @@ pytest tests/ -v
 pytest tests/test_config.py -v
 
 # Run with coverage
-pytest tests/ --cov=clawteam --cov-report=html
+pytest tests/ --cov=agentteam --cov-report=html
 ```
 
 ### Code Style
@@ -161,7 +161,7 @@ mypy clawteam/
 ### 1. Create a New Module
 
 ```python
-# clawteam/new_module.py
+# agentteam/new_module.py
 from typing import Optional
 from dataclasses import dataclass
 
@@ -179,7 +179,7 @@ class NewFeature:
 ```python
 # tests/test_new_module.py
 import pytest
-from clawteam.new_module import NewFeature
+from agentteam.new_module import NewFeature
 
 def test_new_feature():
     feature = NewFeature(name="test")
@@ -189,8 +189,8 @@ def test_new_feature():
 ### 3. Update Exports
 
 ```python
-# clawteam/__init__.py
-from clawteam.new_module import NewFeature
+# agentteam/__init__.py
+from agentteam.new_module import NewFeature
 
 __all__ = [..., "NewFeature"]
 ```
@@ -201,7 +201,7 @@ __all__ = [..., "NewFeature"]
 
 ```yaml
 database:
-  path: "clawteam.db"
+  path: "agentteam.db"
   pool_size: 5
 
 agents:
@@ -218,7 +218,7 @@ debug: false
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CLAWTEAM_DATA_DIR` | Data directory | `~/.clawteam` |
+| `CLAWTEAM_DATA_DIR` | Data directory | `~/.agentteam` |
 | `CLAWTEAM_DEBUG` | Enable debug mode | `false` |
 | `CLAWTEAM_TRANSPORT` | Transport backend | `file` |
 | `OPENCLAW_GATEWAY_URL` | Gateway URL | `http://localhost:18789` |
@@ -229,14 +229,14 @@ debug: false
 
 ```bash
 export CLAWTEAM_DEBUG=1
-clawteam --debug ...
+agentteam --debug ...
 ```
 
 ### Check Logs
 
 ```bash
 # View recent logs
-tail -f ~/.clawteam/logs/clawteam.log
+tail -f ~/.agentteam/logs/agentteam.log
 
 # JSON logging for parsing
 export CLAWTEAM_LOG_JSON=1

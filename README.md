@@ -1,4 +1,4 @@
-# 🦞 ClawTeam-OpenClaw
+# 🦞 AgentTeam-OpenClaw
 
 <p align="center">
   <strong>Production-ready multi-agent swarm coordination — Built for <a href="https://openclaw.ai">OpenClaw</a>, powered by AI agents themselves</strong>
@@ -21,15 +21,15 @@
 
 ---
 
-> **ClawTeam-OpenClaw** is a production-hardened fork of [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam), purpose-built for OpenClaw users who need enterprise-grade multi-agent coordination.
+> **AgentTeam-OpenClaw** is a production-hardened fork of [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam), purpose-built for OpenClaw users who need enterprise-grade multi-agent coordination.
 >
 > All upstream fixes are synced. This is not a demo — it's production software.
 
 ---
 
-## ✨ 为什么选择 ClawTeam-OpenClaw？
+## ✨ 为什么选择 AgentTeam-OpenClaw？
 
-| | ClawTeam-OpenClaw | Basic Agent Frameworks |
+| | AgentTeam-OpenClaw | Basic Agent Frameworks |
 |---|---------|----------------------------|
 | **Target** | AI agents coordinate themselves | Humans micromanage agents |
 | **Setup** | `pip install -e .` → done | Docker + configs + cloud APIs |
@@ -46,14 +46,14 @@
 
 ```bash
 # 1. 安装
-git clone https://github.com/YOUR_USERNAME/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+git clone https://github.com/YOUR_USERNAME/AgentTeam-OpenClaw.git
+cd AgentTeam-OpenClaw
 pip install -e .
 
 # 2. 启动 Web 看板
-clawteam board serve --port 8080
+agentteam board serve --port 8080
 
-# 3. 告诉 AI："用 ClawTeam 构建一个博客系统"
+# 3. 告诉 AI："用 AgentTeam 构建一个博客系统"
 # AI 自动创建团队、分发任务、协调结果
 ```
 
@@ -65,7 +65,7 @@ clawteam board serve --port 8080
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ClawTeam-OpenClaw                       │
+│                    AgentTeam-OpenClaw                       │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
 │  │  Web UI     │    │   CLI       │    │  REST API   │   │
@@ -107,7 +107,7 @@ clawteam board serve --port 8080
 - **实时会话监控** — 每秒刷新，看得见每个 Agent 在做什么
 - **多标签页** — 看板 / 设计器 / 监控 / 工作流 / 设置
 - **状态可视化** — 任务卡片、Agent 状态、漂移预警
-- **一键部署** — `clawteam board serve --port 8080`
+- **一键部署** — `agentteam board serve --port 8080`
 
 ### 🔐 生产级安全
 - **API 认证** — JWT-like Token 机制
@@ -125,7 +125,7 @@ clawteam board serve --port 8080
 - **四级告警** — LOW / MEDIUM / HIGH / CRITICAL
 - **告警类型** — TASK_TIMEOUT / AGENT_FAILURE_RATE_HIGH / TEAM_INACTIVITY
 - **CRUD 操作** — 创建 / 查询 / 列表 / 确认
-- **CLI 集成** — `clawteam alert check/list/ack`
+- **CLI 集成** — `agentteam alert check/list/ack`
 
 ### 🐳 部署选项
 - **Docker** — `Dockerfile` + `docker-compose.yml`
@@ -150,7 +150,7 @@ clawteam board serve --port 8080
 
 ## 📊 版本对比
 
-| 功能 | 上游 v0.3.0 | **ClawTeam-OpenClaw v0.5.1** |
+| 功能 | 上游 v0.3.0 | **AgentTeam-OpenClaw v0.5.1** |
 |------|-------------|-------------------------------|
 | Web UI 看板 | ❌ | ✅ |
 | API 认证 | ❌ | ✅ |
@@ -176,12 +176,12 @@ clawteam board serve --port 8080
 
 | Agent | 命令 | 状态 |
 |-------|------|------|
-| **[OpenClaw](https://openclaw.ai)** | `clawteam spawn tmux openclaw` | ✅ **默认** |
-| **[Claude Code](https://claude.ai/claude-code)** | `clawteam spawn tmux claude` | ✅ 完全支持 |
-| **[Codex](https://openai.com/codex)** | `clawteam spawn tmux codex` | ✅ 完全支持 |
-| **[nanobot](https://github.com/HKUDS/nanobot)** | `clawteam spawn tmux nanobot` | ✅ 完全支持 |
-| **[Cursor](https://cursor.com)** | `clawteam spawn subprocess cursor` | ⚠️ 实验性 |
-| **自定义脚本** | `clawteam spawn subprocess python` | ✅ 完全支持 |
+| **[OpenClaw](https://openclaw.ai)** | `agentteam spawn tmux openclaw` | ✅ **默认** |
+| **[Claude Code](https://claude.ai/claude-code)** | `agentteam spawn tmux claude` | ✅ 完全支持 |
+| **[Codex](https://openai.com/codex)** | `agentteam spawn tmux codex` | ✅ 完全支持 |
+| **[nanobot](https://github.com/HKUDS/nanobot)** | `agentteam spawn tmux nanobot` | ✅ 完全支持 |
+| **[Cursor](https://cursor.com)** | `agentteam spawn subprocess cursor` | ⚠️ 实验性 |
+| **自定义脚本** | `agentteam spawn subprocess python` | ✅ 完全支持 |
 
 ---
 
@@ -223,8 +223,8 @@ python -m pytest tests/test_audit.py -v
 
 ```bash
 # 基础安装
-git clone https://github.com/YOUR_USERNAME/ClawTeam-OpenClaw.git
-cd ClawTeam-OpenClaw
+git clone https://github.com/YOUR_USERNAME/AgentTeam-OpenClaw.git
+cd AgentTeam-OpenClaw
 pip install -e .
 
 # 可选：P2P 传输

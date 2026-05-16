@@ -1,15 +1,15 @@
 ---
-name: clawteam
-description: "Multi-agent swarm coordination via the ClawTeam CLI. Use when the user wants to create agent teams, spawn multiple agents to work in parallel, coordinate tasks with dependencies, broadcast messages between agents, monitor progress via kanban board, or launch pre-built team templates (hedge-fund, code-review, research-paper). ClawTeam uses git worktree isolation + tmux + filesystem-based messaging. Trigger phrases: team, swarm, multi-agent, clawteam, spawn agents, parallel agents, agent team."
+name: agentteam
+description: "Multi-agent swarm coordination via the AgentTeam CLI. Use when the user wants to create agent teams, spawn multiple agents to work in parallel, coordinate tasks with dependencies, broadcast messages between agents, monitor progress via kanban board, or launch pre-built team templates (hedge-fund, code-review, research-paper). AgentTeam uses git worktree isolation + tmux + filesystem-based messaging. Trigger phrases: team, swarm, multi-agent, agentteam, spawn agents, parallel agents, agent team."
 ---
 
-# ClawTeam — Multi-Agent Swarm Coordination
+# AgentTeam — Multi-Agent Swarm Coordination
 
 ## Overview
 
-ClawTeam is a CLI tool (`clawteam`) for orchestrating multiple AI agents as self-organizing swarms. It uses git worktree isolation, tmux windows, and filesystem-based messaging. OpenClaw is the default agent backend.
+AgentTeam is a CLI tool (`agentteam`) for orchestrating multiple AI agents as self-organizing swarms. It uses git worktree isolation, tmux windows, and filesystem-based messaging. OpenClaw is the default agent backend.
 
-**CLI binary**: `clawteam` (installed via pip, available in PATH)
+**CLI binary**: `agentteam` (installed via pip, available in PATH)
 
 ## Quick Start
 
@@ -17,34 +17,34 @@ ClawTeam is a CLI tool (`clawteam`) for orchestrating multiple AI agents as self
 
 ```bash
 # Launch a pre-built team from a template
-clawteam launch hedge-fund --team fund1
-clawteam launch code-review --team review1
-clawteam launch research-paper --team paper1
+agentteam launch hedge-fund --team fund1
+agentteam launch code-review --team review1
+agentteam launch research-paper --team paper1
 ```
 
 ### Manual Team Setup
 
 ```bash
 # 1. Create team with leader
-clawteam team spawn-team my-team -d "Build a web app" -n leader
+agentteam team spawn-team my-team -d "Build a web app" -n leader
 
 # 2. Create tasks with dependencies
-clawteam task create my-team "Design API schema" -o architect
+agentteam task create my-team "Design API schema" -o architect
 # Returns task ID, e.g., abc123
 
-clawteam task create my-team "Implement auth" -o backend --blocked-by abc123
-clawteam task create my-team "Build frontend" -o frontend --blocked-by abc123
-clawteam task create my-team "Write tests" -o tester
+agentteam task create my-team "Implement auth" -o backend --blocked-by abc123
+agentteam task create my-team "Build frontend" -o frontend --blocked-by abc123
+agentteam task create my-team "Write tests" -o tester
 
 # 3. Spawn agents (each gets its own tmux window + git worktree)
-clawteam spawn -t my-team -n architect --task "Design the API schema for a web app"
-clawteam spawn -t my-team -n backend --task "Implement OAuth2 authentication"
-clawteam spawn -t my-team -n frontend --task "Build React dashboard"
+agentteam spawn -t my-team -n architect --task "Design the API schema for a web app"
+agentteam spawn -t my-team -n backend --task "Implement OAuth2 authentication"
+agentteam spawn -t my-team -n frontend --task "Build React dashboard"
 
 # 4. Monitor
-clawteam board show my-team        # Kanban view
-clawteam board attach my-team      # Tmux tiled view (all agents side-by-side)
-clawteam board serve --port 8080   # Web dashboard
+agentteam board show my-team        # Kanban view
+agentteam board attach my-team      # Tmux tiled view (all agents side-by-side)
+agentteam board serve --port 8080   # Web dashboard
 ```
 
 ## Command Reference
@@ -53,21 +53,21 @@ clawteam board serve --port 8080   # Web dashboard
 
 | Command | Description |
 |---------|-------------|
-| `clawteam team spawn-team <name> -d "<desc>" -n <leader>` | Create team |
-| `clawteam team discover` | List all teams |
-| `clawteam team status <team>` | Show team members and info |
-| `clawteam team cleanup <team> --force` | Delete team and all data |
+| `agentteam team spawn-team <name> -d "<desc>" -n <leader>` | Create team |
+| `agentteam team discover` | List all teams |
+| `agentteam team status <team>` | Show team members and info |
+| `agentteam team cleanup <team> --force` | Delete team and all data |
 
 ### Task Management
 
 | Command | Description |
 |---------|-------------|
-| `clawteam task create <team> "<subject>" -o <owner> [-d "<desc>"] [--blocked-by <id>]` | Create task |
-| `clawteam task list <team> [--owner <name>]` | List tasks (filterable) |
-| `clawteam task update <team> <id> --status <status>` | Update status |
-| `clawteam task get <team> <id>` | Get single task |
-| `clawteam task stats <team>` | Timing statistics |
-| `clawteam task wait <team>` | Block until all tasks complete |
+| `agentteam task create <team> "<subject>" -o <owner> [-d "<desc>"] [--blocked-by <id>]` | Create task |
+| `agentteam task list <team> [--owner <name>]` | List tasks (filterable) |
+| `agentteam task update <team> <id> --status <status>` | Update status |
+| `agentteam task get <team> <id>` | Get single task |
+| `agentteam task stats <team>` | Timing statistics |
+| `agentteam task wait <team>` | Block until all tasks complete |
 
 **Task statuses**: `pending`, `in_progress`, `completed`, `blocked`
 
@@ -81,20 +81,20 @@ clawteam board serve --port 8080   # Web dashboard
 
 ```bash
 # Default (RECOMMENDED): spawns openclaw tui in tmux with prompt
-clawteam spawn -t <team> -n <name> --task "<task description>"
+agentteam spawn -t <team> -n <name> --task "<task description>"
 
 # Explicit backend (still uses openclaw by default)
-clawteam spawn tmux -t <team> -n <name> --task "<task>"
-clawteam spawn subprocess -t <team> -n <name> --task "<task>"
+agentteam spawn tmux -t <team> -n <name> --task "<task>"
+agentteam spawn subprocess -t <team> -n <name> --task "<task>"
 
 # With git worktree isolation
-clawteam spawn -t <team> -n <name> --task "<task>" --workspace --repo /path/to/repo
+agentteam spawn -t <team> -n <name> --task "<task>" --workspace --repo /path/to/repo
 ```
 
 Each spawned agent gets:
 - Its own tmux window (visible via `board attach`)
-- Its own git worktree branch (`clawteam/{team}/{agent}`)
-- An auto-injected coordination prompt (how to use clawteam CLI)
+- Its own git worktree branch (`agentteam/{team}/{agent}`)
+- An auto-injected coordination prompt (how to use agentteam CLI)
 - Environment variables: `CLAWTEAM_AGENT_NAME`, `CLAWTEAM_TEAM_NAME`, etc.
 
 **Spawn safety features:**
@@ -106,78 +106,78 @@ Each spawned agent gets:
 
 | Command | Description |
 |---------|-------------|
-| `clawteam inbox send <team> <to> "<msg>" --from <sender>` | Point-to-point message |
-| `clawteam inbox broadcast <team> "<msg>" --from <sender>` | Broadcast to all |
-| `clawteam inbox peek <team> -a <agent>` | Peek without consuming |
-| `clawteam inbox receive <team>` | Consume messages |
-| `clawteam inbox log <team>` | View message history |
+| `agentteam inbox send <team> <to> "<msg>" --from <sender>` | Point-to-point message |
+| `agentteam inbox broadcast <team> "<msg>" --from <sender>` | Broadcast to all |
+| `agentteam inbox peek <team> -a <agent>` | Peek without consuming |
+| `agentteam inbox receive <team>` | Consume messages |
+| `agentteam inbox log <team>` | View message history |
 
 ### Monitoring
 
 | Command | Description |
 |---------|-------------|
-| `clawteam board show <team>` | Kanban board (rich terminal) |
-| `clawteam board overview` | All teams overview |
-| `clawteam board live <team>` | Live-refreshing board |
-| `clawteam board attach <team>` | Tmux tiled view |
-| `clawteam board serve --port 8080` | Web dashboard |
+| `agentteam board show <team>` | Kanban board (rich terminal) |
+| `agentteam board overview` | All teams overview |
+| `agentteam board live <team>` | Live-refreshing board |
+| `agentteam board attach <team>` | Tmux tiled view |
+| `agentteam board serve --port 8080` | Web dashboard |
 
 ### Cost Tracking
 
 | Command | Description |
 |---------|-------------|
-| `clawteam cost report <team> --input-tokens <N> --output-tokens <N> --cost-cents <N>` | Report usage |
-| `clawteam cost show <team>` | Show summary |
-| `clawteam cost budget <team> <dollars>` | Set budget |
+| `agentteam cost report <team> --input-tokens <N> --output-tokens <N> --cost-cents <N>` | Report usage |
+| `agentteam cost show <team>` | Show summary |
+| `agentteam cost budget <team> <dollars>` | Set budget |
 
 ### Templates
 
 | Command | Description |
 |---------|-------------|
-| `clawteam template list` | List available templates |
-| `clawteam template show <name>` | Show template details |
-| `clawteam launch <template> [--team-name <name>] [--goal "<goal>"]` | Launch from template |
+| `agentteam template list` | List available templates |
+| `agentteam template show <name>` | Show template details |
+| `agentteam launch <template> [--team-name <name>] [--goal "<goal>"]` | Launch from template |
 
 **Built-in templates**: `hedge-fund`, `code-review`, `research-paper`
 
 ### Configuration
 
 ```bash
-clawteam config show                           # Show all settings
-clawteam config set transport file             # Set transport backend
-clawteam config set skip_permissions true      # Auto-skip permission prompts
-clawteam config health                         # System health check
+agentteam config show                           # Show all settings
+agentteam config set transport file             # Set transport backend
+agentteam config set skip_permissions true      # Auto-skip permission prompts
+agentteam config health                         # System health check
 ```
 
 ### Other Commands
 
 | Command | Description |
 |---------|-------------|
-| `clawteam lifecycle idle <team> --agent <name>` | Report agent idle |
-| `clawteam session save <team> --session-id <id>` | Save session for resume |
-| `clawteam plan submit <team> "<plan>" --from <agent>` | Submit plan for approval (team-scoped storage) |
-| `clawteam workspace list <team>` | List git worktrees |
-| `clawteam workspace merge <team> --agent <name>` | Merge agent branch |
+| `agentteam lifecycle idle <team> --agent <name>` | Report agent idle |
+| `agentteam session save <team> --session-id <id>` | Save session for resume |
+| `agentteam plan submit <team> "<plan>" --from <agent>` | Submit plan for approval (team-scoped storage) |
+| `agentteam workspace list <team>` | List git worktrees |
+| `agentteam workspace merge <team> --agent <name>` | Merge agent branch |
 
 ## JSON Output
 
 Add `--json` before any subcommand for machine-readable output:
 
 ```bash
-clawteam --json task list my-team
-clawteam --json team status my-team
+agentteam --json task list my-team
+agentteam --json team status my-team
 ```
 
 ## Typical Workflow
 
 1. **User says**: "Create a team to build a web app"
-2. **You do**: `clawteam team spawn-team webapp -d "Build web app" -n leader`
-3. **Create tasks**: Use `clawteam task create` with `--blocked-by` for dependencies
-4. **Spawn agents**: Use `clawteam spawn` for each worker
+2. **You do**: `agentteam team spawn-team webapp -d "Build web app" -n leader`
+3. **Create tasks**: Use `agentteam task create` with `--blocked-by` for dependencies
+4. **Spawn agents**: Use `agentteam spawn` for each worker
 5. **Monitor**: Start a background polling loop immediately — do NOT wait for user to ask
-6. **Communicate**: Use `clawteam inbox broadcast` for team-wide updates
+6. **Communicate**: Use `agentteam inbox broadcast` for team-wide updates
 7. **Deliver**: Proactively send final results to the user as soon as all tasks complete
-8. **Cleanup**: `clawteam cost show`, `clawteam task stats`, merge worktrees, then `clawteam team cleanup webapp --force`
+8. **Cleanup**: `agentteam cost show`, `agentteam task stats`, merge worktrees, then `agentteam team cleanup webapp --force`
 
 ## Leader Orchestration Pattern
 
@@ -194,23 +194,23 @@ When YOU are the leader agent, follow this pattern to autonomously manage a swar
 ### Phase 2: Setup
 ```bash
 # Create team
-clawteam team spawn-team <team> -d "<goal description>" -n leader
+agentteam team spawn-team <team> -d "<goal description>" -n leader
 
 # Create tasks with dependency chains
-clawteam task create <team> "Design API" -o architect
+agentteam task create <team> "Design API" -o architect
 # Save the returned task ID (e.g., abc123)
-clawteam task create <team> "Build backend" -o backend --blocked-by abc123
-clawteam task create <team> "Build frontend" -o frontend --blocked-by abc123
-clawteam task create <team> "Integration tests" -o tester --blocked-by <backend-id>,<frontend-id>
+agentteam task create <team> "Build backend" -o backend --blocked-by abc123
+agentteam task create <team> "Build frontend" -o frontend --blocked-by abc123
+agentteam task create <team> "Integration tests" -o tester --blocked-by <backend-id>,<frontend-id>
 ```
 
 ### Phase 3: Spawn Workers
 ```bash
 # Each spawn launches an openclaw tui in its own tmux window
-clawteam spawn -t <team> -n architect --task "Design REST API schema for <goal>"
-clawteam spawn -t <team> -n backend --task "Implement backend based on API schema"
-clawteam spawn -t <team> -n frontend --task "Build React frontend"
-clawteam spawn -t <team> -n tester --task "Write and run integration tests"
+agentteam spawn -t <team> -n architect --task "Design REST API schema for <goal>"
+agentteam spawn -t <team> -n backend --task "Implement backend based on API schema"
+agentteam spawn -t <team> -n frontend --task "Build React frontend"
+agentteam spawn -t <team> -n tester --task "Write and run integration tests"
 ```
 
 ### Phase 4: Monitor Loop
@@ -222,7 +222,7 @@ clawteam spawn -t <team> -n tester --task "Write and run integration tests"
 ```bash
 # Poll task status every 30-60 seconds
 while true; do
-  clawteam --json task list <team> | python3 -c "
+  agentteam --json task list <team> | python3 -c "
 import sys, json
 tasks = json.load(sys.stdin)
 done = sum(1 for t in tasks if t['status'] == 'completed')
@@ -231,7 +231,7 @@ print(f'{done}/{total} complete')
 if done == total: print('ALL DONE'); sys.exit(0)
 "
   # Check for messages from workers
-  clawteam inbox receive <team>
+  agentteam inbox receive <team>
   # IMPORTANT: Send a mid-progress update to the user when roughly half the tasks are done
   sleep 30
 done
@@ -243,20 +243,20 @@ done
 
 ```bash
 # After all tasks complete — do ALL of these steps:
-clawteam board show <team>           # Final status
-clawteam cost show <team>            # Total cost — include in report to user
-clawteam task stats <team>           # Timing stats — include in report to user
+agentteam board show <team>           # Final status
+agentteam cost show <team>            # Total cost — include in report to user
+agentteam task stats <team>           # Timing stats — include in report to user
 # Merge each worker's branch back to main
 for agent in <agent1> <agent2> ...; do
-  clawteam workspace merge <team> --agent $agent
+  agentteam workspace merge <team> --agent $agent
 done
-clawteam team cleanup <team> --force  # Clean up — ALWAYS do this last
+agentteam team cleanup <team> --force  # Clean up — ALWAYS do this last
 # Then: send the final deliverables to the user immediately
 ```
 
 ### Decision Rules for the Leader
 - **Independent tasks** → spawn workers in parallel
-- **Sequential tasks** → use `--blocked-by` to chain them; ClawTeam auto-unblocks
+- **Sequential tasks** → use `--blocked-by` to chain them; AgentTeam auto-unblocks
 - **Worker asks for help** → check inbox, provide guidance via `inbox send`
 - **Worker stuck** → check task status; if `in_progress` too long, send a nudge via `inbox send`
 - **Worker done** → verify result via inbox message, then move to next phase
@@ -265,9 +265,9 @@ clawteam team cleanup <team> --force  # Clean up — ALWAYS do this last
 
 ## Data Location
 
-All state stored in `~/.clawteam/`:
-- Teams: `~/.clawteam/teams/<team>/config.json`
-- Tasks: `~/.clawteam/tasks/<team>/task-<id>.json` (with `fcntl` file locking for concurrent safety)
-- Plans: `~/.clawteam/plans/<team>/<agent>-<plan_id>.md` (team-scoped, isolated per team)
-- Messages: `~/.clawteam/teams/<team>/inboxes/<agent>/msg-*.json`
-- Costs: `~/.clawteam/costs/<team>/`
+All state stored in `~/.agentteam/`:
+- Teams: `~/.agentteam/teams/<team>/config.json`
+- Tasks: `~/.agentteam/tasks/<team>/task-<id>.json` (with `fcntl` file locking for concurrent safety)
+- Plans: `~/.agentteam/plans/<team>/<agent>-<plan_id>.md` (team-scoped, isolated per team)
+- Messages: `~/.agentteam/teams/<team>/inboxes/<agent>/msg-*.json`
+- Costs: `~/.agentteam/costs/<team>/`

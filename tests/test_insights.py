@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from clawteam.insights import InsightsEngine
+from agentteam.insights import InsightsEngine
 
 
 @pytest.fixture

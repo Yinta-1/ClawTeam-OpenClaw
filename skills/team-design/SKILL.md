@@ -1,20 +1,20 @@
 ---
-name: ClawTeam Team Design
+name: AgentTeam Team Design
 description: >
-  This skill should be used when the user asks to "use ClawTeam", "spawn a team",
+  This skill should be used when the user asks to "use AgentTeam", "spawn a team",
   "coordinate multiple agents", "create an agent team", or any scenario requiring
   multi-agent collaboration. Provides guidance on team structure design, role
   assignment, and leader coordination workflow.
 version: 0.1.0
 ---
 
-# ClawTeam Team Design
+# AgentTeam Team Design
 
 ## Purpose
 
-When needing to use ClawTeam for complex tasks, follow this workflow:
+When needing to use AgentTeam for complex tasks, follow this workflow:
 
-当需要使用 ClawTeam 完成复杂任务时，按照以下流程工作：
+当需要使用 AgentTeam 完成复杂任务时，按照以下流程工作：
 
 ## 标准工作流程
 
@@ -44,7 +44,7 @@ When needing to use ClawTeam for complex tasks, follow this workflow:
 
 ```bash
 # 使用模板创建（推荐）
-clawteam team create <团队名> --template <模板名> --description "<描述>"
+agentteam team create <团队名> --template <模板名> --description "<描述>"
 
 # 可用模板：
 # - development-team-max: 架构师 + 后端 + 前端 + 测试
@@ -59,7 +59,7 @@ clawteam team create <团队名> --template <模板名> --description "<描述>"
 ### 步骤三：派发专家
 
 ```bash
-clawteam spawn openclaw_sdk --team <团队名> --agent-name <名称> --agent-type <类型> --task "<任务描述>"
+agentteam spawn openclaw_sdk --team <团队名> --agent-name <名称> --agent-type <类型> --task "<任务描述>"
 ```
 
 派发的专家类型应该与步骤一设计的团队结构一致。
@@ -69,7 +69,7 @@ clawteam spawn openclaw_sdk --team <团队名> --agent-name <名称> --agent-typ
 **通过 inbox 发送需求文档给 leader**：
 
 ```bash
-clawteam inbox send <团队名> leader "<需求文档>"
+agentteam inbox send <团队名> leader "<需求文档>"
 ```
 
 需求文档应包含：
@@ -92,7 +92,7 @@ clawteam inbox send <团队名> leader "<需求文档>"
 
 ## 示例
 
-### 场景：ClawTeam 升级任务
+### 场景：AgentTeam 升级任务
 
 **错误做法（子代理思维）**：
 ```
@@ -102,7 +102,7 @@ clawteam inbox send <团队名> leader "<需求文档>"
 **正确做法（团队思维）**：
 ```
 1. 设计团队：architect + backend + tester + doc-writer
-2. 创建团队：clawteam team create clawteam-upgrade
+2. 创建团队：agentteam team create clawteam-upgrade
 3. 派发专家：spawn architect, backend, tester, doc-writer
 4. 告知 leader：
    "需要完成：测试增强、性能优化、代码审查、文档更新"
@@ -112,8 +112,8 @@ clawteam inbox send <团队名> leader "<需求文档>"
 ## 触发条件
 
 当用户说：
-- "用 ClawTeam 完成 X"
-- "动用 clawteam 进行升级"
+- "用 AgentTeam 完成 X"
+- "动用 agentteam 进行升级"
 - "用团队协作方式处理"
 - 或任何需要多代理协作的任务
 
@@ -126,4 +126,4 @@ clawteam inbox send <团队名> leader "<需求文档>"
 
 ---
 
-_此技能确保 ClawTeam 团队协作流程规范化，避免临时凑齐专家的子代理思维。_
+_此技能确保 AgentTeam 团队协作流程规范化，避免临时凑齐专家的子代理思维。_

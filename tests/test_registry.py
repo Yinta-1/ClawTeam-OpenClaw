@@ -1,6 +1,6 @@
-"""Tests for clawteam.spawn.registry — agent process registry and liveness."""
+"""Tests for agentteam.spawn.registry — agent process registry and liveness."""
 
-from clawteam.spawn.registry import (
+from agentteam.spawn.registry import (
     _load,
     _pid_alive,
     _save,
@@ -9,7 +9,7 @@ from clawteam.spawn.registry import (
     list_dead_agents,
     register_agent,
 )
-from clawteam.team.manager import TeamManager
+from agentteam.team.manager import TeamManager
 
 
 def _create_team(name: str) -> None:

@@ -5,7 +5,7 @@ import asyncio
 import time
 from typing import List
 
-from clawteam.readiness import AgentReadinessDetector, DetectorConfig
+from agentteam.readiness import AgentReadinessDetector, DetectorConfig
 
 
 @pytest.fixture
