@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, r'C:\Users\31683\.openclaw\workspace\ClawTeam-OpenClaw')
+sys.path.insert(0, r'C:\Users\31683\.openclaw\workspace\AgentTeam-OpenClaw')
 from agentteam.spawn.prompt import build_agent_prompt
 
 prompt = build_agent_prompt(

@@ -1,5 +1,5 @@
 """
-Security utilities for ClawTeam
+Security utilities for AgentTeam
 
 Provides security checking utilities for:
 - SQL injection detection

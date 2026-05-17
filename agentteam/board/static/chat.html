@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClawTeam 聊天</title>
+    <title>AgentTeam 聊天</title>
     <style>
         /* Material Design SVG Icons */
         .material-icon { display: inline-flex; align-items: center; justify-content: center; }
@@ -651,7 +651,7 @@
                         <div class="message-timestamp" id="welcome-time">刚刚</div>
                     </div>
                     <div class="message-content">
-                        欢迎来到 ClawTeam 聊天！你可以与团队成员交流、创建任务并监控进度。输入 /help 查看可用命令。
+                        欢迎来到 AgentTeam 聊天！你可以与团队成员交流、创建任务并监控进度。输入 /help 查看可用命令。
                     </div>
                 </div>
             </div>
@@ -1215,7 +1215,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `clawteam-chat-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `agentteam-chat-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

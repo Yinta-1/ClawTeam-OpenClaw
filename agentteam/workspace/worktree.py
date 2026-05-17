@@ -3,7 +3,7 @@
 所有 git 操作通过链锁串行化，防止竞态条件。
 参考 SpectrAI GitWorktreeService.ts 实现。
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

@@ -10,7 +10,7 @@
 
 ## Testing
 
-- [ ] `ruff check clawteam/ tests/` passes
+- [ ] `ruff check agentteam/ tests/` passes
 - [ ] `pytest tests/` passes (state count: ___ passed, ___ skipped)
 - [ ] New tests added for new functionality
 

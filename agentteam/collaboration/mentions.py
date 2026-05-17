@@ -1,4 +1,4 @@
-"""@Mention support for ClawTeam collaboration.
+"""@Mention support for AgentTeam collaboration.
 
 Provides parsing and notification for @mentions in messages,
 allowing agents to directly notify each other.

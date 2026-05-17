@@ -1,4 +1,4 @@
-"""Orchestrator module for ClawTeam multi-agent teams.
+"""Orchestrator module for AgentTeam multi-agent teams.
 
 This module provides:
 - Provider selection with intelligent routing

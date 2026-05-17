@@ -1,4 +1,4 @@
-"""Alerting system for ClawTeam multi-agent teams.
+"""Alerting system for AgentTeam multi-agent teams.
 
 Detects and manages alerts for task timeouts, agent failure rates, and other
 critical conditions. Alerts are stored as append-only JSON files per team.
@@ -32,7 +32,7 @@ def _alerts_root(team_name: str) -> Path:
 
 
 class AlertType(str, Enum):
-    """Types of alert events in ClawTeam."""
+    """Types of alert events in AgentTeam."""
 
     TASK_TIMEOUT = "task_timeout"
     AGENT_FAILURE_RATE_HIGH = "agent_failure_rate_high"

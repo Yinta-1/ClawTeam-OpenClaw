@@ -1,4 +1,4 @@
-"""Collaboration enhancements for ClawTeam multi-agent coordination.
+"""Collaboration enhancements for AgentTeam multi-agent coordination.
 
 This module provides enhanced collaboration features:
 - Presence status management

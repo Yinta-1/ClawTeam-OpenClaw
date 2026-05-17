@@ -464,14 +464,14 @@ class TestGetCrossSessionBus:
         import agentteam.session.cross_session as bus_module
         bus_module._bus = None
         
-        os.environ["CLAWTEAM_DATA_DIR"] = str(temp_data_dir)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(temp_data_dir)
         
         b1 = get_cross_session_bus()
         b2 = get_cross_session_bus()
         
         assert b1 is b2
         
-        del os.environ["CLAWTEAM_DATA_DIR"]
+        del os.environ["AGENTTEAM_DATA_DIR"]
         bus_module._bus = None
 
 

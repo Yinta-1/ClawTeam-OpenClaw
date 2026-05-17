@@ -14,11 +14,11 @@ class TestRedisTransportMailboxIntegration:
     """Test RedisTransport integration with MailboxManager."""
 
     def test_mailbox_uses_redis_transport_when_configured(self, tmp_path):
-        """Test that MailboxManager uses RedisTransport when CLAWTEAM_TRANSPORT=redis."""
+        """Test that MailboxManager uses RedisTransport when AGENTTEAM_TRANSPORT=redis."""
         from agentteam.team.mailbox import MailboxManager
 
-        os.environ["CLAWTEAM_TRANSPORT"] = "redis"
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
+        os.environ["AGENTTEAM_TRANSPORT"] = "redis"
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path / "data")
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
@@ -37,16 +37,16 @@ class TestRedisTransportMailboxIntegration:
                 from agentteam.transport.redis import RedisTransport
                 assert isinstance(mailbox._transport, RedisTransport)
 
-        del os.environ["CLAWTEAM_TRANSPORT"]
-        if "CLAWTEAM_DATA_DIR" in os.environ:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+        del os.environ["AGENTTEAM_TRANSPORT"]
+        if "AGENTTEAM_DATA_DIR" in os.environ:
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_send_message_via_redis(self, tmp_path):
         """Test sending a message through RedisTransport."""
         from agentteam.team.mailbox import MailboxManager
         from agentteam.team.models import MessageType
 
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path / "data")
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
@@ -69,15 +69,15 @@ class TestRedisTransportMailboxIntegration:
             assert msg.from_agent == "alice"
             assert msg.content == "Hello via Redis!"
 
-        if "CLAWTEAM_DATA_DIR" in os.environ:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+        if "AGENTTEAM_DATA_DIR" in os.environ:
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_receive_message_via_redis(self, tmp_path):
         """Test receiving messages through RedisTransport."""
         from agentteam.team.mailbox import MailboxManager
         from agentteam.team.models import TeamMessage, MessageType
 
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path / "data")
 
         mock_msg = TeamMessage(
             type=MessageType.message,
@@ -106,8 +106,8 @@ class TestRedisTransportMailboxIntegration:
             assert len(messages) == 1
             assert messages[0].from_agent == "alice"
 
-        if "CLAWTEAM_DATA_DIR" in os.environ:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+        if "AGENTTEAM_DATA_DIR" in os.environ:
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
 
 class TestRedisMixedMode:
@@ -118,8 +118,8 @@ class TestRedisMixedMode:
         from agentteam.team.tasks import TaskStore
         from agentteam.team.mailbox import MailboxManager
 
-        os.environ["CLAWTEAM_TRANSPORT"] = "redis"
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path / "data")
+        os.environ["AGENTTEAM_TRANSPORT"] = "redis"
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path / "data")
 
         mock_client = MagicMock()
         mock_client.ping.return_value = True
@@ -142,9 +142,9 @@ class TestRedisMixedMode:
                 from agentteam.transport.redis import RedisTransport
                 assert isinstance(mailbox._transport, RedisTransport)
 
-        del os.environ["CLAWTEAM_TRANSPORT"]
-        if "CLAWTEAM_DATA_DIR" in os.environ:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+        del os.environ["AGENTTEAM_TRANSPORT"]
+        if "AGENTTEAM_DATA_DIR" in os.environ:
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
 
 class TestRedisReconnection:
@@ -257,13 +257,13 @@ class TestRedisEnvironmentConfig:
         """Test Redis URL configuration from environment."""
         from agentteam.transport.redis import RedisTransport
 
-        os.environ["CLAWTEAM_REDIS_URL"] = "redis://custom-host:7000"
+        os.environ["AGENTTEAM_REDIS_URL"] = "redis://custom-host:7000"
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
             transport = RedisTransport("test-team")
             assert transport._redis_url == "redis://custom-host:7000"
 
-        del os.environ["CLAWTEAM_REDIS_URL"]
+        del os.environ["AGENTTEAM_REDIS_URL"]
 
     def test_transport_factory_redis(self):
         """Test get_transport factory with redis."""

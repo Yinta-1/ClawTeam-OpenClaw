@@ -14,7 +14,7 @@ def test_workspace_overlays_subproject_files_into_worktree(monkeypatch, tmp_path
     (scripts / "collect_team_context.ts").write_text("export const ok = true\n", encoding="utf-8")
     (scripts / "workflow_runner.ts").write_text("export const runner = true\n", encoding="utf-8")
 
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setattr("agentteam.workspace.git.repo_root", lambda path: repo_root)
     monkeypatch.setattr("agentteam.workspace.git.current_branch", lambda repo: "main")
     monkeypatch.setattr("agentteam.workspace.git.create_worktree", lambda repo, worktree_path, branch, base_ref='HEAD': Path(worktree_path).mkdir(parents=True, exist_ok=True))

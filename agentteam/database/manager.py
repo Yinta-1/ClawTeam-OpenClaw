@@ -96,7 +96,7 @@ class DatabaseManager:
 
     def _default_db_path(self) -> str:
         """Get default database path."""
-        env_path = os.environ.get("CLAWTEAM_DB_PATH")
+        env_path = os.environ.get("AGENTTEAM_DB_PATH")
         if env_path:
             return env_path
 

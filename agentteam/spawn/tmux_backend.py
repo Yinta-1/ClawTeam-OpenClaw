@@ -17,7 +17,7 @@ from agentteam.spawn.base import SpawnBackend
 from agentteam.spawn.cli_env import (
     build_spawn_path,
     propagate_openclaw_gateway_token,
-    resolve_clawteam_executable,
+    resolve_agentteam_executable,
 )
 from agentteam.spawn.command_validation import (
     command_has_workspace_arg,
@@ -36,9 +36,9 @@ from agentteam.spawn.command_validation import (
 _SHELL_ENV_KEY_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
 _WORKER_AGENTS_MD = """\
-# ClawTeam Worker
+# AgentTeam Worker
 
-This is an isolated workspace for ClawTeam worker agents.
+This is an isolated workspace for AgentTeam worker agents.
 Follow the coordination protocol provided in your system prompt.
 """
 
@@ -77,7 +77,7 @@ def _ensure_worker_workspace() -> str:
 class TmuxBackend(SpawnBackend):
     """Spawn agents in tmux windows for visual monitoring.
 
-    Each agent gets its own tmux window in a session named ``clawteam-{team}``.
+    Each agent gets its own tmux window in a session named ``agentteam-{team}``.
     Agents run in interactive mode so their work is visible in the tmux pane.
     """
 
@@ -112,8 +112,8 @@ class TmuxBackend(SpawnBackend):
             )
             openclaw_agent = None
 
-        session_name = f"clawteam-{team_name}"
-        clawteam_bin = resolve_clawteam_executable()
+        session_name = f"agentteam-{team_name}"
+        agentteam_bin = resolve_agentteam_executable()
         env_vars = os.environ.copy()
         # Interactive CLIs like Codex refuse to start when TERM=dumb is inherited
         # from a non-interactive shell. tmux provides a real terminal, so we
@@ -122,37 +122,37 @@ class TmuxBackend(SpawnBackend):
             env_vars["TERM"] = "xterm-256color"
         env_vars.update(
             {
-                "CLAWTEAM_AGENT_ID": agent_id,
-                "CLAWTEAM_AGENT_NAME": agent_name,
-                "CLAWTEAM_AGENT_TYPE": agent_type,
-                "CLAWTEAM_TEAM_NAME": team_name,
-                "CLAWTEAM_AGENT_LEADER": "0",
-                "CLAWTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
+                "AGENTTEAM_AGENT_ID": agent_id,
+                "AGENTTEAM_AGENT_NAME": agent_name,
+                "AGENTTEAM_AGENT_TYPE": agent_type,
+                "AGENTTEAM_TEAM_NAME": team_name,
+                "AGENTTEAM_AGENT_LEADER": "0",
+                "AGENTTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
             }
         )
         if parent_agent:
-            env_vars["CLAWTEAM_PARENT_AGENT"] = parent_agent
+            env_vars["AGENTTEAM_PARENT_AGENT"] = parent_agent
         # Propagate user if set
-        user = os.environ.get("CLAWTEAM_USER", "")
+        user = os.environ.get("AGENTTEAM_USER", "")
         if user:
-            env_vars["CLAWTEAM_USER"] = user
+            env_vars["AGENTTEAM_USER"] = user
         # Propagate transport if set
-        transport = os.environ.get("CLAWTEAM_TRANSPORT", "")
+        transport = os.environ.get("AGENTTEAM_TRANSPORT", "")
         if transport:
-            env_vars["CLAWTEAM_TRANSPORT"] = transport
+            env_vars["AGENTTEAM_TRANSPORT"] = transport
         if cwd:
-            env_vars["CLAWTEAM_WORKSPACE_DIR"] = cwd
+            env_vars["AGENTTEAM_WORKSPACE_DIR"] = cwd
         if model:
-            env_vars["CLAWTEAM_MODEL"] = model
+            env_vars["AGENTTEAM_MODEL"] = model
         if env:
             env_vars.update(env)
         env_vars["PATH"] = build_spawn_path(env_vars.get("PATH", os.environ.get("PATH")))
-        if os.path.isabs(clawteam_bin):
-            env_vars.setdefault("CLAWTEAM_BIN", clawteam_bin)
+        if os.path.isabs(agentteam_bin):
+            env_vars.setdefault("AGENTTEAM_BIN", agentteam_bin)
             if is_openclaw_command(command):
                 print(
                     f"Hint: OpenClaw 4.2+ requires absolute paths in exec allowlist. "
-                    f'Run: openclaw approvals allowlist add --agent "*" "{clawteam_bin}"',
+                    f'Run: openclaw approvals allowlist add --agent "*" "{agentteam_bin}"',
                     file=sys.stderr,
                 )
 
@@ -196,7 +196,7 @@ class TmuxBackend(SpawnBackend):
 
         # OpenClaw TUI: pass --message for initial prompt and --session for isolation
         if is_openclaw_command(normalized_command):
-            session_key = f"clawteam-{team_name}-{agent_name}"
+            session_key = f"agentteam-{team_name}-{agent_name}"
             if final_command[0].endswith("openclaw") and len(final_command) == 1:
                 final_command = [final_command[0], "tui", "--session", session_key]
                 if model:
@@ -240,7 +240,7 @@ class TmuxBackend(SpawnBackend):
 
         cmd_str = " ".join(shlex.quote(c) for c in final_command)
         # Append on-exit hook: runs immediately when agent process exits
-        exit_cmd = shlex.quote(clawteam_bin) if os.path.isabs(clawteam_bin) else "agentteam"
+        exit_cmd = shlex.quote(agentteam_bin) if os.path.isabs(agentteam_bin) else "agentteam"
         exit_hook = f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} --agent {shlex.quote(agent_name)}"
         # Unset nesting-detection env vars so spawned agents
         # don't refuse to start when the leader is itself a session.
@@ -390,7 +390,7 @@ class TmuxBackend(SpawnBackend):
 
     @staticmethod
     def session_name(team_name: str) -> str:
-        return f"clawteam-{team_name}"
+        return f"agentteam-{team_name}"
 
     @staticmethod
     def tile_panes(team_name: str) -> str:
@@ -738,7 +738,7 @@ def _inject_prompt_via_buffer(
     after the paste to confirm and submit.
     """
     buf_name = f"prompt-{agent_name}"
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, prefix="clawteam-prompt-") as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, prefix="agentteam-prompt-") as f:
         f.write(prompt)
         tmp_path = f.name
 
@@ -787,7 +787,7 @@ def _render_runtime_notification(envelope) -> str:
     evidence_block = "\n".join(str(item) for item in evidence if item)
 
     lines = [
-        '<clawteam_notification version="1"',
+        '<agentteam_notification version="1"',
         f'  source="{escape(str(getattr(envelope, "source", "system") or "system"))}"',
         f'  target="{escape(str(getattr(envelope, "target", "") or ""))}"',
         f'  channel="{escape(str(getattr(envelope, "channel", "direct") or "direct"))}"',
@@ -809,5 +809,5 @@ def _render_runtime_notification(envelope) -> str:
             ]
         )
 
-    lines.append("</clawteam_notification>")
+    lines.append("</agentteam_notification>")
     return "\n".join(lines)

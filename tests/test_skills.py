@@ -1,5 +1,5 @@
 """
-ClawTeam 自主技能创建系统测试
+AgentTeam 自主技能创建系统测试
 
 测试 P13 实现：
 - 检测对话中的技能创建意图
@@ -99,7 +99,7 @@ class TestSkillSpec:
         assert spec.description == "这是一个测试技能"
         assert spec.instructions == "使用说明"
         assert spec.version == "1.0.0"
-        assert spec.author == "ClawTeam Auto Creator"
+        assert spec.author == "AgentTeam Auto Creator"
         assert spec.category == "automation"
         assert spec.inputs == [{"name": "input1", "type": "string", "description": "输入1"}]
         assert spec.outputs == [{"name": "output1", "type": "string", "description": "输出1"}]
@@ -114,7 +114,7 @@ class TestSkillSpec:
         )
         
         assert spec.version == "1.0.0"
-        assert spec.author == "ClawTeam Auto Creator"
+        assert spec.author == "AgentTeam Auto Creator"
         assert spec.category == "automation"
         assert spec.inputs == []
         assert spec.outputs == []

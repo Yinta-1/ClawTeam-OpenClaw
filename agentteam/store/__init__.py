@@ -8,12 +8,12 @@ from agentteam.store.base import BaseTaskStore, TaskLockError
 def get_task_store(team_name: str, backend: str = "") -> BaseTaskStore:
     """Create a task store by backend name.
 
-    Checks CLAWTEAM_TASK_STORE env var, then config, then falls back to
+    Checks AGENTTEAM_TASK_STORE env var, then config, then falls back to
     the file-based store.
     """
     import os
 
-    name = backend or os.environ.get("CLAWTEAM_TASK_STORE", "")
+    name = backend or os.environ.get("AGENTTEAM_TASK_STORE", "")
     if not name:
         from agentteam.config import load_config
 

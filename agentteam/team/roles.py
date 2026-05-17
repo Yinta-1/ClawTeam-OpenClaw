@@ -1,4 +1,4 @@
-"""Dynamic role assignment for ClawTeam agents.
+"""Dynamic role assignment for AgentTeam agents.
 
 Manages agent roles (developer, reviewer, tester, architect, coordinator)
 with persistent storage per team.

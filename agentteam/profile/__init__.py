@@ -1,4 +1,4 @@
-"""ClawTeam 用户画像系统 (P14)"""
+"""AgentTeam 用户画像系统 (P14)"""
 
 from .user_model import (
     BehavioralPattern,

@@ -40,7 +40,7 @@ AgentTeam-OpenClaw can be deployed in various configurations:
 ### From PyPI (Stable Release)
 
 ```bash
-pip install clawteam-openclaw
+pip install AgentTeam-openclaw
 
 # Verify installation
 agentteam --version
@@ -64,14 +64,14 @@ poetry install
 
 ```bash
 # Pull from Docker Hub
-docker pull yintatriss/clawteam-openclaw:latest
+docker pull yintatriss/AgentTeam-openclaw:latest
 
 # Run container
 docker run -d \
   --name agentteam \
   -p 8080:8080 \
   -v ~/.agentteam:/root/.agentteam \
-  yintatriss/clawteam-openclaw:latest
+  yintatriss/AgentTeam-openclaw:latest
 ```
 
 ---
@@ -125,11 +125,11 @@ alerts:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CLAWTEAM_DATA_DIR` | Data directory | `~/.agentteam` |
-| `CLAWTEAM_CONFIG` | Config file path | `./config.yaml` |
-| `CLAWTEAM_AUTH_TOKEN` | API auth token | (none) |
-| `CLAWTEAM_LOG_LEVEL` | Log level | `info` |
-| `CLAWTEAM_DB_PATH` | Database path | `data/agentteam.db` |
+| `AgentTeam_DATA_DIR` | Data directory | `~/.agentteam` |
+| `AgentTeam_CONFIG` | Config file path | `./config.yaml` |
+| `AgentTeam_AUTH_TOKEN` | API auth token | (none) |
+| `AgentTeam_LOG_LEVEL` | Log level | `info` |
+| `AgentTeam_DB_PATH` | Database path | `data/agentteam.db` |
 
 ---
 
@@ -214,7 +214,7 @@ version: '3.8'
 
 services:
   agentteam:
-    image: yintatriss/clawteam-openclaw:latest
+    image: yintatriss/AgentTeam-openclaw:latest
     container_name: agentteam
     ports:
       - "8080:8080"
@@ -222,8 +222,8 @@ services:
       - ./data:/root/.agentteam
       - ./config.yaml:/app/config.yaml:ro
     environment:
-      - CLAWTEAM_AUTH_TOKEN=${AUTH_TOKEN}
-      - CLAWTEAM_LOG_LEVEL=info
+      - AgentTeam_AUTH_TOKEN=${AUTH_TOKEN}
+      - AgentTeam_LOG_LEVEL=info
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/board/status"]
@@ -301,8 +301,8 @@ docker build -t agentteam:latest .
 
 # Tag for ECR
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REGISTRY
-docker tag agentteam:latest $ECR_REGISTRY/clawteam:latest
-docker push $ECR_REGISTRY/clawteam:latest
+docker tag agentteam:latest $ECR_REGISTRY/AgentTeam:latest
+docker push $ECR_REGISTRY/AgentTeam:latest
 
 # Deploy to ECS using docker-compose.ecs.yml
 ```
@@ -311,11 +311,11 @@ docker push $ECR_REGISTRY/clawteam:latest
 
 ```bash
 # Build and push to GCR
-gcloud builds submit --tag gcr.io/$PROJECT_ID/clawteam:latest
+gcloud builds submit --tag gcr.io/$PROJECT_ID/AgentTeam:latest
 
 # Deploy to Cloud Run
 gcloud run deploy agentteam \
-    --image gcr.io/$PROJECT_ID/clawteam:latest \
+    --image gcr.io/$PROJECT_ID/AgentTeam:latest \
     --platform managed \
     --region us-central1 \
     --allow-unauthenticated
@@ -331,8 +331,8 @@ az acr build --registry $ACR_NAME --image agentteam:latest .
 az container create \
     --resource-group $RG \
     --name agentteam \
-    --image $ACR_NAME.azurecr.io/clawteam:latest \
-    --dns-name-label clawteam-$RANDOM \
+    --image $ACR_NAME.azurecr.io/AgentTeam:latest \
+    --dns-name-label AgentTeam-$RANDOM \
     --ports 8080
 ```
 
@@ -345,24 +345,24 @@ az container create \
 For high availability, deploy multiple AgentTeam instances:
 
 ```
-                    ┌─────────────┐
-                    │   Nginx     │
-                    │  (LB)      │
-                    └──────┬──────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-    ┌────▼────┐      ┌────▼────┐      ┌────▼────┐
-    │ Node 1  │      │ Node 2  │      │ Node 3  │
-    │AgentTeam │      │AgentTeam │      │AgentTeam │
-    └────┬────┘      └────┬────┘      └────┬────┘
-         │                 │                 │
-         └─────────────────┼─────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │    Redis    │
-                    │  (Shared)   │
-                    └─────────────┘
+                    ┌─────────────�?
+                    �?  Nginx     �?
+                    �? (LB)      �?
+                    └──────┬──────�?
+                           �?
+         ┌─────────────────┼─────────────────�?
+         �?                �?                �?
+    ┌────▼────�?     ┌────▼────�?     ┌────▼────�?
+    �?Node 1  �?     �?Node 2  �?     �?Node 3  �?
+    │AgentTeam �?     │AgentTeam �?     │AgentTeam �?
+    └────┬────�?     └────┬────�?     └────┬────�?
+         �?                �?                �?
+         └─────────────────┼─────────────────�?
+                           �?
+                    ┌──────▼──────�?
+                    �?   Redis    �?
+                    �? (Shared)   �?
+                    └─────────────�?
 ```
 
 **Requirements:**
@@ -437,7 +437,7 @@ sudo certbot --nginx -d agentteam.example.com
 
 ```bash
 # Use environment variables for secrets
-export CLAWTEAM_AUTH_TOKEN="your-secure-token"
+export AgentTeam_AUTH_TOKEN="your-secure-token"
 export DATABASE_URL="postgresql://user:pass@host/db"
 
 # Or use a secrets manager (AWS Secrets Manager, HashiCorp Vault, etc.)
@@ -555,7 +555,7 @@ agentteam team create my-team --backend openclaw_sdk
 
 ```bash
 # Enable debug logging
-export CLAWTEAM_LOG_LEVEL=debug
+export AgentTeam_LOG_LEVEL=debug
 agentteam board serve --debug
 
 # Or in config.yaml
@@ -576,7 +576,7 @@ cp -r ~/.agentteam ~/.agentteam.backup
 rm -rf ~/.agentteam
 
 # Reinstall
-pip install --force-reinstall clawteam-openclaw
+pip install --force-reinstall AgentTeam-openclaw
 ```
 
 ---

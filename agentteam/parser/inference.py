@@ -3,7 +3,7 @@
 Combines prompt marker detection (precise) and timeout inference (fallback)
 to accurately determine session state.
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

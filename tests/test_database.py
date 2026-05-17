@@ -66,7 +66,7 @@ class TestDatabaseManager:
             db_path = f.name
         
         try:
-            monkeypatch.setenv("CLAWTEAM_DB_PATH", db_path)
+            monkeypatch.setenv("AGENTTEAM_DB_PATH", db_path)
             db = DatabaseManager()
             assert db.db_path == db_path
             db.close()

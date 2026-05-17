@@ -23,7 +23,7 @@ class TestDeliverToRunningAgent:
         # Setup: Create a fake running_agents.json
         data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(data_dir))
 
         running_agents_file = data_dir / "running_agents.json"
         running_agents_file.write_text(
@@ -70,7 +70,7 @@ class TestDeliverToRunningAgent:
         # Setup: Empty running_agents.json
         data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(data_dir))
 
         running_agents_file = data_dir / "running_agents.json"
         running_agents_file.write_text(json.dumps({}))  # No agents running
@@ -95,7 +95,7 @@ class TestDeliverToRunningAgent:
         # Setup: Running agent exists
         data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(data_dir))
 
         running_agents_file = data_dir / "running_agents.json"
         running_agents_file.write_text(
@@ -271,7 +271,7 @@ class TestSmartRoutingIntegration:
         # Setup: Agent registered but with tmux backend type
         data_dir = tmp_path / ".agentteam"
         data_dir.mkdir(exist_ok=True)
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(data_dir))
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(data_dir))
 
         running_agents_file = data_dir / "running_agents.json"
         running_agents_file.write_text(

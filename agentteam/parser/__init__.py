@@ -1,4 +1,4 @@
-"""Output parsing engine for ClawTeam multi-agent teams.
+"""Output parsing engine for AgentTeam multi-agent teams.
 
 Parses AI provider outputs, detects activity events, estimates token usage,
 and supports multiple provider formats (Claude Code, Codex, Gemini, etc.).
@@ -13,7 +13,7 @@ from agentteam.parser.confirmation_detector import (
     get_default_detector,
 )
 from agentteam.parser.integration import (
-    ClawTeamIntegration,
+    AgentTeamIntegration,
     get_integration,
     parse_and_notify,
     remove_integration,
@@ -52,7 +52,7 @@ __all__ = [
     # Usage estimator
     "UsageEstimator",
     # Integration
-    "ClawTeamIntegration",
+    "AgentTeamIntegration",
     "get_integration",
     "parse_and_notify",
     "remove_integration",

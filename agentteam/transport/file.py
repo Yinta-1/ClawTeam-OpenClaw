@@ -280,7 +280,7 @@ class FileTransport(Transport):
         """Clean up expired messages from an agent's inbox.
 
         Scans the inbox directory and removes messages that have exceeded
-        the TTL duration (CLAWTEAM_MESSAGE_TTL).
+        the TTL duration (AGENTTEAM_MESSAGE_TTL).
 
         Args:
             agent_name: Agent whose inbox to clean up.

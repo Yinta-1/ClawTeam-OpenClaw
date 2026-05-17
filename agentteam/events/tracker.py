@@ -1,4 +1,4 @@
-"""Event tracker for ClawTeam Event Tracking System (SpectrAI-inspired).
+"""Event tracker for AgentTeam Event Tracking System (SpectrAI-inspired).
 
 This module provides the core event tracking functionality,
 storing events in a SQLite database for efficient querying.
@@ -19,12 +19,12 @@ from agentteam.team.models import get_data_dir
 
 
 # Global event subscribers for SSE streaming
-_event_subscribers: list[Callable[["ClawTeamEvent"], None]] = []
+_event_subscribers: list[Callable[["AgentTeamEvent"], None]] = []
 _subscriber_lock = threading.Lock()
 
 
 class EventTracker:
-    """Tracks and stores ClawTeam events in SQLite.
+    """Tracks and stores AgentTeam events in SQLite.
 
     Inspired by SpectrAI's event-driven approach, this tracker
     provides persistent event storage with efficient querying.
@@ -35,7 +35,7 @@ class EventTracker:
 
         Args:
             db_path: Path to the SQLite database file.
-                     If None, uses CLAWTEAM_EVENTS_DB_PATH env var or default location.
+                     If None, uses AGENTTEAM_EVENTS_DB_PATH env var or default location.
         """
         if db_path:
             self.db_path = Path(db_path)
@@ -89,11 +89,11 @@ class EventTracker:
         """)
         conn.commit()
 
-    def track(self, event: "ClawTeamEvent") -> None:
+    def track(self, event: "AgentTeamEvent") -> None:
         """Track a single event.
 
         Args:
-            event: The ClawTeamEvent to track.
+            event: The AgentTeamEvent to track.
         """
         with self._lock:
             conn = self._get_conn()
@@ -128,11 +128,11 @@ class EventTracker:
         # Notify subscribers (outside the lock to avoid deadlock)
         _notify_event_subscribers(event)
 
-    def track_batch(self, events: List["ClawTeamEvent"]) -> None:
+    def track_batch(self, events: List["AgentTeamEvent"]) -> None:
         """Track multiple events in a batch.
 
         Args:
-            events: List of ClawTeamEvents to track.
+            events: List of AgentTeamEvents to track.
         """
         if not events:
             return
@@ -452,10 +452,10 @@ def _get_default_db_path() -> Path:
     """Get default database path from environment or use default location."""
     import os
 
-    env_path = os.environ.get("CLAWTEAM_EVENTS_DB_PATH")
+    env_path = os.environ.get("AGENTTEAM_EVENTS_DB_PATH")
     if env_path:
         return Path(env_path)
-    return get_data_dir() / "events" / "clawteam_events.db"
+    return get_data_dir() / "events" / "agentteam_events.db"
 
 
 def get_tracker() -> EventTracker:
@@ -492,17 +492,17 @@ def reset_tracker() -> None:
             _tracker = None
 
 
-def track_event(event: "ClawTeamEvent") -> None:
+def track_event(event: "AgentTeamEvent") -> None:
     """Convenience function to track a single event."""
     get_tracker().track(event)
 
 
-def track_batch(events: List["ClawTeamEvent"]) -> None:
+def track_batch(events: List["AgentTeamEvent"]) -> None:
     """Convenience function to track multiple events."""
     get_tracker().track_batch(events)
 
 
-def _notify_event_subscribers(event: "ClawTeamEvent") -> None:
+def _notify_event_subscribers(event: "AgentTeamEvent") -> None:
     """Notify all subscribers of a new event (called after track/track_batch)."""
     with _subscriber_lock:
         for callback in _event_subscribers[:]:
@@ -512,19 +512,19 @@ def _notify_event_subscribers(event: "ClawTeamEvent") -> None:
                 pass  # Don't let subscriber errors break event tracking
 
 
-def add_event_subscriber(callback: Callable[["ClawTeamEvent"], None]) -> None:
+def add_event_subscriber(callback: Callable[["AgentTeamEvent"], None]) -> None:
     """Add an event subscriber callback.
 
     Args:
         callback: Function to call when a new event is tracked.
-                  Will be called with the ClawTeamEvent as argument.
+                  Will be called with the AgentTeamEvent as argument.
     """
     with _subscriber_lock:
         if callback not in _event_subscribers:
             _event_subscribers.append(callback)
 
 
-def remove_event_subscriber(callback: Callable[["ClawTeamEvent"], None]) -> None:
+def remove_event_subscriber(callback: Callable[["AgentTeamEvent"], None]) -> None:
     """Remove an event subscriber callback.
 
     Args:

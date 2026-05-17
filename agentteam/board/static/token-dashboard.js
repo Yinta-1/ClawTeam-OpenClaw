@@ -1,5 +1,5 @@
 /**
- * Token Dashboard - Enhanced token usage visualization for ClawTeam Web UI
+ * Token Dashboard - Enhanced token usage visualization for AgentTeam Web UI
  * 
  * Features:
  * - 30-day trend chart (line chart)
@@ -8,7 +8,7 @@
  * - Real-time token counter
  * - Usage predictions
  * 
- * @author ClawTeam Frontend
+ * @author AgentTeam Frontend
  */
 
 class TokenDashboard {

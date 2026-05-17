@@ -13,8 +13,8 @@ from pydantic import BaseModel, Field
 
 
 def get_data_dir() -> Path:
-    """Return the data directory, respecting CLAWTEAM_DATA_DIR env var and config."""
-    custom = os.environ.get("CLAWTEAM_DATA_DIR")
+    """Return the data directory, respecting AGENTTEAM_DATA_DIR env var and config."""
+    custom = os.environ.get("AGENTTEAM_DATA_DIR")
     if not custom:
         from agentteam.config import load_config
 

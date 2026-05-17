@@ -1,4 +1,4 @@
-"""Parent-Child lifecycle management for ClawTeam agents.
+"""Parent-Child lifecycle management for AgentTeam agents.
 
 Tracks the hierarchical relationship between parent and child agents.
 When a parent agent exits, all its children (and descendants) are cleaned up.

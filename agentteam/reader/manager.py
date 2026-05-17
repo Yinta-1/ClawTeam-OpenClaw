@@ -3,7 +3,7 @@
 Routes to corresponding reader implementations by Provider ID, exposes unified interface.
 When adding a new Provider: new XxxReader() → register_reader()
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

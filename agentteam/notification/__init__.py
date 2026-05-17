@@ -1,4 +1,4 @@
-"""Notification management for ClawTeam multi-agent teams.
+"""Notification management for AgentTeam multi-agent teams.
 
 Manages system notifications, do-not-disturb periods, and notification deduplication.
 Supports WebSocket push for real-time notifications.

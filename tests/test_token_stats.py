@@ -380,8 +380,8 @@ class TestUsageEstimatorPersistence:
         import os
         with tempfile.TemporaryDirectory() as tmpdir:
             # 通过环境变量设置数据目录
-            original_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            original_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             
             try:
                 estimator = UsageEstimator()
@@ -400,9 +400,9 @@ class TestUsageEstimatorPersistence:
                 assert estimator2._daily_history[today].tokens > 0
             finally:
                 if original_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = original_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = original_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
 
 class TestUsageEstimatorEdgeCases:

@@ -68,7 +68,7 @@ class TestSimpleResponseGenerator:
         greetings = ["你好", "hi", "hello", "嗨"]
         for greeting in greetings:
             response = _generate_simple_response(greeting)
-            assert "ClawTeam" in response or "助手" in response or len(response) > 0
+            assert "AgentTeam" in response or "助手" in response or len(response) > 0
 
     def test_help_request(self):
         """Test help request responses"""
@@ -93,11 +93,11 @@ class TestSimpleResponseGenerator:
         response = _generate_simple_response("任务管理")
         assert "任务" in response or len(response) > 0
 
-    def test_what_is_clawteam(self):
-        """Test 'what is' questions about ClawTeam"""
+    def test_what_is_agentteam(self):
+        """Test 'what is' questions about AgentTeam"""
         from agentteam.board.server import _generate_simple_response
 
-        response = _generate_simple_response("什么是ClawTeam")
+        response = _generate_simple_response("什么是AgentTeam")
         # Just verify it returns a non-empty string
         assert len(response) > 0
 

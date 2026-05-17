@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from agentteam.spawn.cli_env import build_spawn_path, resolve_clawteam_executable
+from agentteam.spawn.cli_env import build_spawn_path, resolve_agentteam_executable
 from agentteam.spawn.subprocess_backend import SubprocessBackend
 from agentteam.spawn.tmux_backend import (
     TmuxBackend,
@@ -31,12 +31,12 @@ class DummyProcess:
         return None
 
 
-def test_subprocess_backend_prepends_current_clawteam_bin_to_path(monkeypatch, tmp_path):
+def test_subprocess_backend_prepends_current_agentteam_bin_to_path(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -66,18 +66,18 @@ def test_subprocess_backend_prepends_current_clawteam_bin_to_path(monkeypatch, t
 
     env = captured["env"]
     # Use platform-specific PATH separator
-    assert env["PATH"].startswith(f"{clawteam_bin.parent}{PATH_SEP}")
-    assert env["CLAWTEAM_BIN"] == str(clawteam_bin)
+    assert env["PATH"].startswith(f"{agentteam_bin.parent}{PATH_SEP}")
+    assert env["AGENTTEAM_BIN"] == str(agentteam_bin)
 
 
 def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry(
     monkeypatch, tmp_path
 ):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
     registered: dict[str, object] = {}
@@ -118,7 +118,7 @@ def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry
     # Check that lifecycle command is present (path format may vary on Windows)
     cmd_str = captured["cmd"]
     assert "lifecycle on-exit --team demo-team --agent worker1" in cmd_str
-    assert str(clawteam_bin) in cmd_str or clawteam_bin.name in cmd_str
+    assert str(agentteam_bin) in cmd_str or agentteam_bin.name in cmd_str
     assert registered == {
         "team_name": "demo-team",
         "agent_name": "worker1",
@@ -132,13 +132,13 @@ def test_subprocess_backend_discards_output_and_preserves_exit_hook_and_registry
 @pytest.mark.skipif(sys.platform == "win32", reason="tmux is not available on Windows")
 def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", "/tmp/clawteam-data")
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", "/tmp/agentteam-data")
     monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "demo-project")
     monkeypatch.setenv("PROGRAMFILES(X86)", "should-not-be-exported")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -201,25 +201,25 @@ def test_tmux_backend_exports_spawn_path_for_agent_commands(monkeypatch, tmp_pat
     # Check that PATH is exported with agentteam bin directory prepended
     # The exact format may vary on Windows (uses os.pathsep)
     assert "export PATH=" in full_cmd
-    assert str(clawteam_bin.parent) in full_cmd or clawteam_bin.parent.name in full_cmd
-    # CLAWTEAM_BIN may be quoted on Windows
-    assert "export CLAWTEAM_BIN=" in full_cmd
-    assert str(clawteam_bin) in full_cmd or clawteam_bin.name in full_cmd
-    assert "export CLAWTEAM_DATA_DIR=/tmp/clawteam-data" in full_cmd
+    assert str(agentteam_bin.parent) in full_cmd or agentteam_bin.parent.name in full_cmd
+    # AGENTTEAM_BIN may be quoted on Windows
+    assert "export AGENTTEAM_BIN=" in full_cmd
+    assert str(agentteam_bin) in full_cmd or agentteam_bin.name in full_cmd
+    assert "export AGENTTEAM_DATA_DIR=/tmp/agentteam-data" in full_cmd
     assert "export GOOGLE_CLOUD_PROJECT=demo-project" in full_cmd
     assert "cd /tmp/demo &&" in full_cmd
     assert "PROGRAMFILES(X86)" not in full_cmd
-    assert f"{clawteam_bin} lifecycle on-exit --team demo-team --agent worker1" in full_cmd
+    assert f"{agentteam_bin} lifecycle on-exit --team demo-team --agent worker1" in full_cmd
 
 
 def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeypatch, tmp_path):
-    from agentteam.config import ClawTeamConfig
+    from agentteam.config import AgentTeamConfig
 
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     class Result:
         def __init__(self, returncode: int = 0, stdout: str = ""):
@@ -252,7 +252,7 @@ def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeyp
             return "/usr/bin/codex"
         return original_which(name, path=path)
 
-    monkeypatch.setattr("agentteam.config.load_config", lambda: ClawTeamConfig(spawn_ready_timeout=42.0))
+    monkeypatch.setattr("agentteam.config.load_config", lambda: AgentTeamConfig(spawn_ready_timeout=42.0))
     monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
     monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
     monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
@@ -275,7 +275,7 @@ def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeyp
         skip_permissions=True,
     )
 
-    assert captured["target"] == "clawteam-demo-team:worker1"
+    assert captured["target"] == "agentteam-demo-team:worker1"
     assert captured["command"] == ["codex"]
     assert captured["timeout_seconds"] == 42.0
     assert captured["poll_interval_seconds"] == 0.2
@@ -283,10 +283,10 @@ def test_tmux_backend_uses_configured_timeout_for_workspace_trust_prompt(monkeyp
 
 def test_tmux_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -323,10 +323,10 @@ def test_tmux_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
 
 def test_subprocess_backend_returns_error_when_command_missing(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     popen_called = False
 
@@ -358,10 +358,10 @@ def test_subprocess_backend_returns_error_when_command_missing(monkeypatch, tmp_
 
 def test_tmux_backend_normalizes_bare_nanobot_to_agent(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -547,13 +547,13 @@ def test_dismiss_codex_update_prompt_sends_enter(monkeypatch):
 
 
 def test_tmux_backend_waits_for_pane_before_declaring_failure(monkeypatch, tmp_path):
-    from agentteam.config import ClawTeamConfig
+    from agentteam.config import AgentTeamConfig
 
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
     pane_calls = 0
@@ -585,7 +585,7 @@ def test_tmux_backend_waits_for_pane_before_declaring_failure(monkeypatch, tmp_p
             return "/usr/bin/claude"
         return None
 
-    monkeypatch.setattr("agentteam.config.load_config", lambda: ClawTeamConfig())
+    monkeypatch.setattr("agentteam.config.load_config", lambda: AgentTeamConfig())
     monkeypatch.setattr("agentteam.spawn.tmux_backend.shutil.which", fake_which)
     monkeypatch.setattr("agentteam.spawn.command_validation.shutil.which", fake_which)
     monkeypatch.setattr("agentteam.spawn.tmux_backend.subprocess.run", fake_run)
@@ -664,10 +664,10 @@ def test_dismiss_codex_update_prompt_sends_enter_versioned(monkeypatch):
 
 def test_subprocess_backend_normalizes_nanobot_and_uses_message_flag(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -701,10 +701,10 @@ def test_subprocess_backend_normalizes_nanobot_and_uses_message_flag(monkeypatch
 def test_tmux_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
     """Gemini gets --yolo for permissions and -p for prompt."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -755,10 +755,10 @@ def test_tmux_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
 def test_subprocess_backend_gemini_skip_permissions_and_prompt(monkeypatch, tmp_path):
     """Gemini subprocess uses --yolo and -p flags."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -820,10 +820,10 @@ def test_tmux_backend_confirms_gemini_workspace_trust_prompt(monkeypatch):
 def test_tmux_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tmp_path):
     """Kimi gets --yolo, -w for workspace, and --print -p for prompt."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -874,10 +874,10 @@ def test_tmux_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tm
 def test_subprocess_backend_kimi_skip_permissions_workspace_and_prompt(monkeypatch, tmp_path):
     """Kimi subprocess uses --yolo, -w, and --print -p flags."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -907,8 +907,8 @@ def test_subprocess_backend_kimi_skip_permissions_workspace_and_prompt(monkeypat
     assert "kimi --yolo -w /tmp/demo --print -p 'fix the bug'" in captured["cmd"]
 
 
-def test_resolve_clawteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_path):
-    unrelated = tmp_path / "not-clawteam-review"
+def test_resolve_agentteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_path):
+    unrelated = tmp_path / "not-agentteam-review"
     unrelated.write_text("#!/bin/sh\n")
     resolved_bin = tmp_path / "bin" / "agentteam"
     resolved_bin.parent.mkdir(parents=True)
@@ -917,12 +917,12 @@ def test_resolve_clawteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_pa
     monkeypatch.setattr(sys, "argv", [str(unrelated)])
     monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
-    assert resolve_clawteam_executable() == str(resolved_bin)
+    assert resolve_agentteam_executable() == str(resolved_bin)
     # Use platform-specific PATH separator
     assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}{PATH_SEP}")
 
 
-def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_exists(
+def test_resolve_agentteam_executable_ignores_relative_argv0_even_if_local_file_exists(
     monkeypatch, tmp_path
 ):
     local_shadow = tmp_path / "agentteam"
@@ -935,12 +935,12 @@ def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_e
     monkeypatch.setattr(sys, "argv", ["agentteam"])
     monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
-    assert resolve_clawteam_executable() == str(resolved_bin)
+    assert resolve_agentteam_executable() == str(resolved_bin)
     # Use platform-specific PATH separator
     assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}{PATH_SEP}")
 
 
-def test_resolve_clawteam_executable_accepts_relative_path_with_explicit_directory(
+def test_resolve_agentteam_executable_accepts_relative_path_with_explicit_directory(
     monkeypatch, tmp_path
 ):
     relative_bin = tmp_path / ".venv" / "bin" / "agentteam"
@@ -951,10 +951,10 @@ def test_resolve_clawteam_executable_accepts_relative_path_with_explicit_directo
     fallback_bin.write_text("#!/bin/sh\n")
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(sys, "argv", ["./.venv/bin/clawteam"])
+    monkeypatch.setattr(sys, "argv", ["./.venv/bin/agentteam"])
     monkeypatch.setattr("agentteam.spawn.cli_env.shutil.which", lambda name: str(fallback_bin))
 
-    assert resolve_clawteam_executable() == str(relative_bin.resolve())
+    assert resolve_agentteam_executable() == str(relative_bin.resolve())
     # Use platform-specific PATH separator
     assert build_spawn_path("/usr/bin:/bin").startswith(f"{relative_bin.parent.resolve()}{PATH_SEP}")
 
@@ -1070,7 +1070,7 @@ def test_tmux_backend_runtime_injection_returns_false_when_target_missing(monkey
     )
 
     assert ok is False
-    assert "clawteam-demo:worker" in reason
+    assert "agentteam-demo:worker" in reason
 
 
 # ---------------------------------------------------------------------------
@@ -1081,10 +1081,10 @@ def test_tmux_backend_runtime_injection_returns_false_when_target_missing(monkey
 def _make_tmux_spawn_harness(monkeypatch, tmp_path, cli_name):
     """Shared harness for tmux spawn tests of new CLIs."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -1163,10 +1163,10 @@ def test_tmux_backend_opencode_skip_permissions_and_prompt(monkeypatch, tmp_path
 
 def test_subprocess_backend_qwen_skip_permissions_and_prompt(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -1198,10 +1198,10 @@ def test_subprocess_backend_qwen_skip_permissions_and_prompt(monkeypatch, tmp_pa
 
 def test_subprocess_backend_opencode_skip_permissions_and_prompt(monkeypatch, tmp_path):
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 

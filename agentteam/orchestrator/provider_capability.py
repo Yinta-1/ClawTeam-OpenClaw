@@ -3,7 +3,7 @@
 声明每个 AI Provider 对 MCP 和 Skill 的支持能力。
 参考 SpectrAI ProviderCapabilityRegistry.ts 实现。
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

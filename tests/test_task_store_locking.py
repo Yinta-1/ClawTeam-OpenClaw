@@ -18,7 +18,7 @@ def _claim_task(
     save_delay: float,
     result_queue,
 ) -> None:
-    os.environ["CLAWTEAM_DATA_DIR"] = data_dir
+    os.environ["AGENTTEAM_DATA_DIR"] = data_dir
     store = TaskStore("demo")
     original_save = TaskStore._save_unlocked
 
@@ -39,7 +39,7 @@ def _claim_task(
 
 @pytest.mark.skipif("fork" not in mp.get_all_start_methods(), reason="requires fork start method")
 def test_only_one_agent_can_claim_task_concurrently(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     store = TaskStore("demo")
     task = store.create("demo task")
 

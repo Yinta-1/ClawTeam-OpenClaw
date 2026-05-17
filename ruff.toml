@@ -1,4 +1,4 @@
-# Ruff configuration for ClawTeam
+# Ruff configuration for AgentTeam
 # Ignoring some pedantic rules that generate many false positives in this codebase
 
 line-length = 120

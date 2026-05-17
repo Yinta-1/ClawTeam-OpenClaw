@@ -13,7 +13,7 @@ def _utc(hour: int, minute: int = 0, second: int = 0) -> datetime:
 
 
 def test_runtime_router_normalizes_team_message_to_runtime_envelope(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     router = RuntimeRouter(team_name="demo", agent_name="worker")
     message = TeamMessage(
         type=MessageType.message,
@@ -39,7 +39,7 @@ def test_default_routing_policy_throttles_same_source_target_and_tracks_pending_
     tmp_path,
     monkeypatch,
 ):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     policy = DefaultRoutingPolicy(team_name="demo", throttle_seconds=30)
 
     first = RuntimeEnvelope(source="leader", target="worker", summary="Initial update")
@@ -60,7 +60,7 @@ def test_default_routing_policy_throttles_same_source_target_and_tracks_pending_
 
 
 def test_runtime_router_dispatches_and_flushes_aggregated_messages(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
 
     class StubBackend:
         def __init__(self):
@@ -105,7 +105,7 @@ def test_runtime_router_dispatches_and_flushes_aggregated_messages(tmp_path, mon
 
 
 def test_default_routing_policy_failed_initial_injection_uses_retry_backoff(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     policy = DefaultRoutingPolicy(team_name="demo", throttle_seconds=30)
 
     first = RuntimeEnvelope(source="leader", target="worker", summary="Initial update")
@@ -127,7 +127,7 @@ def test_default_routing_policy_failed_initial_injection_uses_retry_backoff(tmp_
 
 
 def test_default_routing_policy_failed_flush_uses_retry_backoff(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     policy = DefaultRoutingPolicy(team_name="demo", throttle_seconds=30)
 
     first = RuntimeEnvelope(source="leader", target="worker", summary="Initial update")

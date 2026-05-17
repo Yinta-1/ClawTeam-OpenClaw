@@ -15,11 +15,11 @@ AgentTeam agents use these environment variables for identity:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CLAWTEAM_AGENT_ID` | Unique agent identifier | `a1b2c3d4e5f6` |
-| `CLAWTEAM_AGENT_NAME` | Human-readable agent name | `alice` |
-| `CLAWTEAM_AGENT_TYPE` | Agent role type | `leader`, `general-purpose`, `researcher` |
-| `CLAWTEAM_TEAM_NAME` | Team the agent belongs to | `dev-team` |
-| `CLAWTEAM_DATA_DIR` | Override data directory | `/tmp/clawteam-data` |
+| `AGENTTEAM_AGENT_ID` | Unique agent identifier | `a1b2c3d4e5f6` |
+| `AGENTTEAM_AGENT_NAME` | Human-readable agent name | `alice` |
+| `AGENTTEAM_AGENT_TYPE` | Agent role type | `leader`, `general-purpose`, `researcher` |
+| `AGENTTEAM_TEAM_NAME` | Team the agent belongs to | `dev-team` |
+| `AGENTTEAM_DATA_DIR` | Override data directory | `/tmp/agentteam-data` |
 
 When spawning agents via `agentteam spawn`, these are set automatically.
 

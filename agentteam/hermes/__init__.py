@@ -1,5 +1,5 @@
 """
-ClawTeam Hermes 集成层
+AgentTeam Hermes 集成层
 
 将 Hermes Agent 的核心优势集成到 OpenClaw 楚灵系统。
 包含 5 个 Phase 的实现：

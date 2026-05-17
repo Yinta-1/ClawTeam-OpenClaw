@@ -1,5 +1,5 @@
 """
-ClawTeam Performance Profiler
+AgentTeam Performance Profiler
 
 Provides profiling utilities for analyzing latency, throughput, memory, and resource usage.
 """
@@ -75,7 +75,7 @@ class LatencyResult:
 
 class Profiler:
     """
-    Performance profiler for ClawTeam operations.
+    Performance profiler for AgentTeam operations.
 
     Usage:
         profiler = Profiler()

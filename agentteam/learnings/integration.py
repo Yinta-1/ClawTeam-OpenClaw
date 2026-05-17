@@ -1,7 +1,7 @@
 """
 P12 .learnings 自动闭环集成
 
-将 learnings 系统与 ClawTeam Agent 集成：
+将 learnings 系统与 AgentTeam Agent 集成：
 1. 任务完成后自动捕获经验
 2. 周期性晋升检查
 3. 上下文注入到新任务
@@ -33,8 +33,8 @@ class LearningsIntegrator:
     """
 
     def __init__(self, learnings_dir: str = None, workspace_dir: str = None):
-        learnings_dir = learnings_dir or "~/.openclaw/workspace/ClawTeam-OpenClaw/.learnings"
-        workspace_dir = workspace_dir or "~/.openclaw/workspace/ClawTeam-OpenClaw"
+        learnings_dir = learnings_dir or "~/.openclaw/workspace/AgentTeam-OpenClaw/.learnings"
+        workspace_dir = workspace_dir or "~/.openclaw/workspace/AgentTeam-OpenClaw"
 
         self.learnings_dir = Path(learnings_dir).expanduser()
         self.learnings_dir.mkdir(parents=True, exist_ok=True)

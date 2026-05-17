@@ -148,22 +148,22 @@ class TestDiffStore:
         """Test creating a diff store."""
         with tempfile.TemporaryDirectory() as tmpdir:
             # Use environment variable to set data dir
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 store = DiffStore("test-team")
                 assert store.team_name == "test-team"
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_store_save_and_load(self):
         """Test saving and loading diff entries."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 store = DiffStore("test-team")
 
@@ -181,15 +181,15 @@ class TestDiffStore:
                 assert loaded.change_type == "modified"
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_store_list_diffs(self):
         """Test listing diff entries."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 store = DiffStore("test-team")
 
@@ -202,15 +202,15 @@ class TestDiffStore:
                 assert len(diffs) == 2
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_store_delete_diff(self):
         """Test deleting a diff entry."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 store = DiffStore("test-team")
 
@@ -222,9 +222,9 @@ class TestDiffStore:
                 assert len(store.list_diffs()) == 0
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
 
 class TestDiffTracker:
@@ -260,8 +260,8 @@ class TestDiffTracker:
     def test_tracker_track_change_created(self):
         """Test tracking created file change."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
                     f.write("New content")
@@ -279,15 +279,15 @@ class TestDiffTracker:
                     Path(f.name).unlink()
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_tracker_track_change_modified(self):
         """Test tracking modified file change."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 # Create file first
                 test_file = Path(tmpdir) / "test.txt"
@@ -308,15 +308,15 @@ class TestDiffTracker:
                 assert entry.change_type == "modified"
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_tracker_get_stats(self):
         """Test getting tracker statistics."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 tracker = DiffTracker("test-team")
 
@@ -333,9 +333,9 @@ class TestDiffTracker:
                 assert "totalEntries" in stats or "totalDiffs" in stats
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_tracker_take_snapshot(self):
         """Test taking a file snapshot."""
@@ -390,8 +390,8 @@ class TestDiffTrackerEdgeCases:
     def test_tracker_large_file_compression(self):
         """Test large file triggers compression."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            old_env = os.environ.get("CLAWTEAM_DATA_DIR")
-            os.environ["CLAWTEAM_DATA_DIR"] = tmpdir
+            old_env = os.environ.get("AGENTTEAM_DATA_DIR")
+            os.environ["AGENTTEAM_DATA_DIR"] = tmpdir
             try:
                 store = DiffStore("test-team", compress_threshold=100)
 
@@ -408,9 +408,9 @@ class TestDiffTrackerEdgeCases:
                 assert entry.is_compressed is True
             finally:
                 if old_env:
-                    os.environ["CLAWTEAM_DATA_DIR"] = old_env
+                    os.environ["AGENTTEAM_DATA_DIR"] = old_env
                 else:
-                    os.environ.pop("CLAWTEAM_DATA_DIR", None)
+                    os.environ.pop("AGENTTEAM_DATA_DIR", None)
 
     def test_tracker_clear_snapshots(self):
         """Test clearing snapshots."""

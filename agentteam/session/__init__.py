@@ -1,4 +1,4 @@
-"""Cross-session awareness module for ClawTeam.
+"""Cross-session awareness module for AgentTeam.
 
 This module provides session registry and cross-session communication capabilities,
 inspired by SpectrAI's supervisorPrompt.ts awareness layer.

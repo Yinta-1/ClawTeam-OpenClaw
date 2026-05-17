@@ -4,11 +4,11 @@ Messages can be configured to automatically expire after a specified duration.
 This helps prevent message accumulation in long-running deployments.
 
 Configuration:
-    export CLAWTEAM_MESSAGE_TTL=86400  # 24 hours in seconds (default)
-    export CLAWTEAM_MESSAGE_TTL=0      # Disable TTL (messages never expire)
+    export AGENTTEAM_MESSAGE_TTL=86400  # 24 hours in seconds (default)
+    export AGENTTEAM_MESSAGE_TTL=0      # Disable TTL (messages never expire)
 
 Environment Variables:
-    CLAWTEAM_MESSAGE_TTL: TTL in seconds (default: 86400 = 24 hours)
+    AGENTTEAM_MESSAGE_TTL: TTL in seconds (default: 86400 = 24 hours)
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ def get_message_ttl() -> int:
     Returns:
         TTL in seconds. 0 means no TTL (messages never expire).
     """
-    ttl_str = os.environ.get("CLAWTEAM_MESSAGE_TTL", str(DEFAULT_TTL_SECONDS))
+    ttl_str = os.environ.get("AGENTTEAM_MESSAGE_TTL", str(DEFAULT_TTL_SECONDS))
     try:
         ttl = int(ttl_str)
         if ttl < 0:

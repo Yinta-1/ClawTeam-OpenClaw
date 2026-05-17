@@ -83,7 +83,7 @@ class OpenClawAPIBackend(SpawnBackend):
                 cmd.append("agent")
 
         # 生成唯一 session key
-        session_key = f"clawteam-{team_name}-{agent_name}"
+        session_key = f"agentteam-{team_name}-{agent_name}"
         cmd.extend(["--session-id", session_key])
 
         # 添加 prompt
@@ -100,18 +100,18 @@ class OpenClawAPIBackend(SpawnBackend):
 
         # 构建环境
         spawn_env = os.environ.copy()
-        spawn_env["CLAWTEAM_AGENT_ID"] = agent_id
-        spawn_env["CLAWTEAM_AGENT_NAME"] = agent_name
-        spawn_env["CLAWTEAM_AGENT_TYPE"] = agent_type
-        spawn_env["CLAWTEAM_TEAM_NAME"] = team_name
-        spawn_env["CLAWTEAM_AGENT_LEADER"] = "0"
-        spawn_env["CLAWTEAM_MEMORY_SCOPE"] = f"custom:team-{team_name}"
+        spawn_env["AGENTTEAM_AGENT_ID"] = agent_id
+        spawn_env["AGENTTEAM_AGENT_NAME"] = agent_name
+        spawn_env["AGENTTEAM_AGENT_TYPE"] = agent_type
+        spawn_env["AGENTTEAM_TEAM_NAME"] = team_name
+        spawn_env["AGENTTEAM_AGENT_LEADER"] = "0"
+        spawn_env["AGENTTEAM_MEMORY_SCOPE"] = f"custom:team-{team_name}"
 
         # 添加 openclaw 到 PATH
         spawn_env["PATH"] = build_spawn_path(spawn_env.get("PATH"))
 
         if cwd:
-            spawn_env["CLAWTEAM_WORKSPACE_DIR"] = cwd
+            spawn_env["AGENTTEAM_WORKSPACE_DIR"] = cwd
         if env:
             spawn_env.update(env)
 
@@ -221,9 +221,9 @@ class OpenClawAPIBackend(SpawnBackend):
         try:
             import subprocess as sp
 
-            clawteam_bin = os.environ.get("CLAWTEAM_BIN", "agentteam")
+            agentteam_bin = os.environ.get("AGENTTEAM_BIN", "agentteam")
             sp.run(
-                [clawteam_bin, "lifecycle", "on-exit", "--team", team_name, "--agent", agent_name],
+                [agentteam_bin, "lifecycle", "on-exit", "--team", team_name, "--agent", agent_name],
                 capture_output=True,
                 timeout=10,
             )

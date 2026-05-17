@@ -1,4 +1,4 @@
-"""Tests for ClawTeam Event Tracking System (SpectrAI-inspired)."""
+"""Tests for AgentTeam Event Tracking System (SpectrAI-inspired)."""
 
 import json
 import os
@@ -10,13 +10,13 @@ from pathlib import Path
 
 # Set up test data directory before imports
 _temp_dir = tempfile.mkdtemp()
-os.environ["CLAWTEAM_DATA_DIR"] = _temp_dir
+os.environ["AGENTTEAM_DATA_DIR"] = _temp_dir
 
 from agentteam.events.models import (
     EventType,
     EventSeverity,
     EventCategory,
-    ClawTeamEvent,
+    AgentTeamEvent,
     create_team_event,
     create_task_event,
     create_agent_event,
@@ -85,9 +85,9 @@ class TestEventModels(unittest.TestCase):
         self.assertEqual(EventCategory.USAGE.value, "usage")
         self.assertEqual(EventCategory.SYSTEM.value, "system")
 
-    def test_clawteam_event_creation(self):
+    def test_agentteam_event_creation(self):
         """Test basic event creation."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.TASK_CREATED,
             category=EventCategory.TASK,
             team_name="test-team",
@@ -105,9 +105,9 @@ class TestEventModels(unittest.TestCase):
         self.assertIsNotNone(event.id)
         self.assertIsNotNone(event.timestamp)
 
-    def test_clawteam_event_to_dict(self):
+    def test_agentteam_event_to_dict(self):
         """Test event serialization to dict."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.AGENT_SPAWNED,
             category=EventCategory.AGENT,
             agent_name="worker-1",

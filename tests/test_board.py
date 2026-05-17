@@ -13,7 +13,7 @@ from agentteam.team.manager import TeamManager
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_overview leader/pendingMessages fields")
 def test_collect_overview_does_not_call_collect_team(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name="demo",
         leader_name="leader",
@@ -42,7 +42,7 @@ def test_collect_overview_does_not_call_collect_team(monkeypatch, tmp_path: Path
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_overview inbox count summing")
 def test_collect_overview_sums_inbox_counts_for_all_members(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name="demo",
         leader_name="leader",
@@ -115,7 +115,7 @@ def test_team_snapshot_cache_expires_after_ttl(monkeypatch):
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_team conflicts field")
 def test_collect_team_preserves_conflicts_field(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name="demo",
         leader_name="leader",
@@ -130,7 +130,7 @@ def test_collect_team_preserves_conflicts_field(monkeypatch, tmp_path: Path):
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_team memberKey/inboxName fields")
 def test_collect_team_exposes_member_inbox_identity(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name="demo",
         leader_name="leader",
@@ -148,7 +148,7 @@ def test_collect_team_exposes_member_inbox_identity(monkeypatch, tmp_path: Path)
 
 @pytest.mark.skip(reason="upstream feature not yet synced: collect_team message participant normalization")
 def test_collect_team_normalizes_message_participants(monkeypatch, tmp_path: Path):
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name="demo",
         leader_name="leader",
@@ -334,7 +334,7 @@ def test_proxy_fetches_allowed_github_content(monkeypatch):
 
 
 def test_board_ui_escapes_attacker_controlled_fields():
-    html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+    html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
     assert "escapeHtml(m.name)" in html
     assert "escapeHtml(m.agentType || 'Agent')" in html
@@ -357,7 +357,7 @@ class TestBoardHTTPEndpoints:
         import time
         import urllib.request
 
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
 
         # Create a test team
         TeamManager.create_team(
@@ -386,7 +386,7 @@ class TestBoardHTTPEndpoints:
             resp = urllib.request.urlopen("http://127.0.0.1:8765/", timeout=5)
             content = resp.read().decode("utf-8")
             assert "<!DOCTYPE html>" in content
-            assert "ClawTeam" in content
+            assert "AgentTeam" in content
         finally:
             server.server_close()
 
@@ -617,7 +617,7 @@ class TestBoardUIFeatures:
 
     def test_index_html_has_theme_toggle(self):
         """Test that index.html includes theme toggle functionality."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "toggleTheme" in html
         assert "theme-toggle" in html
@@ -625,7 +625,7 @@ class TestBoardUIFeatures:
 
     def test_index_html_has_task_drag_drop(self):
         """Test that index.html includes drag and drop functionality."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "draggable=\"true\"" in html
         assert "dragstart" in html or "dragging" in html
@@ -634,7 +634,7 @@ class TestBoardUIFeatures:
 
     def test_index_html_has_task_detail_modal(self):
         """Test that index.html includes task detail modal."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "task-detail-modal" in html
         assert "openTaskDetailModal" in html
@@ -642,35 +642,35 @@ class TestBoardUIFeatures:
 
     def test_index_html_has_message_filter(self):
         """Test that index.html includes message filtering."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "message-filter" in html or "filterMessages" in html
         assert "setMessageFilter" in html
 
     def test_index_html_has_responsive_design(self):
         """Test that index.html includes responsive CSS."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "@media" in html
         assert "max-width:" in html
 
     def test_index_html_has_patch_api_call(self):
         """Test that index.html calls PATCH API for status update."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "'PATCH'" in html or "method: 'PATCH'" in html
         assert "cycleTaskStatus" in html
 
     def test_index_html_has_team_overview(self):
         """Test that index.html includes team overview functionality."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "showTeamOverview" in html
         assert "team-overview-card" in html
 
     def test_index_html_has_mobile_menu(self):
         """Test that index.html includes mobile menu toggle."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         assert "mobile-menu-btn" in html
         assert "toggleMobileMenu" in html
@@ -704,7 +704,7 @@ class TestBoardServerSecurity:
 
     def test_escape_html_prevents_xss(self):
         """Test that escapeHtml function properly escapes dangerous chars."""
-        html = Path("clawteam/board/static/index.html").read_text(encoding="utf-8")
+        html = Path("agentteam/board/static/index.html").read_text(encoding="utf-8")
 
         # Check that escapeHtml is defined and used
         assert "function escapeHtml" in html

@@ -1,5 +1,5 @@
 """
-ClawTeam 自主技能创建引擎 - P13 实现
+AgentTeam 自主技能创建引擎 - P13 实现
 
 核心功能：
 1. 检测对话中的技能创建意图
@@ -49,7 +49,7 @@ class SkillSpec(BaseModel):
     name: str
     description: str
     version: str = "1.0.0"
-    author: str = "ClawTeam Auto Creator"
+    author: str = "AgentTeam Auto Creator"
     created_at: datetime = Field(default_factory=datetime.now)
     category: str = "automation"
     instructions: str

@@ -1,5 +1,5 @@
 """
-ClawTeam .learnings 自动闭环系统
+AgentTeam .learnings 自动闭环系统
 
 参考 Hermes 机制实现：
 - .learnings 文件格式解析

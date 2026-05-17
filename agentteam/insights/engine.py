@@ -574,7 +574,7 @@ class InsightsEngine:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ClawTeam Insights Report</title>
+    <title>AgentTeam Insights Report</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 20px; }}
         .section {{ margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }}
@@ -587,7 +587,7 @@ class InsightsEngine:
     </style>
 </head>
 <body>
-    <h1>ClawTeam Insights Report</h1>
+    <h1>AgentTeam Insights Report</h1>
     <p>Generated at: {report["generated_at"]}</p>
     <p>Time range: {report["time_range_days"]} days</p>
     

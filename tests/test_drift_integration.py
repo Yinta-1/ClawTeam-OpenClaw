@@ -11,7 +11,7 @@ from agentteam.team.models import TaskPriority, TaskStatus
 @pytest.fixture()
 def store(tmp_path, monkeypatch):
     """Create a FileTaskStore with a temp data directory."""
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     return FileTaskStore(team_name="test-team")
 
 

@@ -1,5 +1,5 @@
 """
-API versioning module for ClawTeam
+API versioning module for AgentTeam
 
 Provides API version management and backward compatibility support.
 """
@@ -315,9 +315,9 @@ def deprecated_since(version: APIVersion, replacement: str = None):
 
 # Global API info
 API_VERSION = APIVersion.LATEST.value
-API_TITLE = "ClawTeam API"
+API_TITLE = "AgentTeam API"
 API_DESCRIPTION = """
-ClawTeam Multi-Agent Coordination API
+AgentTeam Multi-Agent Coordination API
 
 ## Versioning
 

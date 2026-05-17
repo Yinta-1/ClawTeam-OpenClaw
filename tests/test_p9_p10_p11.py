@@ -1,6 +1,6 @@
 """测试 P9/P10/P11 功能：Provider 自适应、Git Worktree、Token 统计
 
-@author ClawTeam
+@author AgentTeam
 """
 
 import pytest

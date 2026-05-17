@@ -10,7 +10,7 @@ SkillEngine - 技能引擎
 - 默认值填充
 - 必填变量验证
 
-@author ClawTeam
+@author AgentTeam
 """
 
 import logging
@@ -323,7 +323,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["code", "review", "quality"],
     ),
     Skill(
@@ -356,7 +356,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["language", "translation"],
     ),
     Skill(
@@ -382,7 +382,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["code", "explain", "learning"],
     ),
     Skill(
@@ -417,7 +417,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["testing", "code", "quality"],
     ),
     Skill(
@@ -452,7 +452,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["documentation", "code"],
     ),
     Skill(
@@ -481,7 +481,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["refactoring", "code", "quality"],
     ),
     Skill(
@@ -506,7 +506,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["git", "commit"],
     ),
     Skill(
@@ -532,7 +532,7 @@ BUILTIN_SKILLS: List[Skill] = [
         is_enabled=True,
         source=SkillSource.BUILTIN,
         version="1.0.0",
-        author="ClawTeam",
+        author="AgentTeam",
         tags=["debug", "bug", "troubleshoot"],
     ),
 ]

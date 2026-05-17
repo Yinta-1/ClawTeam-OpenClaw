@@ -1,4 +1,4 @@
-"""Event models for ClawTeam Event Tracking System (SpectrAI-inspired).
+"""Event models for AgentTeam Event Tracking System (SpectrAI-inspired).
 
 This module defines the core event types and schemas for tracking
 team activities in an event-driven architecture.
@@ -19,7 +19,7 @@ def _now_iso() -> str:
 
 
 class EventType(str, Enum):
-    """Core event types for ClawTeam.
+    """Core event types for AgentTeam.
 
     Inspired by SpectrAI's turn_complete event-driven approach,
     these events track all meaningful state changes in the system.
@@ -91,8 +91,8 @@ class EventCategory(str, Enum):
     SYSTEM = "system"
 
 
-class ClawTeamEvent(BaseModel):
-    """Base event model for all ClawTeam events.
+class AgentTeamEvent(BaseModel):
+    """Base event model for all AgentTeam events.
 
     Inspired by SpectrAI's event-driven architecture, this model
     provides a consistent structure for all tracked events.
@@ -160,9 +160,9 @@ def create_team_event(
     agent_name: Optional[str] = None,
     message: str = "",
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for team-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.TEAM,
         team_name=team_name,
@@ -179,9 +179,9 @@ def create_task_event(
     agent_name: Optional[str] = None,
     message: str = "",
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for task-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.TASK,
         task_id=task_id,
@@ -201,9 +201,9 @@ def create_agent_event(
     message: str = "",
     data: Optional[Dict[str, Any]] = None,
     duration_ms: Optional[float] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for agent-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.AGENT,
         agent_name=agent_name,
@@ -223,9 +223,9 @@ def create_session_event(
     team_name: Optional[str] = None,
     message: str = "",
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for session-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.SESSION,
         session_id=session_id,
@@ -243,9 +243,9 @@ def create_message_event(
     recipient: Optional[str] = None,
     message: str = "",
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for message-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.MESSAGE,
         team_name=team_name,
@@ -262,9 +262,9 @@ def create_alert_event(
     message: str = "",
     severity: EventSeverity = EventSeverity.WARNING,
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for alert-related events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=event_type,
         category=EventCategory.ALERT,
         team_name=team_name,
@@ -283,9 +283,9 @@ def create_usage_event(
     estimated_cost: float,
     provider_id: str = "unknown",
     data: Optional[Dict[str, Any]] = None,
-) -> ClawTeamEvent:
+) -> AgentTeamEvent:
     """Factory function for usage/ cost tracking events."""
-    return ClawTeamEvent(
+    return AgentTeamEvent(
         event_type=EventType.USAGE_RECORDED,
         category=EventCategory.USAGE,
         team_name=team_name,
@@ -306,7 +306,7 @@ __all__ = [
     "EventType",
     "EventSeverity",
     "EventCategory",
-    "ClawTeamEvent",
+    "AgentTeamEvent",
     "create_team_event",
     "create_task_event",
     "create_agent_event",

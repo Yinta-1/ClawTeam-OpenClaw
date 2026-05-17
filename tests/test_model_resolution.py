@@ -255,21 +255,21 @@ model_tier = "cheap"
 
 
 class TestConfigModelFields:
-    """Test model fields on ClawTeamConfig."""
+    """Test model fields on AgentTeamConfig."""
 
     def test_config_default_model(self):
-        from agentteam.config import ClawTeamConfig
-        cfg = ClawTeamConfig(default_model="opus")
+        from agentteam.config import AgentTeamConfig
+        cfg = AgentTeamConfig(default_model="opus")
         assert cfg.default_model == "opus"
 
     def test_config_model_tiers(self):
-        from agentteam.config import ClawTeamConfig
-        cfg = ClawTeamConfig(model_tiers={"strong": "my-opus"})
+        from agentteam.config import AgentTeamConfig
+        cfg = AgentTeamConfig(model_tiers={"strong": "my-opus"})
         assert cfg.model_tiers["strong"] == "my-opus"
 
     def test_config_defaults_empty(self):
-        from agentteam.config import ClawTeamConfig
-        cfg = ClawTeamConfig()
+        from agentteam.config import AgentTeamConfig
+        cfg = AgentTeamConfig()
         assert cfg.default_model == ""
         assert cfg.model_tiers == {}
 
@@ -284,7 +284,7 @@ class TestIdentityModelField:
 
     def test_identity_model_from_env(self, monkeypatch):
         from agentteam.identity import AgentIdentity
-        monkeypatch.setenv("CLAWTEAM_MODEL", "sonnet-4.6")
+        monkeypatch.setenv("AGENTTEAM_MODEL", "sonnet-4.6")
         identity = AgentIdentity.from_env()
         assert identity.model == "sonnet-4.6"
 
@@ -292,14 +292,14 @@ class TestIdentityModelField:
         from agentteam.identity import AgentIdentity
         identity = AgentIdentity(model="opus")
         env = identity.to_env()
-        assert env["CLAWTEAM_MODEL"] == "opus"
+        assert env["AGENTTEAM_MODEL"] == "opus"
 
     def test_identity_no_model(self):
         from agentteam.identity import AgentIdentity
         identity = AgentIdentity()
         assert identity.model is None
         env = identity.to_env()
-        assert "CLAWTEAM_MODEL" not in env
+        assert "AGENTTEAM_MODEL" not in env
 
 
 class TestTeamMemberModelField:

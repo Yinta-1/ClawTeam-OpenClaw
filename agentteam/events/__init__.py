@@ -1,6 +1,6 @@
-"""ClawTeam Event Tracking System (SpectrAI-inspired).
+"""AgentTeam Event Tracking System (SpectrAI-inspired).
 
-This module provides event-driven tracking for ClawTeam,
+This module provides event-driven tracking for AgentTeam,
 inspired by SpectrAI's turn_complete event architecture.
 
 Core Components:
@@ -31,7 +31,7 @@ from agentteam.events.api import (
     get_event_api,
 )
 from agentteam.events.models import (
-    ClawTeamEvent,
+    AgentTeamEvent,
     EventCategory,
     EventSeverity,
     EventType,
@@ -55,7 +55,7 @@ __all__ = [
     "EventType",
     "EventSeverity",
     "EventCategory",
-    "ClawTeamEvent",
+    "AgentTeamEvent",
     "create_team_event",
     "create_task_event",
     "create_agent_event",

@@ -1,4 +1,4 @@
-"""Inbox rendering module for ClawTeam CLI.
+"""Inbox rendering module for AgentTeam CLI.
 
 Provides rich console rendering for inbox messages with image support.
 Uses iTerm2 inline images when available, with URL fallback for other terminals.

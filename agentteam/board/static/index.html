@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClawTeam Nexus · 指挥中心</title>
+    <title>AgentTeam Nexus · 指挥中心</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2358a6ff'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
     <style>
         /* ===== SpectrAI-inspired Dark Theme ===== */
@@ -1412,7 +1412,7 @@
             <div class="topbar-left">
                 <div class="topbar-logo">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    ClawTeam
+                    AgentTeam
                 </div>
                 <div class="topbar-mode">
                     <button class="active" id="mode-pro" onclick="switchMode('pro')">专业模式</button>
@@ -1630,7 +1630,7 @@
                 <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;">工作区热度</div>
                 <div class="workspace-heatmap" id="workspace-heatmap" style="display:flex;flex-direction:column;gap:6px;">
                     <div style="padding:8px 12px;background:var(--bg-tertiary);border-radius:6px;display:flex;justify-content:space-between;font-size:11px;">
-                        <span style="color:var(--text-secondary);">ClawTeam</span>
+                        <span style="color:var(--text-secondary);">AgentTeam</span>
                         <span style="color:var(--text-tertiary);">12 次</span>
                     </div>
                     <div style="padding:8px 12px;background:var(--bg-tertiary);border-radius:6px;display:flex;justify-content:space-between;font-size:11px;">
@@ -1942,7 +1942,7 @@
                                 <div class="avatar">🤖</div>
                                 <div class="content">
                                     <div class="author">AI 助手</div>
-                                    <div class="text">你好！我是 ClawTeam AI 助手。有什么我可以帮助你的吗？</div>
+                                    <div class="text">你好！我是 AgentTeam AI 助手。有什么我可以帮助你的吗？</div>
                                     <div class="time">刚刚</div>
                                 </div>
                             </div>
@@ -2261,7 +2261,7 @@
             <div class="page" id="page-settings">
                 <div class="dashboard-header">
                     <h1>系统设置</h1>
-                    <p>配置 ClawTeam 运行参数与行为</p>
+                    <p>配置 AgentTeam 运行参数与行为</p>
                 </div>
                 <div style="padding:0 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px;">
                     <!-- Settings Tabs -->
@@ -2285,8 +2285,8 @@
                                 <form id="form-general" class="settings-form">
                                     <div class="form-group">
                                         <label for="data_dir">数据目录</label>
-                                        <input type="text" id="data_dir" placeholder="~/.clawteam">
-                                        <small>ClawTeam 存储团队数据和任务的位置</small>
+                                        <input type="text" id="data_dir" placeholder="~/.agentteam">
+                                        <small>AgentTeam 存储团队数据和任务的位置</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="default_team">默认团队</label>
@@ -2990,7 +2990,7 @@
         };
         
         function getTemplates() {
-            const saved = localStorage.getItem('clawteam-team-templates');
+            const saved = localStorage.getItem('agentteam-team-templates');
             const custom = saved ? JSON.parse(saved) : {};
             return { ...DEFAULT_TEMPLATES, ...custom };
         }
@@ -3000,7 +3000,7 @@
             for (const [id, template] of Object.entries(templates)) {
                 if (!DEFAULT_TEMPLATES[id]) custom[id] = template;
             }
-            localStorage.setItem('clawteam-team-templates', JSON.stringify(custom));
+            localStorage.setItem('agentteam-team-templates', JSON.stringify(custom));
         }
         
         function applyTeamTemplate(templateId) {
@@ -4485,9 +4485,9 @@
             };
             
             // Save to localStorage for demo
-            const projects = JSON.parse(localStorage.getItem('clawteam-design-projects') || '[]');
+            const projects = JSON.parse(localStorage.getItem('agentteam-design-projects') || '[]');
             projects.push(project);
-            localStorage.setItem('clawteam-design-projects', JSON.stringify(projects));
+            localStorage.setItem('agentteam-design-projects', JSON.stringify(projects));
             
             loadDesignProjects();
             showToast('项目已创建');
@@ -4497,7 +4497,7 @@
             const list = document.getElementById('design-project-list');
             if (!list) return;
             
-            const projects = JSON.parse(localStorage.getItem('clawteam-design-projects') || '[]');
+            const projects = JSON.parse(localStorage.getItem('agentteam-design-projects') || '[]');
             
             if (projects.length === 0) {
                 list.innerHTML = `
@@ -4528,7 +4528,7 @@
         }
 
         function openDesignProject(projectId) {
-            const projects = JSON.parse(localStorage.getItem('clawteam-design-projects') || '[]');
+            const projects = JSON.parse(localStorage.getItem('agentteam-design-projects') || '[]');
             const project = projects.find(p => p.id === projectId);
             if (!project) return;
             
@@ -4653,7 +4653,7 @@
         }
 
         // ===== Mode Toggle (Professional/Simple) =====
-        let currentMode = localStorage.getItem('clawteam-mode') || 'pro';
+        let currentMode = localStorage.getItem('agentteam-mode') || 'pro';
         
         function switchMode(mode) {
             const proBtn = document.getElementById('mode-pro');
@@ -4663,14 +4663,14 @@
                 proBtn.classList.add('active');
                 simpleBtn.classList.remove('active');
                 currentMode = 'pro';
-                localStorage.setItem('clawteam-mode', 'pro');
+                localStorage.setItem('agentteam-mode', 'pro');
                 // Apply professional mode styles
                 document.body.classList.remove('simple-mode');
             } else {
                 simpleBtn.classList.add('active');
                 proBtn.classList.remove('active');
                 currentMode = 'simple';
-                localStorage.setItem('clawteam-mode', 'simple');
+                localStorage.setItem('agentteam-mode', 'simple');
                 // Apply simple mode styles
                 document.body.classList.add('simple-mode');
             }
@@ -4689,13 +4689,13 @@
         });
 
         // ===== Theme Toggle =====
-        let currentTheme = localStorage.getItem('clawteam-theme') || 'dark';
+        let currentTheme = localStorage.getItem('agentteam-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', currentTheme);
 
         function toggleTheme() {
             currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('clawteam-theme', currentTheme);
+            localStorage.setItem('agentteam-theme', currentTheme);
             const btn = document.querySelector('.theme-toggle-btn');
             btn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
         }
@@ -4907,25 +4907,25 @@
                 document.getElementById('task_store').value = cfg.task_store;
                 
                 // Set log level from localStorage
-                const logLevel = localStorage.getItem('clawteam_log_level') || 'info';
+                const logLevel = localStorage.getItem('agentteam_log_level') || 'info';
                 document.getElementById('log_level').value = logLevel;
-                document.getElementById('debug_mode').checked = localStorage.getItem('clawteam_debug_mode') === 'true';
+                document.getElementById('debug_mode').checked = localStorage.getItem('agentteam_debug_mode') === 'true';
             } catch (error) {
                 console.error('Error loading general config:', error);
             }
         }
         
         function loadAppearanceSettings() {
-            const theme = localStorage.getItem('clawteam-theme') || 'dark';
+            const theme = localStorage.getItem('agentteam-theme') || 'dark';
             document.getElementById('ui_theme').value = theme;
             
-            const density = localStorage.getItem('clawteam_density_mode') || 'comfortable';
+            const density = localStorage.getItem('agentteam_density_mode') || 'comfortable';
             document.getElementById('density_mode').value = density;
             
-            const fontSize = localStorage.getItem('clawteam_font_size') || 'medium';
+            const fontSize = localStorage.getItem('agentteam_font_size') || 'medium';
             document.getElementById('font_size').value = fontSize;
             
-            const animations = localStorage.getItem('clawteam_animations') !== 'false';
+            const animations = localStorage.getItem('agentteam_animations') !== 'false';
             document.getElementById('animations').checked = animations;
         }
         
@@ -4994,11 +4994,11 @@
                 };
                 
                 // Save to localStorage for demo purposes
-                localStorage.setItem('clawteam_general_settings', JSON.stringify(settings));
+                localStorage.setItem('agentteam_general_settings', JSON.stringify(settings));
                 
                 // Save log level separately
-                localStorage.setItem('clawteam_log_level', document.getElementById('log_level').value);
-                localStorage.setItem('clawteam_debug_mode', document.getElementById('debug_mode').checked);
+                localStorage.setItem('agentteam_log_level', document.getElementById('log_level').value);
+                localStorage.setItem('agentteam_debug_mode', document.getElementById('debug_mode').checked);
                 
                 return true;
             } catch (error) {
@@ -5026,7 +5026,7 @@
                     temperature: parseFloat(document.getElementById('temperature').value) || 0.7,
                 };
                 
-                localStorage.setItem('clawteam_model_settings', JSON.stringify(settings));
+                localStorage.setItem('agentteam_model_settings', JSON.stringify(settings));
                 return true;
             } catch (error) {
                 console.error('Error saving model settings:', error);
@@ -5115,9 +5115,9 @@
                 };
                 
                 // Save to localStorage
-                localStorage.setItem('clawteam_advanced_settings', JSON.stringify(settings));
-                localStorage.setItem('clawteam_log_level', settings.log_level);
-                localStorage.setItem('clawteam_debug_mode', settings.debug_mode);
+                localStorage.setItem('agentteam_advanced_settings', JSON.stringify(settings));
+                localStorage.setItem('agentteam_log_level', settings.log_level);
+                localStorage.setItem('agentteam_debug_mode', settings.debug_mode);
                 
                 return true;
             } catch (error) {
@@ -5136,14 +5136,14 @@
                 };
                 
                 // Save theme
-                localStorage.setItem('clawteam-theme', settings.ui_theme);
+                localStorage.setItem('agentteam-theme', settings.ui_theme);
                 document.documentElement.setAttribute('data-theme', settings.ui_theme);
                 
                 // Save other appearance settings
-                localStorage.setItem('clawteam_appearance_settings', JSON.stringify(settings));
-                localStorage.setItem('clawteam_density_mode', settings.density_mode);
-                localStorage.setItem('clawteam_font_size', settings.font_size);
-                localStorage.setItem('clawteam_animations', settings.animations);
+                localStorage.setItem('agentteam_appearance_settings', JSON.stringify(settings));
+                localStorage.setItem('agentteam_density_mode', settings.density_mode);
+                localStorage.setItem('agentteam_font_size', settings.font_size);
+                localStorage.setItem('agentteam_animations', settings.animations);
                 
                 // Update UI density if needed
                 updateUIDensity(settings.density_mode);
@@ -5166,7 +5166,7 @@
                     notification_desktop: document.getElementById('notification_desktop').checked,
                 };
                 
-                localStorage.setItem('clawteam_notification_settings', JSON.stringify(settings));
+                localStorage.setItem('agentteam_notification_settings', JSON.stringify(settings));
                 return true;
             } catch (error) {
                 console.error('Error saving notification settings:', error);
@@ -5707,7 +5707,7 @@
             
             // Simulate workspace data (in real app, this would come from file tracker)
             const workspaces = [
-                { path: 'C:\\Users\\...\\ClawTeam', count: 12, level: 'hot' },
+                { path: 'C:\\Users\\...\\AgentTeam', count: 12, level: 'hot' },
                 { path: 'C:\\Users\\...\\openclaw', count: 8, level: 'warm' },
                 { path: 'C:\\Users\\...\\石榴籽', count: 5, level: 'cool' }
             ];
@@ -5911,7 +5911,7 @@
                     <div class="avatar">🤖</div>
                     <div class="content">
                         <div class="author">AI 助手</div>
-                        <div class="text">你好！我是 ClawTeam AI 助手。有什么我可以帮助你的吗？</div>
+                        <div class="text">你好！我是 AgentTeam AI 助手。有什么我可以帮助你的吗？</div>
                         <div class="time">刚刚</div>
                     </div>
                 </div>
@@ -5970,12 +5970,12 @@
         }
         
         function saveChatHistory() {
-            localStorage.setItem('clawteam-chat-history', JSON.stringify(chatHistory));
+            localStorage.setItem('agentteam-chat-history', JSON.stringify(chatHistory));
         }
         
         function loadChatHistory() {
             try {
-                const saved = localStorage.getItem('clawteam-chat-history');
+                const saved = localStorage.getItem('agentteam-chat-history');
                 if (saved) {
                     chatHistory = JSON.parse(saved);
                     const container = document.getElementById('global-chat-messages');

@@ -81,72 +81,72 @@ ok "agentteam installed."
 
 # ─── 5. Find agentteam binary location ────────────────────────────────────────
 info "Locating agentteam binary..."
-CLAWTEAM_BIN=""
+AGENTTEAM_BIN=""
 
-# Guard: detect npm name-squatting package (a9logic/clawteam on npm)
+# Guard: detect npm name-squatting package (a9logic/agentteam on npm)
 if command -v agentteam &>/dev/null; then
     _CANDIDATE="$(command -v agentteam)"
     if head -1 "$_CANDIDATE" 2>/dev/null | grep -q node; then
-        warn "Found $_CANDIDATE but it is the npm name-squatting package (not the real ClawTeam)."
+        warn "Found $_CANDIDATE but it is the npm name-squatting package (not the real AgentTeam)."
         warn "Remove it with: npm uninstall -g agentteam"
         # Don't use it — fall through to pip-based detection
     else
-        CLAWTEAM_BIN="$_CANDIDATE"
+        AGENTTEAM_BIN="$_CANDIDATE"
     fi
 fi
 
 # Method 2: pip show + Scripts/bin dir
-if [[ -z "$CLAWTEAM_BIN" ]]; then
+if [[ -z "$AGENTTEAM_BIN" ]]; then
     SITE_PKG="$(pip show agentteam 2>/dev/null | grep -i '^Location:' | awk '{print $2}')"
     if [[ -n "$SITE_PKG" ]]; then
         # Typical bin is one level up from site-packages, in a bin/ directory
-        CANDIDATE="$(dirname "$(dirname "$SITE_PKG")")/bin/clawteam"
+        CANDIDATE="$(dirname "$(dirname "$SITE_PKG")")/bin/agentteam"
         if [[ -x "$CANDIDATE" ]]; then
-            CLAWTEAM_BIN="$CANDIDATE"
+            AGENTTEAM_BIN="$CANDIDATE"
         fi
     fi
 fi
 
 # Method 3: common paths
-if [[ -z "$CLAWTEAM_BIN" ]]; then
+if [[ -z "$AGENTTEAM_BIN" ]]; then
     for p in \
-        "$HOME/.local/bin/clawteam" \
-        "/usr/local/bin/clawteam" \
-        "/opt/homebrew/bin/clawteam" \
-        "$HOME/Library/Python/3.*/bin/clawteam" \
-        "/Library/Frameworks/Python.framework/Versions/3.*/bin/clawteam"; do
+        "$HOME/.local/bin/agentteam" \
+        "/usr/local/bin/agentteam" \
+        "/opt/homebrew/bin/agentteam" \
+        "$HOME/Library/Python/3.*/bin/agentteam" \
+        "/Library/Frameworks/Python.framework/Versions/3.*/bin/agentteam"; do
         # shellcheck disable=SC2086
         for expanded in $p; do
             if [[ -x "$expanded" ]]; then
-                CLAWTEAM_BIN="$expanded"
+                AGENTTEAM_BIN="$expanded"
                 break 2
             fi
         done
     done
 fi
 
-if [[ -z "$CLAWTEAM_BIN" ]]; then
+if [[ -z "$AGENTTEAM_BIN" ]]; then
     fail "Could not locate the agentteam binary. Ensure pip's bin directory is in your PATH."
 fi
-ok "agentteam binary found at: $CLAWTEAM_BIN"
+ok "agentteam binary found at: $AGENTTEAM_BIN"
 
-# ─── 6. Create symlink at ~/bin/clawteam ──────────────────────────────────────
-info "Setting up ~/bin/clawteam symlink..."
+# ─── 6. Create symlink at ~/bin/agentteam ──────────────────────────────────────
+info "Setting up ~/bin/agentteam symlink..."
 mkdir -p "$HOME/bin"
 
-if [[ -L "$HOME/bin/clawteam" ]]; then
-    EXISTING_TARGET="$(readlink "$HOME/bin/clawteam")"
-    if [[ "$EXISTING_TARGET" == "$CLAWTEAM_BIN" ]]; then
-        ok "Symlink already correct: ~/bin/clawteam -> $CLAWTEAM_BIN"
+if [[ -L "$HOME/bin/agentteam" ]]; then
+    EXISTING_TARGET="$(readlink "$HOME/bin/agentteam")"
+    if [[ "$EXISTING_TARGET" == "$AGENTTEAM_BIN" ]]; then
+        ok "Symlink already correct: ~/bin/agentteam -> $AGENTTEAM_BIN"
     else
-        ln -sf "$CLAWTEAM_BIN" "$HOME/bin/clawteam"
-        ok "Symlink updated: ~/bin/clawteam -> $CLAWTEAM_BIN"
+        ln -sf "$AGENTTEAM_BIN" "$HOME/bin/agentteam"
+        ok "Symlink updated: ~/bin/agentteam -> $AGENTTEAM_BIN"
     fi
-elif [[ -e "$HOME/bin/clawteam" ]]; then
-    warn "~/bin/clawteam already exists and is not a symlink. Skipping."
+elif [[ -e "$HOME/bin/agentteam" ]]; then
+    warn "~/bin/agentteam already exists and is not a symlink. Skipping."
 else
-    ln -s "$CLAWTEAM_BIN" "$HOME/bin/clawteam"
-    ok "Symlink created: ~/bin/clawteam -> $CLAWTEAM_BIN"
+    ln -s "$AGENTTEAM_BIN" "$HOME/bin/agentteam"
+    ok "Symlink created: ~/bin/agentteam -> $AGENTTEAM_BIN"
 fi
 
 # ─── 7. Verify ~/bin is in PATH ──────────────────────────────────────────────
@@ -165,7 +165,7 @@ fi
 # ─── 8. Copy SKILL.md ────────────────────────────────────────────────────────
 info "Installing OpenClaw skill file..."
 SKILL_SRC="$REPO_ROOT/skills/openclaw/SKILL.md"
-SKILL_DST="$HOME/.openclaw/workspace/skills/clawteam/SKILL.md"
+SKILL_DST="$HOME/.openclaw/workspace/skills/agentteam/SKILL.md"
 
 if [[ ! -f "$SKILL_SRC" ]]; then
     warn "Source skill file not found at $SKILL_SRC — skipping skill copy."
@@ -176,7 +176,7 @@ else
 fi
 
 # ─── 9. Configure exec approvals ─────────────────────────────────────────────
-info "Configuring exec approvals for ClawTeam..."
+info "Configuring exec approvals for AgentTeam..."
 APPROVALS_FILE="$HOME/.openclaw/exec-approvals.json"
 if [[ -f "$APPROVALS_FILE" ]]; then
     # Ensure security is "allowlist" (not "full") so spawned agents don't get
@@ -197,7 +197,7 @@ with open('$APPROVALS_FILE', 'w') as f:
     fi
     # Add agentteam to the allowlist for all agents
     if command -v openclaw &>/dev/null; then
-        openclaw approvals allowlist add --agent "*" "$CLAWTEAM_BIN" &>/dev/null 2>&1 && \
+        openclaw approvals allowlist add --agent "*" "$AGENTTEAM_BIN" &>/dev/null 2>&1 && \
             ok "Added agentteam to exec approvals allowlist" || \
             warn "Could not add agentteam to allowlist (gateway may not be running)"
     fi
@@ -207,8 +207,8 @@ fi
 
 # ─── 10. Verify agentteam --version ───────────────────────────────────────────
 info "Verifying installation..."
-if "$CLAWTEAM_BIN" --version &>/dev/null; then
-    CT_VERSION="$("$CLAWTEAM_BIN" --version 2>&1)"
+if "$AGENTTEAM_BIN" --version &>/dev/null; then
+    CT_VERSION="$("$AGENTTEAM_BIN" --version 2>&1)"
     ok "agentteam --version: $CT_VERSION"
 else
     warn "agentteam --version did not return cleanly, but the binary exists."
@@ -219,7 +219,7 @@ echo ""
 printf "${BOLD}${GREEN}"
 cat << 'MSG'
   ╔═══════════════════════════════════════════════════╗
-  ║   Installation complete! ClawTeam is ready.       ║
+  ║   Installation complete! AgentTeam is ready.       ║
   ╚═══════════════════════════════════════════════════╝
 MSG
 printf "${NC}\n"

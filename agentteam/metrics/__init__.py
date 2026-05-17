@@ -1,5 +1,5 @@
 """
-Metrics collection system for ClawTeam
+Metrics collection system for AgentTeam
 
 Provides metrics collection and export capabilities for monitoring
 system health, performance, and usage patterns.
@@ -121,7 +121,7 @@ class Histogram:
 
 class MetricsCollector:
     """
-    Central metrics collector for ClawTeam
+    Central metrics collector for AgentTeam
 
     Thread-safe metrics collection with support for:
     - Counters (cumulative counts)

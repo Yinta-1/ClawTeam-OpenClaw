@@ -1,5 +1,5 @@
 """
-ClawTeam .learnings 自动闭环系统测试
+AgentTeam .learnings 自动闭环系统测试
 
 测试 P12 实现：
 - .learnings 文件格式解析
@@ -432,7 +432,7 @@ class TestAutoCaptureEngine:
         # 测试文本格式
         text_summary = engine.generate_learning_summary(days=7, format="text")
         assert isinstance(text_summary, str)
-        assert "ClawTeam" in text_summary or "学习摘要" in text_summary
+        assert "AgentTeam" in text_summary or "学习摘要" in text_summary
         
     def test_get_context_for_task(self, engine):
         """测试为任务获取上下文"""

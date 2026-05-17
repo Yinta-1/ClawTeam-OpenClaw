@@ -1,4 +1,4 @@
-"""Session awareness CLI commands for ClawTeam (Typer)."""
+"""Session awareness CLI commands for AgentTeam (Typer)."""
 
 import json
 from datetime import datetime

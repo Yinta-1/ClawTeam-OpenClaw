@@ -7,14 +7,14 @@ import uuid
 from dataclasses import dataclass, field
 
 
-def _env(clawteam_key: str, claude_code_key: str, default: str = "") -> str:
-    """Read from CLAWTEAM_* first, fall back to OPENCLAW_* or CLAUDE_CODE_*."""
-    openclaw_key = clawteam_key.replace("CLAWTEAM_", "OPENCLAW_", 1)
-    return os.environ.get(clawteam_key) or os.environ.get(openclaw_key) or os.environ.get(claude_code_key) or default
+def _env(agentteam_key: str, claude_code_key: str, default: str = "") -> str:
+    """Read from AGENTTEAM_* first, fall back to OPENCLAW_* or CLAUDE_CODE_*."""
+    openclaw_key = agentteam_key.replace("AGENTTEAM_", "OPENCLAW_", 1)
+    return os.environ.get(agentteam_key) or os.environ.get(openclaw_key) or os.environ.get(claude_code_key) or default
 
 
-def _env_bool(clawteam_key: str, claude_code_key: str) -> bool:
-    val = _env(clawteam_key, claude_code_key)
+def _env_bool(agentteam_key: str, claude_code_key: str) -> bool:
+    val = _env(agentteam_key, claude_code_key)
     return val.lower() in ("1", "true", "yes")
 
 
@@ -37,36 +37,36 @@ class AgentIdentity:
 
     @classmethod
     def from_env(cls) -> AgentIdentity:
-        """Build identity from CLAWTEAM_*, OPENCLAW_*, or CLAUDE_CODE_* environment variables."""
-        user = os.environ.get("CLAWTEAM_USER", "")
+        """Build identity from AGENTTEAM_*, OPENCLAW_*, or CLAUDE_CODE_* environment variables."""
+        user = os.environ.get("AGENTTEAM_USER", "")
         if not user:
             from agentteam.config import load_config
 
             user = load_config().user
         return cls(
-            agent_id=_env("CLAWTEAM_AGENT_ID", "CLAUDE_CODE_AGENT_ID", uuid.uuid4().hex[:12]),
-            agent_name=_env("CLAWTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME", "agent"),
+            agent_id=_env("AGENTTEAM_AGENT_ID", "CLAUDE_CODE_AGENT_ID", uuid.uuid4().hex[:12]),
+            agent_name=_env("AGENTTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME", "agent"),
             user=user,
-            agent_type=_env("CLAWTEAM_AGENT_TYPE", "CLAUDE_CODE_AGENT_TYPE", "general-purpose"),
-            team_name=_env("CLAWTEAM_TEAM_NAME", "CLAUDE_CODE_TEAM_NAME") or None,
-            is_leader=_env_bool("CLAWTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER"),
-            plan_mode_required=_env_bool("CLAWTEAM_PLAN_MODE_REQUIRED", "CLAUDE_CODE_PLAN_MODE_REQUIRED"),
-            model=_env("CLAWTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
+            agent_type=_env("AGENTTEAM_AGENT_TYPE", "CLAUDE_CODE_AGENT_TYPE", "general-purpose"),
+            team_name=_env("AGENTTEAM_TEAM_NAME", "CLAUDE_CODE_TEAM_NAME") or None,
+            is_leader=_env_bool("AGENTTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER"),
+            plan_mode_required=_env_bool("AGENTTEAM_PLAN_MODE_REQUIRED", "CLAUDE_CODE_PLAN_MODE_REQUIRED"),
+            model=_env("AGENTTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
         )
 
     def to_env(self) -> dict[str, str]:
         """Export identity as environment variables (for spawning sub-agents)."""
         env = {
-            "CLAWTEAM_AGENT_ID": self.agent_id,
-            "CLAWTEAM_AGENT_NAME": self.agent_name,
-            "CLAWTEAM_AGENT_TYPE": self.agent_type,
-            "CLAWTEAM_AGENT_LEADER": "1" if self.is_leader else "0",
-            "CLAWTEAM_PLAN_MODE_REQUIRED": "1" if self.plan_mode_required else "0",
+            "AGENTTEAM_AGENT_ID": self.agent_id,
+            "AGENTTEAM_AGENT_NAME": self.agent_name,
+            "AGENTTEAM_AGENT_TYPE": self.agent_type,
+            "AGENTTEAM_AGENT_LEADER": "1" if self.is_leader else "0",
+            "AGENTTEAM_PLAN_MODE_REQUIRED": "1" if self.plan_mode_required else "0",
         }
         if self.user:
-            env["CLAWTEAM_USER"] = self.user
+            env["AGENTTEAM_USER"] = self.user
         if self.team_name:
-            env["CLAWTEAM_TEAM_NAME"] = self.team_name
+            env["AGENTTEAM_TEAM_NAME"] = self.team_name
         if self.model:
-            env["CLAWTEAM_MODEL"] = self.model
+            env["AGENTTEAM_MODEL"] = self.model
         return env

@@ -1,1 +1,1 @@
-"""Tests for ClawTeam Event Tracking System."""
+"""Tests for AgentTeam Event Tracking System."""

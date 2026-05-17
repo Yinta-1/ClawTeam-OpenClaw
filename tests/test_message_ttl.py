@@ -22,10 +22,10 @@ class TestTTLConfig:
             assert ttl == 86400
 
     def test_custom_ttl_from_environment(self):
-        """TTL can be set via CLAWTEAM_MESSAGE_TTL environment variable."""
+        """TTL can be set via AGENTTEAM_MESSAGE_TTL environment variable."""
         from agentteam.utils.ttl import get_message_ttl
 
-        with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
+        with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "3600"}):
             ttl = get_message_ttl()
             assert ttl == 3600
 
@@ -33,7 +33,7 @@ class TestTTLConfig:
         """TTL can be disabled by setting to 0."""
         from agentteam.utils.ttl import get_message_ttl, is_ttl_enabled
 
-        with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
+        with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "0"}):
             ttl = get_message_ttl()
             assert ttl == 0
             assert not is_ttl_enabled()
@@ -42,7 +42,7 @@ class TestTTLConfig:
         """Invalid TTL values fall back to default."""
         from agentteam.utils.ttl import get_message_ttl, DEFAULT_TTL_SECONDS
 
-        with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "invalid"}):
+        with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "invalid"}):
             ttl = get_message_ttl()
             assert ttl == DEFAULT_TTL_SECONDS
 
@@ -84,7 +84,7 @@ class TestTTLConfigClass:
         """TTLConfig.from_env() creates config from environment."""
         from agentteam.utils.ttl import TTLConfig
 
-        with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "7200"}):
+        with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "7200"}):
             config = TTLConfig.from_env()
             assert config.ttl_seconds == 7200
             assert config.enabled
@@ -119,8 +119,8 @@ class TestFileTransportTTL:
         """cleanup_expired_messages removes files older than TTL."""
         from agentteam.transport.file import FileTransport
 
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
-        monkeypatch.setenv("CLAWTEAM_MESSAGE_TTL", "10")
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AGENTTEAM_MESSAGE_TTL", "10")
 
         transport = FileTransport("test-team")
 
@@ -145,8 +145,8 @@ class TestFileTransportTTL:
         """cleanup_expired_messages returns 0 when TTL is disabled."""
         from agentteam.transport.file import FileTransport
 
-        monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
-        monkeypatch.setenv("CLAWTEAM_MESSAGE_TTL", "0")
+        monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("AGENTTEAM_MESSAGE_TTL", "0")
 
         transport = FileTransport("test-team")
 
@@ -173,7 +173,7 @@ class TestRedisTransportTTL:
         mock_client.expire.return_value = True
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
-            with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
+            with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "3600"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
 
@@ -192,7 +192,7 @@ class TestRedisTransportTTL:
         mock_client.lpush.return_value = 1
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
-            with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
+            with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "0"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
 
@@ -210,7 +210,7 @@ class TestRedisTransportTTL:
         mock_client.expire.return_value = True
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
-            with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "7200"}):
+            with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "7200"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
 
@@ -237,7 +237,7 @@ class TestRedisTransportTTL:
         mock_client.lrem.return_value = 1
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
-            with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "3600"}):
+            with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "3600"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
 
@@ -254,7 +254,7 @@ class TestRedisTransportTTL:
         mock_client.ping.return_value = True
 
         with patch("agentteam.transport.redis.RedisTransport._connect"):
-            with patch.dict(os.environ, {"CLAWTEAM_MESSAGE_TTL": "0"}):
+            with patch.dict(os.environ, {"AGENTTEAM_MESSAGE_TTL": "0"}):
                 transport = RedisTransport("test-team")
                 transport._client = mock_client
 

@@ -1,5 +1,5 @@
 """
-clawteam-agentd - 持久化 Agent 守护进程
+agentteam-agentd - 持久化 Agent 守护进程
 
 运行方式：
     agentteam agentd start  # 启动守护进程
@@ -19,7 +19,7 @@ clawteam-agentd - 持久化 Agent 守护进程
 └─────────────────────┬───────────────────────────────────────┘
                       │ IPC (Unix Socket / TCP)
 ┌─────────────────────▼───────────────────────────────────────┐
-│                  clawteam-agentd (Daemon)                   │
+│                  agentteam-agentd (Daemon)                   │
 │  ┌─────────────────────────────────────────────────────┐  │
 │  │              Agent Session Manager                    │  │
 │  │  - 加载 running_agents.json                         │  │
@@ -56,7 +56,7 @@ except Exception:
     LOCALE_ENCODING = "utf-8"
 
 # 路径配置
-DATA_DIR = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+DATA_DIR = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
 PID_FILE = DATA_DIR / "agentd.pid"
 # Windows 不支持 Unix Socket，使用 TCP
 import platform

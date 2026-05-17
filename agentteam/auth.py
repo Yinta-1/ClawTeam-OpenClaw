@@ -1,4 +1,4 @@
-"""Authentication module for ClawTeam Web UI."""
+"""Authentication module for AgentTeam Web UI."""
 
 from __future__ import annotations
 
@@ -51,9 +51,9 @@ class AuthManager:
     """Manages authentication for the Web UI."""
 
     def __init__(self):
-        self._api_key = os.environ.get("CLAWTEAM_API_KEY", "")
-        self._jwt_secret = os.environ.get("CLAWTEAM_JWT_SECRET", secrets.token_hex(32))
-        self._token_expiry = int(os.environ.get("CLAWTEAM_TOKEN_EXPIRY", "86400"))  # 24 hours
+        self._api_key = os.environ.get("AGENTTEAM_API_KEY", "")
+        self._jwt_secret = os.environ.get("AGENTTEAM_JWT_SECRET", secrets.token_hex(32))
+        self._token_expiry = int(os.environ.get("AGENTTEAM_TOKEN_EXPIRY", "86400"))  # 24 hours
         self._users: dict[str, dict] = {}
         self._tokens: dict[str, TokenPayload] = {}
 

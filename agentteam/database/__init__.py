@@ -1,5 +1,5 @@
 """
-Database migration module for ClawTeam
+Database migration module for AgentTeam
 
 Provides database schema version management and migration support.
 """
@@ -330,7 +330,7 @@ class MigrationManager:
 
 
 def get_default_migrations() -> list[Migration]:
-    """Get the default set of migrations for ClawTeam"""
+    """Get the default set of migrations for AgentTeam"""
     migrations = []
 
     # V1: Initial schema

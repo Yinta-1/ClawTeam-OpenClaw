@@ -95,7 +95,7 @@ Each spawned agent gets:
 - Its own tmux window (visible via `board attach`)
 - Its own git worktree branch (`agentteam/{team}/{agent}`)
 - An auto-injected coordination prompt (how to use agentteam CLI)
-- Environment variables: `CLAWTEAM_AGENT_NAME`, `CLAWTEAM_TEAM_NAME`, etc.
+- Environment variables: `AGENTTEAM_AGENT_NAME`, `AGENTTEAM_TEAM_NAME`, etc.
 
 **Spawn safety features:**
 - Commands are pre-validated before launch — you get a clear error if the agent CLI is not installed

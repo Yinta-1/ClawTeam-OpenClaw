@@ -1,5 +1,5 @@
 """
-ClawTeam 自动经验捕获引擎 - P12 .learnings 自动闭环实现
+AgentTeam 自动经验捕获引擎 - P12 .learnings 自动闭环实现
 
 核心功能：
 1. .learnings 文件格式解析
@@ -528,7 +528,7 @@ class AutoCaptureEngine:
             stats[entry_type] += 1
 
         if format == "markdown":
-            summary = f"""# ClawTeam 学习摘要 ({days}天)
+            summary = f"""# AgentTeam 学习摘要 ({days}天)
 
 ## 统计概览
 """
@@ -570,7 +570,7 @@ class AutoCaptureEngine:
         else:
             # 文本格式
             lines = []
-            lines.append(f"ClawTeam 学习摘要 ({days}天)")
+            lines.append(f"AgentTeam 学习摘要 ({days}天)")
             lines.append("=" * 50)
             lines.append("统计概览:")
             for entry_type, count in sorted(stats.items()):

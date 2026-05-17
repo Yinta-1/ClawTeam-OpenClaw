@@ -52,32 +52,32 @@ class TestAuthManager:
 
     def test_manager_initialization_no_api_key(self, monkeypatch):
         """Test manager initialization without API key."""
-        monkeypatch.delenv("CLAWTEAM_API_KEY", raising=False)
+        monkeypatch.delenv("AGENTTEAM_API_KEY", raising=False)
         manager = AuthManager()
         assert not manager.is_auth_required()
 
     def test_manager_initialization_with_api_key(self, monkeypatch):
         """Test manager initialization with API key."""
-        monkeypatch.setenv("CLAWTEAM_API_KEY", "test-api-key-123")
+        monkeypatch.setenv("AGENTTEAM_API_KEY", "test-api-key-123")
         manager = AuthManager()
         assert manager.is_auth_required()
         assert "admin" in manager._users
 
     def test_verify_api_key_correct(self, monkeypatch):
         """Test API key verification with correct key."""
-        monkeypatch.setenv("CLAWTEAM_API_KEY", "test-api-key-123")
+        monkeypatch.setenv("AGENTTEAM_API_KEY", "test-api-key-123")
         manager = AuthManager()
         assert manager.verify_api_key("test-api-key-123")
 
     def test_verify_api_key_wrong(self, monkeypatch):
         """Test API key verification with wrong key."""
-        monkeypatch.setenv("CLAWTEAM_API_KEY", "test-api-key-123")
+        monkeypatch.setenv("AGENTTEAM_API_KEY", "test-api-key-123")
         manager = AuthManager()
         assert not manager.verify_api_key("wrong-key")
 
     def test_create_token(self, monkeypatch):
         """Test creating a JWT token."""
-        monkeypatch.delenv("CLAWTEAM_API_KEY", raising=False)
+        monkeypatch.delenv("AGENTTEAM_API_KEY", raising=False)
         manager = AuthManager()
         token = manager.create_token("testuser", "user")
         assert token is not None
@@ -86,7 +86,7 @@ class TestAuthManager:
 
     def test_verify_token_valid(self, monkeypatch):
         """Test verifying a valid token."""
-        monkeypatch.delenv("CLAWTEAM_API_KEY", raising=False)
+        monkeypatch.delenv("AGENTTEAM_API_KEY", raising=False)
         manager = AuthManager()
         token = manager.create_token("testuser", "user")
         payload = manager.verify_token(token)
@@ -95,28 +95,28 @@ class TestAuthManager:
 
     def test_verify_token_invalid(self, monkeypatch):
         """Test verifying an invalid token."""
-        monkeypatch.delenv("CLAWTEAM_API_KEY", raising=False)
+        monkeypatch.delenv("AGENTTEAM_API_KEY", raising=False)
         manager = AuthManager()
         payload = manager.verify_token("invalid-token")
         assert payload is None
 
     def test_login_with_api_key_success(self, monkeypatch):
         """Test login with correct API key."""
-        monkeypatch.setenv("CLAWTEAM_API_KEY", "test-api-key-123")
+        monkeypatch.setenv("AGENTTEAM_API_KEY", "test-api-key-123")
         manager = AuthManager()
         token = manager.login_with_api_key("test-api-key-123")
         assert token is not None
 
     def test_login_with_api_key_failure(self, monkeypatch):
         """Test login with wrong API key."""
-        monkeypatch.setenv("CLAWTEAM_API_KEY", "test-api-key-123")
+        monkeypatch.setenv("AGENTTEAM_API_KEY", "test-api-key-123")
         manager = AuthManager()
         token = manager.login_with_api_key("wrong-key")
         assert token is None
 
     def test_logout(self, monkeypatch):
         """Test logout functionality."""
-        monkeypatch.delenv("CLAWTEAM_API_KEY", raising=False)
+        monkeypatch.delenv("AGENTTEAM_API_KEY", raising=False)
         manager = AuthManager()
         token = manager.create_token("testuser", "user")
         result = manager.logout(token)

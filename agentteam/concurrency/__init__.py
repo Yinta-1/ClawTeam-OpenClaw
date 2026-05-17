@@ -1,5 +1,5 @@
 """
-ClawTeam 并发控制模块
+AgentTeam 并发控制模块
 """
 
 from .guard import ConcurrencyConfig, ConcurrencyGuard, ResourceStatus

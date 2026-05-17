@@ -17,7 +17,7 @@ def _default_transport(team_name: str) -> Transport:
     """Resolve the transport from env / config, with optional P2P listener binding."""
     import os
 
-    name = os.environ.get("CLAWTEAM_TRANSPORT", "")
+    name = os.environ.get("AGENTTEAM_TRANSPORT", "")
     if not name:
         from agentteam.config import load_config
 

@@ -6,9 +6,9 @@ A common workflow for setting up a new project team.
 
 ```bash
 # 1. Set leader identity
-export CLAWTEAM_AGENT_ID="leader-001"
-export CLAWTEAM_AGENT_NAME="leader"
-export CLAWTEAM_AGENT_TYPE="leader"
+export AGENTTEAM_AGENT_ID="leader-001"
+export AGENTTEAM_AGENT_NAME="leader"
+export AGENTTEAM_AGENT_TYPE="leader"
 
 # 2. Create team
 agentteam team spawn-team my-project -d "Web app development" -n leader

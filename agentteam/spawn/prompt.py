@@ -1,7 +1,7 @@
 """Agent prompt builder — identity + task only.
 
 Coordination knowledge (how to use agentteam CLI) is provided
-by the ClawTeam Skill, not duplicated here.
+by the AgentTeam Skill, not duplicated here.
 """
 
 from __future__ import annotations
@@ -177,7 +177,7 @@ def build_agent_prompt(
             task,
             "",
             "## Coordination Protocol\n",
-            "- IMPORTANT: spawned OpenClaw workers run under exec allowlist mode. Use only the allowlisted executable path from $CLAWTEAM_BIN, not arbitrary shell commands.",
+            "- IMPORTANT: spawned OpenClaw workers run under exec allowlist mode. Use only the allowlisted executable path from $AGENTTEAM_BIN, not arbitrary shell commands.",
             f"- First action: run `agentteam task list {team_name} --owner {agent_name}` to discover your task ID.",
             f"- Starting a task: `agentteam task update {team_name} [TASK_ID] --status in_progress`",
             f"- Finishing a task: `agentteam task update {team_name} [TASK_ID] --status completed`",

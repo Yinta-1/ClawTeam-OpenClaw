@@ -1,5 +1,5 @@
 """
-Tool Registry - Register and discover tools for ClawTeam agents
+Tool Registry - Register and discover tools for AgentTeam agents
 
 Security: All credentials are loaded from environment variables or OpenClaw config.
 NEVER hardcode sensitive information!
@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, Optional
 
 
 class ToolRegistry:
-    """Tool registry for ClawTeam agents"""
+    """Tool registry for AgentTeam agents"""
 
     def __init__(self):
         self._tools: Dict[str, Dict[str, Any]] = {}
@@ -179,7 +179,7 @@ def list_tools_cli(category: str = None):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="ClawTeam Tool Registry")
+    parser = argparse.ArgumentParser(description="AgentTeam Tool Registry")
     parser.add_argument("--list", action="store_true", help="List all tools")
     parser.add_argument("--category", help="Filter by category")
 

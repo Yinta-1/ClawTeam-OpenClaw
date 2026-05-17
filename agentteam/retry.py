@@ -1,5 +1,5 @@
 """
-Error recovery module for ClawTeam
+Error recovery module for AgentTeam
 
 Provides retry logic, fallback strategies, and error recovery.
 """
@@ -12,7 +12,7 @@ from enum import Enum
 from functools import wraps
 from typing import Any, Callable, Optional, TypeVar
 
-from agentteam.exceptions import ClawTeamError
+from agentteam.exceptions import AgentTeamError
 from agentteam.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -138,7 +138,7 @@ class ErrorRecoveryManager:
         func: Callable[..., Any],
         *args,
         config: Optional[RetryConfig] = None,
-        error_types: tuple = (RetryableError, ClawTeamError),
+        error_types: tuple = (RetryableError, AgentTeamError),
         fallback_name: Optional[str] = None,
         **kwargs,
     ) -> FallbackResult:
@@ -258,7 +258,7 @@ class ErrorRecoveryManager:
 
 def retry(
     config: Optional[RetryConfig] = None,
-    error_types: tuple = (RetryableError, ClawTeamError),
+    error_types: tuple = (RetryableError, AgentTeamError),
 ):
     """
     Decorator to add retry logic to a function

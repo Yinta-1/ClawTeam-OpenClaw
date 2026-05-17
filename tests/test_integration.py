@@ -1,5 +1,5 @@
 """
-ClawTeam Integration Tests
+AgentTeam Integration Tests
 
 End-to-end tests that verify the full system works together.
 """
@@ -148,7 +148,7 @@ class TestIntegrationCrossCutting:
     def test_error_context_propagation(self):
         """Test that error context propagates through layers"""
         from agentteam.exceptions import (
-            ClawTeamError,
+            AgentTeamError,
             AgentError,
             ErrorContext,
         )

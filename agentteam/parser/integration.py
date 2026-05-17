@@ -1,4 +1,4 @@
-"""Integration module for output parser and notification manager with ClawTeam.
+"""Integration module for output parser and notification manager with AgentTeam.
 
 Provides integration with:
 - TeamBus (mailbox system)
@@ -21,8 +21,8 @@ from agentteam.parser.output_parser import OutputParser
 logger = logging.getLogger(__name__)
 
 
-class ClawTeamIntegration:
-    """Integration hub for parser and notification with ClawTeam systems."""
+class AgentTeamIntegration:
+    """Integration hub for parser and notification with AgentTeam systems."""
 
     def __init__(
         self,
@@ -157,16 +157,16 @@ class ClawTeamIntegration:
 
 
 # Global integration instances per team
-_integration_instances: dict[str, ClawTeamIntegration] = {}
+_integration_instances: dict[str, AgentTeamIntegration] = {}
 _integration_lock = threading.Lock()
 
 
-def get_integration(team_name: str) -> ClawTeamIntegration:
+def get_integration(team_name: str) -> AgentTeamIntegration:
     """Get or create integration instance for a team."""
     global _integration_instances
     with _integration_lock:
         if team_name not in _integration_instances:
-            _integration_instances[team_name] = ClawTeamIntegration(team_name)
+            _integration_instances[team_name] = AgentTeamIntegration(team_name)
         return _integration_instances[team_name]
 
 

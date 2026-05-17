@@ -93,7 +93,7 @@ def _generate_simple_response(message: str) -> str:
     # Greetings
     greetings = ["你好", "hi", "hello", "嗨", "您好", "hey"]
     if any(g in msg_lower for g in greetings):
-        return "你好！我是 ClawTeam AI 助手。很高兴为你服务！有什么我可以帮助你的吗？"
+        return "你好！我是 AgentTeam AI 助手。很高兴为你服务！有什么我可以帮助你的吗？"
 
     # Help requests
     if "帮助" in message or "help" in msg_lower or "怎么" in message:
@@ -107,9 +107,9 @@ def _generate_simple_response(message: str) -> str:
     if "任务" in message or "task" in msg_lower:
         return "任务管理是我的强项！你可以：\\n1. 在看板视图中拖拽任务 \\n2. 分配负责人 \\n3. 设置优先级"
 
-    # Questions about ClawTeam
+    # Questions about AgentTeam
     if "什么是" in message or "what is" in msg_lower:
-        return "ClawTeam 是一个多智能体团队协作平台。你可以创建多个 AI 助手组成的团队，协同完成复杂任务。"
+        return "AgentTeam 是一个多智能体团队协作平台。你可以创建多个 AI 助手组成的团队，协同完成复杂任务。"
 
     # Default response
     responses = [
@@ -166,7 +166,7 @@ def _normalize_proxy_target(target_url: str) -> str:
 def _fetch_proxy_content(target_url: str) -> bytes:
     normalized = _normalize_proxy_target(target_url)
     opener = urllib.request.build_opener(_NoRedirectHandler)
-    req = urllib.request.Request(normalized, headers={"User-Agent": "ClawTeam-Server"})
+    req = urllib.request.Request(normalized, headers={"User-Agent": "AgentTeam-Server"})
     with opener.open(req, timeout=10) as resp:
         final_url = resp.geturl()
         _normalize_proxy_target(final_url)
@@ -178,7 +178,7 @@ def _fetch_proxy_content(target_url: str) -> bytes:
         if not download_url:
             raise ValueError("GitHub README proxy target has no downloadable content")
         normalized = _normalize_proxy_target(download_url)
-        req = urllib.request.Request(normalized, headers={"User-Agent": "ClawTeam-Server"})
+        req = urllib.request.Request(normalized, headers={"User-Agent": "AgentTeam-Server"})
         with opener.open(req, timeout=10) as resp:
             _normalize_proxy_target(resp.geturl())
             return resp.read()
@@ -554,9 +554,9 @@ class BoardHandler(BaseHTTPRequestHandler):
                 # A restart is required for the change to take full effect
                 import os
 
-                os.environ["CLAWTEAM_TRANSPORT"] = new_transport
+                os.environ["AGENTTEAM_TRANSPORT"] = new_transport
                 if new_transport == "redis" and payload.get("redis_url"):
-                    os.environ["CLAWTEAM_REDIS_URL"] = payload.get("redis_url")
+                    os.environ["AGENTTEAM_REDIS_URL"] = payload.get("redis_url")
                 self._serve_json(
                     {
                         "status": "ok",
@@ -1252,13 +1252,13 @@ class BoardHandler(BaseHTTPRequestHandler):
                 import os
 
                 if payload.get("maxConcurrentSessions"):
-                    os.environ["CLAWTEAM_MAX_SESSIONS"] = str(payload["maxConcurrentSessions"])
+                    os.environ["AGENTTEAM_MAX_SESSIONS"] = str(payload["maxConcurrentSessions"])
                 if payload.get("maxTokensPerSession"):
-                    os.environ["CLAWTEAM_MAX_TOKENS_PER_SESSION"] = str(payload["maxTokensPerSession"])
+                    os.environ["AGENTTEAM_MAX_TOKENS_PER_SESSION"] = str(payload["maxTokensPerSession"])
                 if payload.get("maxQueueLength"):
-                    os.environ["CLAWTEAM_MAX_QUEUE_LENGTH"] = str(payload["maxQueueLength"])
+                    os.environ["AGENTTEAM_MAX_QUEUE_LENGTH"] = str(payload["maxQueueLength"])
                 if payload.get("timeoutMinutes"):
-                    os.environ["CLAWTEAM_SESSION_TIMEOUT"] = str(payload["timeoutMinutes"])
+                    os.environ["AGENTTEAM_SESSION_TIMEOUT"] = str(payload["timeoutMinutes"])
                 self._serve_json({"status": "ok", "limits": payload})
             except Exception as e:
                 self.send_error(400, str(e))
@@ -1334,7 +1334,7 @@ class BoardHandler(BaseHTTPRequestHandler):
                             }
 
                             # Build messages with context
-                            system_content = "你是 ClawTeam AI 助手，专门帮助用户管理多代理团队、任务分配和协作工作。"
+                            system_content = "你是 AgentTeam AI 助手，专门帮助用户管理多代理团队、任务分配和协作工作。"
                             if context:
                                 system_content += "\n\n以下是对话历史：\n" + context
 
@@ -1485,7 +1485,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         """Serve list of files in the workspace."""
         import os
 
-        workspace = os.environ.get("CLAWTEAM_WORKSPACE", os.path.expanduser("~/.agentteam/workspace"))
+        workspace = os.environ.get("AGENTTEAM_WORKSPACE", os.path.expanduser("~/.agentteam/workspace"))
         files = []
 
         try:
@@ -1571,7 +1571,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         """Serve transport connection status."""
         import os
 
-        transport_type = os.environ.get("CLAWTEAM_TRANSPORT", "file")
+        transport_type = os.environ.get("AGENTTEAM_TRANSPORT", "file")
 
         status_data = {
             "transport": transport_type,
@@ -1582,11 +1582,11 @@ class BoardHandler(BaseHTTPRequestHandler):
 
         # Add transport-specific info
         if transport_type == "redis":
-            redis_url = os.environ.get("CLAWTEAM_REDIS_URL", "redis://localhost:6379")
+            redis_url = os.environ.get("AGENTTEAM_REDIS_URL", "redis://localhost:6379")
             status_data["config"] = {
                 "url": redis_url,
-                "db": os.environ.get("CLAWTEAM_REDIS_DB", "0"),
-                "hasPassword": bool(os.environ.get("CLAWTEAM_REDIS_PASSWORD")),
+                "db": os.environ.get("AGENTTEAM_REDIS_DB", "0"),
+                "hasPassword": bool(os.environ.get("AGENTTEAM_REDIS_PASSWORD")),
             }
             # Try to get actual Redis status
             try:
@@ -1637,7 +1637,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         """Serve transport statistics (queue lengths, throughput)."""
         import os
 
-        transport_type = os.environ.get("CLAWTEAM_TRANSPORT", "file")
+        transport_type = os.environ.get("AGENTTEAM_TRANSPORT", "file")
 
         stats_data = {
             "transport": transport_type,
@@ -2327,10 +2327,10 @@ class BoardHandler(BaseHTTPRequestHandler):
         import os
 
         limits = {
-            "maxConcurrentSessions": int(os.environ.get("CLAWTEAM_MAX_SESSIONS", "10")),
-            "maxTokensPerSession": int(os.environ.get("CLAWTEAM_MAX_TOKENS_PER_SESSION", "50000")),
-            "maxQueueLength": int(os.environ.get("CLAWTEAM_MAX_QUEUE_LENGTH", "100")),
-            "timeoutMinutes": int(os.environ.get("CLAWTEAM_SESSION_TIMEOUT", "30")),
+            "maxConcurrentSessions": int(os.environ.get("AGENTTEAM_MAX_SESSIONS", "10")),
+            "maxTokensPerSession": int(os.environ.get("AGENTTEAM_MAX_TOKENS_PER_SESSION", "50000")),
+            "maxQueueLength": int(os.environ.get("AGENTTEAM_MAX_QUEUE_LENGTH", "100")),
+            "timeoutMinutes": int(os.environ.get("AGENTTEAM_SESSION_TIMEOUT", "30")),
         }
         self._serve_json(limits)
 
@@ -2448,7 +2448,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         from pathlib import Path
 
         # Get settings file path
-        config_dir = Path.home() / ".openclaw" / "workspace" / "ClawTeam-OpenClaw"
+        config_dir = Path.home() / ".openclaw" / "workspace" / "AgentTeam-OpenClaw"
         settings_file = config_dir / "settings.json"
 
         if self.command == "GET":
@@ -2588,7 +2588,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         from pathlib import Path
 
         # Simple file-based chat storage
-        chat_file = Path(os.environ.get("CLAWTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
+        chat_file = Path(os.environ.get("AGENTTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
         chat_file = chat_file.expanduser()
 
         try:
@@ -2716,7 +2716,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         import os
         from pathlib import Path
 
-        chat_file = Path(os.environ.get("CLAWTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
+        chat_file = Path(os.environ.get("AGENTTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
         chat_file = chat_file.expanduser()
 
         try:
@@ -2734,7 +2734,7 @@ class BoardHandler(BaseHTTPRequestHandler):
         import os
         from pathlib import Path
 
-        chat_file = Path(os.environ.get("CLAWTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
+        chat_file = Path(os.environ.get("AGENTTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json"))
         chat_file = chat_file.expanduser()
 
         try:
@@ -2882,7 +2882,7 @@ You can also type regular messages to communicate with the team.""",
 
                 from agentteam.team.tasks import TaskStore
 
-                transport_name = os.environ.get("CLAWTEAM_TRANSPORT", "file")
+                transport_name = os.environ.get("AGENTTEAM_TRANSPORT", "file")
                 store = TaskStore(transport_name)
                 task = store.create(subject=title, description=description, owner="")
 
@@ -2992,7 +2992,7 @@ You can also type regular messages to communicate with the team.""",
                 raise ValueError("No MiniMax API key found")
 
             # Build system prompt for 楚灵 persona
-            system_prompt = """你是楚灵，ClawTeam 的 AI 助手。
+            system_prompt = """你是楚灵，AgentTeam 的 AI 助手。
 
 性格特点：
 - 外冷内热，表面冷漠但内心温柔

@@ -43,7 +43,7 @@ def _ws_manager(team_name: str, repo: str | None = None) -> WorkspaceManager:
 
 
 def _agent_branch(team_name: str, agent_name: str) -> str:
-    return f"clawteam/{team_name}/{agent_name}"
+    return f"agentteam/{team_name}/{agent_name}"
 
 
 def _base_branch(team_name: str, agent_name: str, mgr: WorkspaceManager) -> str:

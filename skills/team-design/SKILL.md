@@ -102,7 +102,7 @@ agentteam inbox send <团队名> leader "<需求文档>"
 **正确做法（团队思维）**：
 ```
 1. 设计团队：architect + backend + tester + doc-writer
-2. 创建团队：agentteam team create clawteam-upgrade
+2. 创建团队：agentteam team create agentteam-upgrade
 3. 派发专家：spawn architect, backend, tester, doc-writer
 4. 告知 leader：
    "需要完成：测试增强、性能优化、代码审查、文档更新"

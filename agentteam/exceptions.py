@@ -1,5 +1,5 @@
 """
-ClawTeam Exception System
+AgentTeam Exception System
 
 Hierarchical exception classes with error codes, recovery strategies, and context tracking.
 """
@@ -33,10 +33,10 @@ class ErrorContext:
         }
 
 
-class ClawTeamError(Exception):
-    """Base exception for all ClawTeam errors"""
+class AgentTeamError(Exception):
+    """Base exception for all AgentTeam errors"""
 
-    code: str = "CLAWTEAM_ERROR"
+    code: str = "AGENTTEAM_ERROR"
     is_retryable: bool = False
     severity: str = "error"
 
@@ -69,7 +69,7 @@ class ClawTeamError(Exception):
 
 
 # Agent-related errors
-class AgentError(ClawTeamError):
+class AgentError(AgentTeamError):
     """Agent operation errors"""
 
     code = "AGENT_ERROR"
@@ -103,7 +103,7 @@ class AgentCrashedError(AgentError):
 
 
 # Team-related errors
-class TeamError(ClawTeamError):
+class TeamError(AgentTeamError):
     """Team operation errors"""
 
     code = "TEAM_ERROR"
@@ -129,7 +129,7 @@ class MemberNotFoundError(TeamError):
 
 
 # Session-related errors
-class SessionError(ClawTeamError):
+class SessionError(AgentTeamError):
     """Session operation errors"""
 
     code = "SESSION_ERROR"
@@ -148,7 +148,7 @@ class SessionExpiredError(SessionError):
 
 
 # Transport/Mailbox errors
-class TransportError(ClawTeamError):
+class TransportError(AgentTeamError):
     """Transport layer errors"""
 
     code = "TRANSPORT_ERROR"
@@ -168,7 +168,7 @@ class MailboxFullError(MailboxError):
 
 
 # Config errors
-class ConfigError(ClawTeamError):
+class ConfigError(AgentTeamError):
     """Configuration errors"""
 
     code = "CONFIG_ERROR"
@@ -187,14 +187,14 @@ class ConfigValidationError(ConfigError):
 
 
 # Retryable errors mixin
-class RetryableError(ClawTeamError):
+class RetryableError(AgentTeamError):
     """Marker for errors that can be retried"""
 
     is_retryable = True
 
 
 # Rate limiting
-class RateLimitError(ClawTeamError):
+class RateLimitError(AgentTeamError):
     """Rate limit exceeded"""
 
     code = "RATE_LIMIT"
@@ -202,7 +202,7 @@ class RateLimitError(ClawTeamError):
 
 
 # Authentication/Authorization
-class AuthError(ClawTeamError):
+class AuthError(AgentTeamError):
     """Authentication/Authorization errors"""
 
     code = "AUTH_ERROR"
@@ -235,7 +235,7 @@ class ErrorRecovery:
         Returns:
             (success, result) tuple
         """
-        if isinstance(error, ClawTeamError) and not error.is_retryable:
+        if isinstance(error, AgentTeamError) and not error.is_retryable:
             if retry_count >= self.max_retries:
                 return False, f"Max retries ({self.max_retries}) exceeded for non-retryable error"
             return False, None
@@ -284,14 +284,14 @@ class ErrorRecovery:
 
 def format_error(error: Exception) -> str:
     """Format an exception for logging"""
-    if isinstance(error, ClawTeamError):
+    if isinstance(error, AgentTeamError):
         return str(error)
     return f"[{error.__class__.__name__}] {str(error)}"
 
 
 __all__ = [
     "ErrorContext",
-    "ClawTeamError",
+    "AgentTeamError",
     "AgentError",
     "AgentNotFoundError",
     "AgentSpawnError",

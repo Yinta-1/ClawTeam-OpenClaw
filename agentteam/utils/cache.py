@@ -1,5 +1,5 @@
 """
-Simple caching utilities for ClawTeam
+Simple caching utilities for AgentTeam
 """
 
 import functools

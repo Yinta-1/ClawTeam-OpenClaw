@@ -1,4 +1,4 @@
-"""ClawTeam Tracker Module — 文件追踪和Token统计"""
+"""AgentTeam Tracker Module — 文件追踪和Token统计"""
 
 from __future__ import annotations
 

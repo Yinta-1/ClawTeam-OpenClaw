@@ -1,12 +1,12 @@
 /**
- * Performance Profiler Dashboard - Shows performance metrics for ClawTeam
+ * Performance Profiler Dashboard - Shows performance metrics for AgentTeam
  * 
  * Features:
  * - System metrics (CPU, memory, threads)
  * - Recent operation profiles
  * - Latency statistics
  * 
- * @author ClawTeam
+ * @author AgentTeam
  */
 
 class ProfilerDashboard {

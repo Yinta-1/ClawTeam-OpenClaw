@@ -10,7 +10,7 @@ from agentteam.spawn.base import SpawnBackend
 from agentteam.spawn.cli_env import (
     build_spawn_path,
     propagate_openclaw_gateway_token,
-    resolve_clawteam_executable,
+    resolve_agentteam_executable,
 )
 from agentteam.spawn.command_validation import (
     command_has_workspace_arg,
@@ -56,36 +56,36 @@ class SubprocessBackend(SpawnBackend):
             )
 
         spawn_env = os.environ.copy()
-        clawteam_bin = resolve_clawteam_executable()
+        agentteam_bin = resolve_agentteam_executable()
         spawn_env.update(
             {
-                "CLAWTEAM_AGENT_ID": agent_id,
-                "CLAWTEAM_AGENT_NAME": agent_name,
-                "CLAWTEAM_AGENT_TYPE": agent_type,
-                "CLAWTEAM_TEAM_NAME": team_name,
-                "CLAWTEAM_AGENT_LEADER": "0",
-                "CLAWTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
+                "AGENTTEAM_AGENT_ID": agent_id,
+                "AGENTTEAM_AGENT_NAME": agent_name,
+                "AGENTTEAM_AGENT_TYPE": agent_type,
+                "AGENTTEAM_TEAM_NAME": team_name,
+                "AGENTTEAM_AGENT_LEADER": "0",
+                "AGENTTEAM_MEMORY_SCOPE": f"custom:team-{team_name}",
             }
         )
         if parent_agent:
-            spawn_env["CLAWTEAM_PARENT_AGENT"] = parent_agent
+            spawn_env["AGENTTEAM_PARENT_AGENT"] = parent_agent
         # Propagate user if set
-        user = os.environ.get("CLAWTEAM_USER", "")
+        user = os.environ.get("AGENTTEAM_USER", "")
         if user:
-            spawn_env["CLAWTEAM_USER"] = user
+            spawn_env["AGENTTEAM_USER"] = user
         # Propagate transport if set
-        transport = os.environ.get("CLAWTEAM_TRANSPORT", "")
+        transport = os.environ.get("AGENTTEAM_TRANSPORT", "")
         if transport:
-            spawn_env["CLAWTEAM_TRANSPORT"] = transport
+            spawn_env["AGENTTEAM_TRANSPORT"] = transport
         if cwd:
-            spawn_env["CLAWTEAM_WORKSPACE_DIR"] = cwd
+            spawn_env["AGENTTEAM_WORKSPACE_DIR"] = cwd
         if model:
-            spawn_env["CLAWTEAM_MODEL"] = model
+            spawn_env["AGENTTEAM_MODEL"] = model
         if env:
             spawn_env.update(env)
         spawn_env["PATH"] = build_spawn_path(spawn_env.get("PATH"))
-        if os.path.isabs(clawteam_bin):
-            spawn_env.setdefault("CLAWTEAM_BIN", clawteam_bin)
+        if os.path.isabs(agentteam_bin):
+            spawn_env.setdefault("AGENTTEAM_BIN", agentteam_bin)
         if is_openclaw_command(command):
             propagate_openclaw_gateway_token(spawn_env)
 
@@ -131,14 +131,14 @@ class SubprocessBackend(SpawnBackend):
                 if "agent" not in final_command and "tui" not in final_command:
                     final_command.insert(1, "agent")
                 # Isolate each agent in its own session
-                session_key = f"clawteam-{team_name}-{agent_name}"
+                session_key = f"agentteam-{team_name}-{agent_name}"
                 final_command.extend(["--session-id", session_key, "--message", prompt])
             else:
                 final_command.extend(["-p", prompt])
 
         # Wrap with on-exit hook so task status updates immediately on exit
         cmd_str = " ".join(shlex.quote(c) for c in final_command)
-        exit_cmd = shlex.quote(clawteam_bin) if os.path.isabs(clawteam_bin) else "agentteam"
+        exit_cmd = shlex.quote(agentteam_bin) if os.path.isabs(agentteam_bin) else "agentteam"
         exit_hook = f"{exit_cmd} lifecycle on-exit --team {shlex.quote(team_name)} --agent {shlex.quote(agent_name)}"
         shell_cmd = f'trap "{exit_hook}" EXIT; {cmd_str}'
 

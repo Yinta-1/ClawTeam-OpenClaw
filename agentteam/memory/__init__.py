@@ -1,4 +1,4 @@
-"""ClawTeam 记忆模块 - 提供记忆存储与检索能力。
+"""AgentTeam 记忆模块 - 提供记忆存储与检索能力。
 
 借鉴 Hermes Agent 的 MemoryProvider 架构。
 核心概念：

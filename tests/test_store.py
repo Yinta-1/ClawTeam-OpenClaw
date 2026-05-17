@@ -54,7 +54,7 @@ class TestFactory:
         assert isinstance(store, FileTaskStore)
 
     def test_env_var_override(self, team_name):
-        with patch.dict(os.environ, {"CLAWTEAM_TASK_STORE": "file"}):
+        with patch.dict(os.environ, {"AGENTTEAM_TASK_STORE": "file"}):
             store = get_task_store(team_name)
         assert isinstance(store, FileTaskStore)
 
@@ -121,14 +121,14 @@ class TestStoreRoundTrip:
 
 class TestConfigIntegration:
     def test_task_store_in_config(self):
-        from agentteam.config import ClawTeamConfig
-        cfg = ClawTeamConfig()
+        from agentteam.config import AgentTeamConfig
+        cfg = AgentTeamConfig()
         assert hasattr(cfg, "task_store")
         assert cfg.task_store == ""
 
     def test_task_store_env_var_in_get_effective(self):
         from agentteam.config import get_effective
-        with patch.dict(os.environ, {"CLAWTEAM_TASK_STORE": "redis"}):
+        with patch.dict(os.environ, {"AGENTTEAM_TASK_STORE": "redis"}):
             val, source = get_effective("task_store")
         assert val == "redis"
         assert source == "env"

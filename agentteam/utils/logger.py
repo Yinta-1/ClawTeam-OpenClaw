@@ -1,7 +1,7 @@
-"""Structured logging utilities for ClawTeam.
+"""Structured logging utilities for AgentTeam.
 
 Provides JSON-formatted logging with trace_id support and per-module
-log level configuration via CLAWTEAM_LOG_LEVEL environment variable.
+log level configuration via AGENTTEAM_LOG_LEVEL environment variable.
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ def get_logger(name: str) -> StructuredLogger:
     Configures the logger with:
     - JSON formatter
     - Rotating file handler (10MB, 5 backups)
-    - Per-module log level from CLAWTEAM_LOG_LEVEL env var
+    - Per-module log level from AGENTTEAM_LOG_LEVEL env var
     """
     logger = StructuredLogger(name)
 
@@ -120,7 +120,7 @@ def get_logger(name: str) -> StructuredLogger:
         return logger
 
     # Get log level from environment
-    log_level_str = os.environ.get("CLAWTEAM_LOG_LEVEL", "INFO").upper()
+    log_level_str = os.environ.get("AGENTTEAM_LOG_LEVEL", "INFO").upper()
     log_level = getattr(logging, log_level_str, logging.INFO)
 
     # Set level
@@ -162,7 +162,7 @@ def init_logging() -> None:
 
     Call this once at application startup to configure root logging.
     """
-    log_level_str = os.environ.get("CLAWTEAM_LOG_LEVEL", "INFO").upper()
+    log_level_str = os.environ.get("AGENTTEAM_LOG_LEVEL", "INFO").upper()
     log_level = getattr(logging, log_level_str, logging.INFO)
 
     # Configure root logger

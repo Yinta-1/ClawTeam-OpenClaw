@@ -10,7 +10,7 @@ ConcurrencyGuard - 并发控制和资源检查
 - CPU检查（可选）
 - 系统资源状态监控
 
-@author ClawTeam
+@author AgentTeam
 """
 
 import logging

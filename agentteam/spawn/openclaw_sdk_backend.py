@@ -27,7 +27,7 @@ from agentteam.spawn.base import SpawnBackend
 
 GATEWAY_PORT = int(os.environ.get("OPENCLAW_GATEWAY_PORT", "18789"))
 GATEWAY_TOKEN = os.environ.get("OPENCLAW_GATEWAY_TOKEN", "")
-DATA_DIR = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+DATA_DIR = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
 
 
 # 持续运行 Block - 用于 specialist agents
@@ -101,7 +101,7 @@ class OpenClawSDKBackend(SpawnBackend):
 
     架构图：
     ┌─────────────────────────────────────────────────────────────┐
-    │                     ClawTeam CLI                            │
+    │                     AgentTeam CLI                            │
     │  agentteam spawn --backend openclaw_sdk --team foo ...       │
     └─────────────────────┬───────────────────────────────────────┘
                           │
@@ -203,7 +203,7 @@ class OpenClawSDKBackend(SpawnBackend):
         import urllib.parse
 
         # Board server configuration
-        board_port = int(os.environ.get("CLAWTEAM_BOARD_PORT", "8080"))
+        board_port = int(os.environ.get("AGENTTEAM_BOARD_PORT", "8080"))
         board_url = f"http://127.0.0.1:{board_port}/api/agents/activity"
 
         activity_data = {

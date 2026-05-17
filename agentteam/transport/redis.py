@@ -1,17 +1,17 @@
 """Redis-based transport for cross-machine message delivery.
 
-Provides a Redis-backed transport for distributed ClawTeam deployments:
+Provides a Redis-backed transport for distributed AgentTeam deployments:
 - Messages are stored in Redis lists (per-agent queues)
 - Supports connection pooling and automatic reconnection
 - Mixed mode: messages via Redis, config/tasks via file (optional)
 - SSL/TLS support for secure connections
 
 Configuration:
-    export CLAWTEAM_TRANSPORT=redis
-    export CLAWTEAM_REDIS_URL=redis://192.168.1.100:6379
-    export CLAWTEAM_REDIS_PASSWORD=secret  # optional
-    export CLAWTEAM_REDIS_SSL=true  # enable SSL/TLS
-    export CLAWTEAM_REDIS_CA_CERTS=/path/to/ca.pem  # optional CA certs
+    export AGENTTEAM_TRANSPORT=redis
+    export AGENTTEAM_REDIS_URL=redis://192.168.1.100:6379
+    export AGENTTEAM_REDIS_PASSWORD=secret  # optional
+    export AGENTTEAM_REDIS_SSL=true  # enable SSL/TLS
+    export AGENTTEAM_REDIS_CA_CERTS=/path/to/ca.pem  # optional CA certs
 """
 
 from __future__ import annotations
@@ -28,17 +28,17 @@ from agentteam.utils.ttl import get_message_ttl
 
 def _get_redis_url() -> str:
     """Get Redis URL from environment or default."""
-    return os.environ.get("CLAWTEAM_REDIS_URL", "redis://localhost:6379")
+    return os.environ.get("AGENTTEAM_REDIS_URL", "redis://localhost:6379")
 
 
 def _get_redis_password() -> str | None:
     """Get Redis password from environment."""
-    return os.environ.get("CLAWTEAM_REDIS_PASSWORD")
+    return os.environ.get("AGENTTEAM_REDIS_PASSWORD")
 
 
 def _get_redis_db() -> int:
     """Get Redis database number from environment."""
-    db_str = os.environ.get("CLAWTEAM_REDIS_DB", "0")
+    db_str = os.environ.get("AGENTTEAM_REDIS_DB", "0")
     try:
         return int(db_str)
     except ValueError:
@@ -49,9 +49,9 @@ def _get_redis_ssl() -> bool:
     """Get Redis SSL/TLS setting from environment.
 
     Returns:
-        True if CLAWTEAM_REDIS_SSL is set to 'true', '1', or 'yes' (case-insensitive).
+        True if AGENTTEAM_REDIS_SSL is set to 'true', '1', or 'yes' (case-insensitive).
     """
-    ssl_value = os.environ.get("CLAWTEAM_REDIS_SSL", "").lower()
+    ssl_value = os.environ.get("AGENTTEAM_REDIS_SSL", "").lower()
     return ssl_value in ("true", "1", "yes")
 
 
@@ -61,7 +61,7 @@ def _get_redis_ca_certs() -> str | None:
     Returns:
         Path to CA certificates file, or None if not set.
     """
-    ca_certs = os.environ.get("CLAWTEAM_REDIS_CA_CERTS")
+    ca_certs = os.environ.get("AGENTTEAM_REDIS_CA_CERTS")
     if ca_certs and os.path.isfile(ca_certs):
         return ca_certs
     return None
@@ -197,7 +197,7 @@ class RedisTransport(Transport):
         Messages are consumed from the right (RPOP) for FIFO order.
 
         TTL Support:
-        If CLAWTEAM_MESSAGE_TTL is set (>0), the inbox key will be set to
+        If AGENTTEAM_MESSAGE_TTL is set (>0), the inbox key will be set to
         expire after the TTL duration. This ensures old messages are
         automatically cleaned up by Redis.
         """
@@ -426,7 +426,7 @@ class RedisTransport(Transport):
 
         Args:
             agent_name: Agent whose inbox to set TTL on.
-            ttl_seconds: TTL in seconds. If None, uses CLAWTEAM_MESSAGE_TTL.
+            ttl_seconds: TTL in seconds. If None, uses AGENTTEAM_MESSAGE_TTL.
 
         Returns:
             True if TTL was set, False if key doesn't exist or TTL disabled.

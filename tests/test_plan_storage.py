@@ -9,7 +9,7 @@ from agentteam.team.plan import PlanManager
 
 
 def _create_team(tmp_path: Path, monkeypatch, team_name: str) -> None:
-    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENTTEAM_DATA_DIR", str(tmp_path))
     TeamManager.create_team(
         name=team_name,
         leader_name="leader",

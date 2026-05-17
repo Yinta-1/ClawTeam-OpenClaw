@@ -11,7 +11,7 @@ This reader is responsible for:
   2. Incrementally reading files (tail -f semantics), parsing each JSON line
   3. Converting Claude-specific format to NormalizedMessage and emitting 'message' events
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

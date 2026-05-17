@@ -1,4 +1,4 @@
-"""Event API integration for ClawTeam Board Server.
+"""Event API integration for AgentTeam Board Server.
 
 This module provides API handlers for the event tracking system,
 integrating with the existing board server endpoints.
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from agentteam.events.models import ClawTeamEvent, EventCategory, EventSeverity, EventType
+from agentteam.events.models import AgentTeamEvent, EventCategory, EventSeverity, EventType
 from agentteam.events.tracker import EventTracker, get_tracker
 
 
@@ -133,7 +133,7 @@ class EventAPI:
 
     def record_event(
         self,
-        event: ClawTeamEvent,
+        event: AgentTeamEvent,
     ) -> Dict[str, Any]:
         """Record a new event.
 
@@ -157,7 +157,7 @@ class EventAPI:
         message: str = "",
     ) -> Dict[str, Any]:
         """Record a team creation event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.TEAM_CREATED,
             category=EventCategory.TEAM,
             team_name=team_name,
@@ -174,7 +174,7 @@ class EventAPI:
         message: str = "",
     ) -> Dict[str, Any]:
         """Record a member joined event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.MEMBER_JOINED,
             category=EventCategory.TEAM,
             team_name=team_name,
@@ -193,7 +193,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record a task creation event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.TASK_CREATED,
             category=EventCategory.TASK,
             task_id=task_id,
@@ -213,7 +213,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record a task completion event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.TASK_COMPLETED,
             category=EventCategory.TASK,
             task_id=task_id,
@@ -238,7 +238,7 @@ class EventAPI:
         This event marks the completion of an agent's turn,
         enabling real-time tracking of agent activity.
         """
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.TURN_COMPLETE,
             category=EventCategory.AGENT,
             team_name=team_name,
@@ -260,7 +260,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record an agent spawn event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.AGENT_SPAWNED,
             category=EventCategory.AGENT,
             team_name=team_name,
@@ -282,7 +282,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record an agent termination event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.AGENT_TERMINATED,
             category=EventCategory.AGENT,
             team_name=team_name,
@@ -303,7 +303,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record a session start event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.SESSION_STARTED,
             category=EventCategory.SESSION,
             session_id=session_id,
@@ -323,7 +323,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record a session end event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.SESSION_ENDED,
             category=EventCategory.SESSION,
             session_id=session_id,
@@ -344,7 +344,7 @@ class EventAPI:
         data: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Record an alert event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.ALERT_TRIGGERED,
             category=EventCategory.ALERT,
             team_name=team_name,
@@ -365,7 +365,7 @@ class EventAPI:
         provider_id: str = "unknown",
     ) -> Dict[str, Any]:
         """Record a usage/cost tracking event."""
-        event = ClawTeamEvent(
+        event = AgentTeamEvent(
             event_type=EventType.USAGE_RECORDED,
             category=EventCategory.USAGE,
             team_name=team_name,

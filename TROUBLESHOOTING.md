@@ -287,13 +287,13 @@ Enable debug mode for detailed logging:
 
 ```bash
 # Environment variable
-export CLAWTEAM_DEBUG=1
+export AgentTeam_DEBUG=1
 
 # Or CLI flag
 agentteam --debug board serve
 
 # JSON logging for parsing
-export CLAWTEAM_LOG_JSON=1
+export AgentTeam_LOG_JSON=1
 ```
 
 ## Getting Help

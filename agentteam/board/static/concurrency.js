@@ -1,5 +1,5 @@
 /**
- * Concurrency Control Panel - Session monitoring and resource management for ClawTeam Web UI
+ * Concurrency Control Panel - Session monitoring and resource management for AgentTeam Web UI
  * 
  * Features:
  * - Active sessions count monitoring
@@ -8,7 +8,7 @@
  * - Session list with status indicators
  * - Real-time updates via WebSocket
  * 
- * @author ClawTeam Frontend
+ * @author AgentTeam Frontend
  */
 
 class ConcurrencyControl {

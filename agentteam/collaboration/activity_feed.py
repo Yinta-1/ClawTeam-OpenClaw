@@ -1,4 +1,4 @@
-"""Activity Feed for ClawTeam collaboration.
+"""Activity Feed for AgentTeam collaboration.
 
 Provides a real-time feed of team activities that agents can subscribe to.
 Tracks actions like task updates, messages sent, file changes, etc.

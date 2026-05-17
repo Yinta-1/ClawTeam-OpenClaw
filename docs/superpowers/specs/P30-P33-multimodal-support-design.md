@@ -189,7 +189,7 @@ All changes are **backward compatible**:
 ## File Structure
 
 ```
-clawteam/
+agentteam/
 ├── team/
 │   └── models.py              # Add FileAttachment, image fields, streaming types
 ├── notification/

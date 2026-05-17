@@ -284,7 +284,7 @@ def test_generate_report_html_format(engine):
     assert "html" in report
     assert isinstance(report["html"], str)
     assert "<!DOCTYPE html>" in report["html"]
-    assert "ClawTeam Insights Report" in report["html"]
+    assert "AgentTeam Insights Report" in report["html"]
 
 
 def test_generate_report_with_team_filter(engine):

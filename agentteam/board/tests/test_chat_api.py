@@ -22,8 +22,8 @@ class TestChatAPI(unittest.TestCase):
     def setUpClass(cls):
         """Set up test environment."""
         # Set test environment variables
-        os.environ["CLAWTEAM_CHAT_HISTORY"] = tempfile.mktemp(suffix=".json")
-        os.environ["CLAWTEAM_TRANSPORT"] = "memory"
+        os.environ["AGENTTEAM_CHAT_HISTORY"] = tempfile.mktemp(suffix=".json")
+        os.environ["AGENTTEAM_TRANSPORT"] = "memory"
 
         # Import after setting env vars
         from agentteam.board.server import BoardHandler, serve
@@ -38,7 +38,7 @@ class TestChatAPI(unittest.TestCase):
         if cls.server:
             cls.server.shutdown()
         # Clean up test file
-        chat_file = Path(os.environ.get("CLAWTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json")).expanduser()
+        chat_file = Path(os.environ.get("AGENTTEAM_CHAT_HISTORY", "~/.openclaw/chat_history.json")).expanduser()
         if chat_file.exists():
             chat_file.unlink()
 

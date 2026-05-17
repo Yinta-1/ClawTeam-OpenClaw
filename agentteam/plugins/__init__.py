@@ -1,7 +1,7 @@
 """
-Plugin system for ClawTeam
+Plugin system for AgentTeam
 
-Provides a plugin architecture for extending ClawTeam functionality.
+Provides a plugin architecture for extending AgentTeam functionality.
 """
 
 import importlib.util
@@ -89,7 +89,7 @@ class HookRegistry:
 
 class Plugin(ABC):
     """
-    Base class for ClawTeam plugins
+    Base class for AgentTeam plugins
 
     Example:
         class MyPlugin(Plugin):
@@ -155,7 +155,7 @@ class Plugin(ABC):
 
 class PluginManager:
     """
-    Central plugin manager for ClawTeam
+    Central plugin manager for AgentTeam
 
     Manages plugin discovery, loading, and hook execution.
     """
@@ -201,7 +201,7 @@ class PluginManager:
 
                 if init_file.exists() or plugin_file.exists():
                     try:
-                        module_name = f"clawteam_plugins.{item.name}"
+                        module_name = f"agentteam_plugins.{item.name}"
 
                         if init_file.exists():
                             spec = importlib.util.spec_from_file_location(module_name, init_file)
@@ -353,7 +353,7 @@ def get_plugin_manager() -> PluginManager:
 
 # Built-in hooks
 class Hooks:
-    """Standard ClawTeam hooks"""
+    """Standard AgentTeam hooks"""
 
     # Agent lifecycle
     PRE_AGENT_SPAWN = "pre_agent_spawn"

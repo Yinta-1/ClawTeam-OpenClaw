@@ -1,5 +1,5 @@
 /**
- * Notifications Manager - Real-time notification system for ClawTeam Web UI
+ * Notifications Manager - Real-time notification system for AgentTeam Web UI
  * 
  * Features:
  * - Real-time push via WebSocket
@@ -8,7 +8,7 @@
  * - Notification history
  * - Sound alerts (optional)
  * 
- * @author ClawTeam Frontend
+ * @author AgentTeam Frontend
  */
 
 class NotificationsManager {

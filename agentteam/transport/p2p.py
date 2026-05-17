@@ -114,7 +114,7 @@ class P2PTransport(Transport):
         self._heartbeat_stop.clear()
         self._heartbeat_thread = threading.Thread(
             target=self._heartbeat_loop,
-            name=f"clawteam-p2p-heartbeat-{self.team_name}-{self._bind_agent}",
+            name=f"agentteam-p2p-heartbeat-{self.team_name}-{self._bind_agent}",
             daemon=True,
         )
         self._heartbeat_thread.start()

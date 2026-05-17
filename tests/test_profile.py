@@ -1,5 +1,5 @@
 """
-ClawTeam 用户画像系统测试 (P14)
+AgentTeam 用户画像系统测试 (P14)
 
 测试 P14 实现：
 - 偏好提取（PreferenceExtractor）
@@ -429,17 +429,17 @@ class TestUserProfileManager:
             user_id="test_user",
             changes=[{
                 "type": "project",
-                "project_name": "ClawTeam升级",
+                "project_name": "AgentTeam升级",
                 "value": {
-                    "name": "ClawTeam升级",
+                    "name": "AgentTeam升级",
                     "status": "active",
                     "priority": "high"
                 }
             }]
         )
 
-        assert "ClawTeam升级" in profile.projects
-        assert profile.projects["ClawTeam升级"]["status"] == "active"
+        assert "AgentTeam升级" in profile.projects
+        assert profile.projects["AgentTeam升级"]["status"] == "active"
 
     def test_get_context_for_prompt_empty(self, manager):
         """测试生成空上下文字符串"""

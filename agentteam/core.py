@@ -1,5 +1,5 @@
 """
-ClawTeam Core - 真正的多 Agent 协作框架 (SDK 风格)
+AgentTeam Core - 真正的多 Agent 协作框架 (SDK 风格)
 
 核心概念：
 - CTTeam: 团队容器，管理多个 CTAgent

@@ -131,15 +131,15 @@ class TestTaskRouter:
     def setup_method(self):
         """Set up temporary directory for each test."""
         self.temp_dir = tempfile.mkdtemp()
-        self.original_data_dir = os.environ.get('CLAWTEAM_DATA_DIR')
-        os.environ['CLAWTEAM_DATA_DIR'] = self.temp_dir
+        self.original_data_dir = os.environ.get('AGENTTEAM_DATA_DIR')
+        os.environ['AGENTTEAM_DATA_DIR'] = self.temp_dir
         
     def teardown_method(self):
         """Clean up temporary directory."""
         if self.original_data_dir is not None:
-            os.environ['CLAWTEAM_DATA_DIR'] = self.original_data_dir
+            os.environ['AGENTTEAM_DATA_DIR'] = self.original_data_dir
         else:
-            os.environ.pop('CLAWTEAM_DATA_DIR', None)
+            os.environ.pop('AGENTTEAM_DATA_DIR', None)
         import shutil
         shutil.rmtree(self.temp_dir, ignore_errors=True)
         

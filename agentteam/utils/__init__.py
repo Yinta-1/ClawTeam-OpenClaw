@@ -1,4 +1,4 @@
-"""Utility modules for ClawTeam."""
+"""Utility modules for AgentTeam."""
 
 from agentteam.utils.cache import Cache, cached, clear_global_cache, get_cache, lru_cache
 from agentteam.utils.logger import get_logger, get_trace_id, set_trace_id

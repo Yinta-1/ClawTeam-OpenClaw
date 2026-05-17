@@ -1,4 +1,4 @@
-"""Git Worktree manager for ClawTeam.
+"""Git Worktree manager for AgentTeam.
 
 Provides isolated Git worktrees for concurrent tasks, enabling parallel
 development without conflicts.

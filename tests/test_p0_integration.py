@@ -56,7 +56,7 @@ class TestRetryIntegration:
 
     def test_file_store_with_retry(self, tmp_path: Path) -> None:
         """Test that FileTaskStore works with retry decorator."""
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path)
 
         try:
             store = FileTaskStore(team_name="test-team")
@@ -77,11 +77,11 @@ class TestRetryIntegration:
             assert retrieved.id == task.id
             assert retrieved.subject == "Test task"
         finally:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_file_transport_with_retry(self, tmp_path: Path) -> None:
         """Test that FileTransport works with retry decorator."""
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path)
 
         try:
             transport = FileTransport(team_name="test-team")
@@ -99,12 +99,12 @@ class TestRetryIntegration:
             assert len(messages) == 1
             assert messages[0] == test_data
         finally:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_retry_config_from_env(self, tmp_path: Path) -> None:
         """Test that retry config can be loaded from environment."""
-        os.environ["CLAWTEAM_RETRY_MAX_RETRIES"] = "5"
-        os.environ["CLAWTEAM_RETRY_BASE_DELAY"] = "0.1"
+        os.environ["AGENTTEAM_RETRY_MAX_RETRIES"] = "5"
+        os.environ["AGENTTEAM_RETRY_BASE_DELAY"] = "0.1"
 
         try:
             from agentteam.config import get_effective
@@ -117,8 +117,8 @@ class TestRetryIntegration:
             assert base_delay == "0.1"
             assert source == "env"
         finally:
-            del os.environ["CLAWTEAM_RETRY_MAX_RETRIES"]
-            del os.environ["CLAWTEAM_RETRY_BASE_DELAY"]
+            del os.environ["AGENTTEAM_RETRY_MAX_RETRIES"]
+            del os.environ["AGENTTEAM_RETRY_BASE_DELAY"]
 
     def test_retry_on_file_operation_failure(self, tmp_path: Path) -> None:
         """Test that retry decorator handles file operation failures."""
@@ -145,7 +145,7 @@ class TestEndToEndIntegration:
 
     def test_full_task_lifecycle(self, tmp_path: Path) -> None:
         """Test complete task lifecycle with retry and logging."""
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path)
 
         try:
             # Setup
@@ -196,11 +196,11 @@ class TestEndToEndIntegration:
             assert stats["completed"] == 1
 
         finally:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_concurrent_task_creation(self, tmp_path: Path) -> None:
         """Test concurrent task creation with retry."""
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path)
 
         try:
             store = FileTaskStore(team_name="concurrent-team")
@@ -226,11 +226,11 @@ class TestEndToEndIntegration:
             assert len(all_tasks) == 5
 
         finally:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+            del os.environ["AGENTTEAM_DATA_DIR"]
 
     def test_idempotent_task_creation(self, tmp_path: Path) -> None:
         """Test idempotent task creation with retry."""
-        os.environ["CLAWTEAM_DATA_DIR"] = str(tmp_path)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(tmp_path)
 
         try:
             store = FileTaskStore(team_name="idempotent-team")
@@ -260,4 +260,4 @@ class TestEndToEndIntegration:
             assert len(all_tasks) == 1
 
         finally:
-            del os.environ["CLAWTEAM_DATA_DIR"]
+            del os.environ["AGENTTEAM_DATA_DIR"]

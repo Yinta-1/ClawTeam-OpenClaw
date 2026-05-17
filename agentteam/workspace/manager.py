@@ -107,7 +107,7 @@ class WorkspaceManager:
     ) -> WorkspaceInfo:
         validate_identifier(team_name, "team name")
         validate_identifier(agent_name, "agent name")
-        branch = f"clawteam/{team_name}/{agent_name}"
+        branch = f"agentteam/{team_name}/{agent_name}"
         wt_path = ensure_within_root(_workspaces_root(), team_name, agent_name)
 
         # Crash recovery: if worktree already exists, clean it up first

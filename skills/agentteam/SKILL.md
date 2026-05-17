@@ -38,8 +38,8 @@ Tasks support dependency chains (`--blocks`, `--blocked-by`). Completing a task 
 **Board** — Terminal kanban dashboard. `board show` for single team, `board overview` for all teams,
 `board live` for real-time auto-refresh, `board attach` for tiled tmux view of all agents.
 
-**Identity** — Each agent has env vars (`CLAWTEAM_AGENT_ID`, `CLAWTEAM_AGENT_NAME`, `CLAWTEAM_AGENT_TYPE`,
-`CLAWTEAM_TEAM_NAME`). Set automatically when spawned via `agentteam spawn`.
+**Identity** — Each agent has env vars (`AGENTTEAM_AGENT_ID`, `AGENTTEAM_AGENT_NAME`, `AGENTTEAM_AGENT_TYPE`,
+`AGENTTEAM_TEAM_NAME`). Set automatically when spawned via `agentteam spawn`.
 
 ## Quick Start
 
@@ -47,9 +47,9 @@ Tasks support dependency chains (`--blocks`, `--blocked-by`). Completing a task 
 
 ```bash
 # Set identity for the current session
-export CLAWTEAM_AGENT_ID="leader-001"
-export CLAWTEAM_AGENT_NAME="leader"
-export CLAWTEAM_AGENT_TYPE="leader"
+export AGENTTEAM_AGENT_ID="leader-001"
+export AGENTTEAM_AGENT_NAME="leader"
+export AGENTTEAM_AGENT_TYPE="leader"
 
 # Create team
 agentteam team spawn-team my-team -d "Project team" -n leader
@@ -138,7 +138,7 @@ agentteam --json task wait my-team --timeout 600
 agentteam board attach my-team
 
 # Or attach to the tmux session manually and switch windows with Ctrl-b + number
-tmux attach -t clawteam-my-team
+tmux attach -t agentteam-my-team
 ```
 
 ## Command Groups

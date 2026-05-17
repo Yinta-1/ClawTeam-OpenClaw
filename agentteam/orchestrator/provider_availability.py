@@ -3,7 +3,7 @@
 检测本地是否安装了对应的 CLI 工具。
 参考 SpectrAI providerAvailability.ts 实现。
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

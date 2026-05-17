@@ -1,4 +1,4 @@
-"""Notification manager for ClawTeam multi-agent teams.
+"""Notification manager for AgentTeam multi-agent teams.
 
 Manages system notifications, do-not-disturb periods, notification deduplication,
 and WebSocket push for real-time notifications.
@@ -38,7 +38,7 @@ def _get_current_time() -> str:
 
 
 class NotificationManager:
-    """Manages notifications for ClawTeam sessions.
+    """Manages notifications for AgentTeam sessions.
 
     Features:
     - Do-not-disturb periods
@@ -247,7 +247,7 @@ class NotificationManager:
 
         return self._send_notification(
             notification_type=NotificationType.CONFIRMATION,
-            title="ClawTeam 需要确认",
+            title="AgentTeam 需要确认",
             body=body,
             session_id=session_id,
             session_name=session_name,
@@ -291,7 +291,7 @@ class NotificationManager:
 
         return self._send_notification(
             notification_type=NotificationType.ERROR,
-            title="ClawTeam 遇到错误",
+            title="AgentTeam 遇到错误",
             body=body,
             session_id=session_id,
             session_name=session_name,
@@ -312,7 +312,7 @@ class NotificationManager:
 
         return self._send_notification(
             notification_type=NotificationType.STUCK,
-            title="ClawTeam 可能卡住",
+            title="AgentTeam 可能卡住",
             body=body,
             session_id=session_id,
             session_name=session_name,

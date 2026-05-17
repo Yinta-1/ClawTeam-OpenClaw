@@ -1,4 +1,4 @@
-"""Intelligent task routing for ClawTeam multi-agent teams.
+"""Intelligent task routing for AgentTeam multi-agent teams.
 
 Routes tasks to the best-matched agent based on:
 - Historical performance (success rate, quality scores)

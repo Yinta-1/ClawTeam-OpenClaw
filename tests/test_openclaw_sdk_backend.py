@@ -1,5 +1,5 @@
 """
-Tests for OpenClaw SDK Backend - ClawTeam's native multi-agent coordination backend.
+Tests for OpenClaw SDK Backend - AgentTeam's native multi-agent coordination backend.
 
 This module tests the openclaw_sdk_backend which provides:
 1. Gateway Sessions API integration

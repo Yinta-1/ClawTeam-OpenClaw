@@ -579,22 +579,22 @@ class ModelRouter:
         """Load model tiers from environment variable or file config.
 
         Environment Variables:
-            CLAWTEAM_MODEL_TIERS_JSON: JSON string with model tier config
-            CLAWTEAM_MODEL_TIERS_FILE: Path to JSON config file
+            AGENTTEAM_MODEL_TIERS_JSON: JSON string with model tier config
+            AGENTTEAM_MODEL_TIERS_FILE: Path to JSON config file
         """
         import json
         import os
 
         # Try environment variable first
-        env_json = os.environ.get("CLAWTEAM_MODEL_TIERS_JSON")
+        env_json = os.environ.get("AGENTTEAM_MODEL_TIERS_JSON")
         if env_json:
             try:
                 return json.loads(env_json)
             except json.JSONDecodeError as e:
-                logger.warning(f"Failed to parse CLAWTEAM_MODEL_TIERS_JSON: {e}")
+                logger.warning(f"Failed to parse AGENTTEAM_MODEL_TIERS_JSON: {e}")
 
         # Try config file
-        config_file = os.environ.get("CLAWTEAM_MODEL_TIERS_FILE")
+        config_file = os.environ.get("AGENTTEAM_MODEL_TIERS_FILE")
         if config_file:
             try:
                 with open(config_file, "r") as f:

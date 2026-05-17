@@ -1,4 +1,4 @@
-"""Shared Context Board for ClawTeam collaboration.
+"""Shared Context Board for AgentTeam collaboration.
 
 Provides a shared space where agents can publish their current context
 (current task, file being worked on, notes, etc.) visible to all team members.

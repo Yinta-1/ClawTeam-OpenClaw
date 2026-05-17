@@ -1,4 +1,4 @@
-"""Presence status management for ClawTeam collaboration.
+"""Presence status management for AgentTeam collaboration.
 
 Provides enhanced presence tracking with custom status messages,
 availability indicators, and real-time status updates.

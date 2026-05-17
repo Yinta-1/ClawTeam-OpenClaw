@@ -1,5 +1,5 @@
 """
-Configuration management for ClawTeam
+Configuration management for AgentTeam
 
 Provides centralized configuration with validation and environment variable support.
 """
@@ -60,7 +60,7 @@ class BaseConfig:
         config = AppConfig.load("config.yaml")
 
         # Load from environment
-        config = AppConfig.load_from_env(prefix="CLAWTEAM_")
+        config = AppConfig.load_from_env(prefix="AGENTTEAM_")
     """
 
     _fields: dict[str, ConfigField] = {}
@@ -138,8 +138,8 @@ class BaseConfig:
         {PREFIX}{SECTION}_{FIELD}
 
         Example:
-            CLAWTEAM_AGENTS_MAX_CONCURRENT=10
-            CLAWTEAM_DEBUG=true
+            AGENTTEAM_AGENTS_MAX_CONCURRENT=10
+            AGENTTEAM_DEBUG=true
 
         Args:
             prefix: Environment variable prefix
@@ -347,7 +347,7 @@ def load_config(path: str = "config.yaml") -> AppConfig:
     if not config_path_obj.exists():
         # Try fallback locations in order:
         # 1. ~/.agentteam/config.yaml (NEW - primary fallback)
-        # 2. ~/.config/clawteam/config.json (legacy fallback)
+        # 2. ~/.config/agentteam/config.json (legacy fallback)
         fallbacks = [
             Path.home() / ".agentteam" / "config.yaml",
             Path.home() / ".config" / "agentteam" / "config.json",
@@ -360,7 +360,7 @@ def load_config(path: str = "config.yaml") -> AppConfig:
     return _config
 
 
-def load_config_from_env(prefix: str = "CLAWTEAM_") -> AppConfig:
+def load_config_from_env(prefix: str = "AGENTTEAM_") -> AppConfig:
     """Load configuration from environment variables"""
     global _config
     _config = AppConfig.load_from_env(prefix)
@@ -368,7 +368,7 @@ def load_config_from_env(prefix: str = "CLAWTEAM_") -> AppConfig:
 
 
 # Backward compatibility aliases
-ClawTeamConfig = AppConfig
+AgentTeamConfig = AppConfig
 
 
 def save_config(cfg: AppConfig) -> None:
@@ -394,7 +394,7 @@ def get_effective(key: str) -> tuple:
     Returns (value, source) tuple where source is 'env', 'file', or 'default'
     """
     # Check environment first
-    env_key = f"CLAWTEAM_{key.upper()}"
+    env_key = f"AGENTTEAM_{key.upper()}"
     if env_key in os.environ:
         return os.environ[env_key], "env"
 
@@ -422,7 +422,7 @@ __all__ = [
     "AlertConfig",
     "AppConfig",
     # Backward compatibility
-    "ClawTeamConfig",
+    "AgentTeamConfig",
     "save_config",
     "config_path",
     "get_effective",

@@ -1,5 +1,5 @@
 ---
-name: clawteam-dev
+name: agentteam-dev
 description: >
   This skill should be used when the user asks to "run e2e test", "test agentteam",
   "end-to-end test", "test agent team", "verify agentteam works", "dev test", or wants
@@ -34,7 +34,7 @@ This ensures a clean slate regardless of what team names were used before or if 
 
 ```bash
 # 1. Kill ALL agentteam tmux sessions
-for sess in $(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^clawteam-'); do
+for sess in $(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^agentteam-'); do
   tmux kill-session -t "$sess" 2>/dev/null
 done
 echo "tmux sessions cleaned"
@@ -46,7 +46,7 @@ done
 echo "worktrees cleaned"
 
 # 3. Delete ALL agentteam branches
-for br in $(git branch --list 'clawteam/*' | tr -d ' +'); do
+for br in $(git branch --list 'agentteam/*' | tr -d ' +'); do
   git branch -D "$br" 2>/dev/null
 done
 echo "branches cleaned"
@@ -58,8 +58,8 @@ echo "data cleaned"
 # 5. Verify clean state
 echo "=== Verification ==="
 git worktree list
-git branch --list 'clawteam/*' | grep . || echo "OK: no agentteam branches"
-tmux list-sessions 2>&1 | grep '^clawteam-' || echo "OK: no agentteam tmux sessions"
+git branch --list 'agentteam/*' | grep . || echo "OK: no agentteam branches"
+tmux list-sessions 2>&1 | grep '^agentteam-' || echo "OK: no agentteam tmux sessions"
 ls ~/.agentteam/ 2>/dev/null
 ```
 
@@ -69,9 +69,9 @@ ls ~/.agentteam/ 2>/dev/null
 ### Step 2: Set Leader Identity
 
 ```bash
-export CLAWTEAM_AGENT_ID="e2e-leader-001"
-export CLAWTEAM_AGENT_NAME="leader"
-export CLAWTEAM_AGENT_TYPE="leader"
+export AGENTTEAM_AGENT_ID="e2e-leader-001"
+export AGENTTEAM_AGENT_NAME="leader"
+export AGENTTEAM_AGENT_TYPE="leader"
 ```
 
 These env vars MUST be set for all subsequent commands in this test.
@@ -118,7 +118,7 @@ agentteam spawn --team e2e-test --agent-name worker3 \
   --task "Write pytest tests in test_all.py for hello.py (hello function) and goodbye.py (goodbye function). When done, mark your task as completed and send a summary to leader."
 ```
 
-**Expected**: Each prints `OK Agent '<name>' spawned in tmux (clawteam-e2e-test:<name>)` with a workspace path.
+**Expected**: Each prints `OK Agent '<name>' spawned in tmux (agentteam-e2e-test:<name>)` with a workspace path.
 
 ### Step 6: Verify Team State
 
@@ -126,7 +126,7 @@ agentteam spawn --team e2e-test --agent-name worker3 \
 agentteam team status e2e-test
 agentteam board show e2e-test
 git worktree list
-tmux list-windows -t clawteam-e2e-test
+tmux list-windows -t agentteam-e2e-test
 ```
 
 **Expected**:
@@ -173,7 +173,7 @@ Reuse the same full cleanup from Step 1 to remove everything created during this
 
 ```bash
 # Kill ALL agentteam tmux sessions
-for sess in $(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^clawteam-'); do
+for sess in $(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^agentteam-'); do
   tmux kill-session -t "$sess" 2>/dev/null
 done
 
@@ -183,7 +183,7 @@ for wt in $(git worktree list --porcelain | grep 'worktree.*/\.agentteam/' | awk
 done
 
 # Delete ALL agentteam branches
-for br in $(git branch --list 'clawteam/*' | tr -d ' +'); do
+for br in $(git branch --list 'agentteam/*' | tr -d ' +'); do
   git branch -D "$br" 2>/dev/null
 done
 
@@ -199,8 +199,8 @@ echo "E2E test cleanup complete"
 
 ```bash
 git worktree list | grep -v '^\/' | head -1  # should show only main
-git branch --list 'clawteam/*' | grep . || echo "OK: no agentteam branches"
-tmux list-sessions 2>&1 | grep '^clawteam-' || echo "OK: no agentteam tmux sessions"
+git branch --list 'agentteam/*' | grep . || echo "OK: no agentteam branches"
+tmux list-sessions 2>&1 | grep '^agentteam-' || echo "OK: no agentteam tmux sessions"
 ls ~/.agentteam/teams/ 2>&1 | grep -q "No such file" && echo "OK: no team data"
 ls ~/.agentteam/tasks/ 2>&1 | grep -q "No such file" && echo "OK: no task data"
 ls ~/.agentteam/workspaces/ 2>&1 | grep -q "No such file" && echo "OK: no workspace data"
@@ -212,7 +212,7 @@ ls ~/.agentteam/workspaces/ 2>&1 | grep -q "No such file" && echo "OK: no worksp
 
 ### With P2P Transport
 
-Add `--transport p2p` and `export CLAWTEAM_TRANSPORT=p2p` before Step 3 to test ZeroMQ direct messaging with file fallback. The rest of the steps remain the same.
+Add `--transport p2p` and `export AGENTTEAM_TRANSPORT=p2p` before Step 3 to test ZeroMQ direct messaging with file fallback. The rest of the steps remain the same.
 
 ### With subprocess Backend
 

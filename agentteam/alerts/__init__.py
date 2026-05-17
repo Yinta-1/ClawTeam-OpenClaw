@@ -1,5 +1,5 @@
 """
-Alert system for ClawTeam
+Alert system for AgentTeam
 
 Provides alerting capabilities based on metrics thresholds
 and system health checks.
@@ -174,7 +174,7 @@ class WebhookAlertChannel(AlertChannel):
 
 class AlertManager:
     """
-    Central alert manager for ClawTeam
+    Central alert manager for AgentTeam
 
     Manages alert rules, evaluates conditions, and dispatches alerts
     to configured channels.

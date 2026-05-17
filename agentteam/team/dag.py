@@ -1,4 +1,4 @@
-"""DAG (Directed Acyclic Graph) dependency resolution for ClawTeam tasks.
+"""DAG (Directed Acyclic Graph) dependency resolution for AgentTeam tasks.
 
 Provides topological sorting, cycle detection, ready-task identification,
 and blocking-task analysis for task dependency graphs.

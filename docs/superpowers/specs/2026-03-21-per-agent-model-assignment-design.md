@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-21
 **Status:** Draft
-**Issue:** https://github.com/win4r/ClawTeam-OpenClaw/issues/1
+**Issue:** https://github.com/win4r/AgentTeam-OpenClaw/issues/1
 
 ## Problem
 
@@ -94,13 +94,13 @@ class AgentIdentity:
 def from_env(cls) -> "AgentIdentity":
     return cls(
         ...existing fields...
-        model=_env("CLAWTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
+        model=_env("AGENTTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
     )
 
 def to_env(self) -> dict[str, str]:
     env = {...existing vars...}
     if self.model:
-        env["CLAWTEAM_MODEL"] = self.model
+        env["AGENTTEAM_MODEL"] = self.model
     return env
 ```
 
@@ -252,7 +252,7 @@ Insert `--model` into the OpenClaw command construction:
 
 ```python
 if _is_openclaw_command(normalized_command):
-    session_key = f"clawteam-{team_name}-{agent_name}"
+    session_key = f"agentteam-{team_name}-{agent_name}"
     if final_command[0].endswith("openclaw") and len(final_command) == 1:
         final_command = [final_command[0], "tui", "--session", session_key]
         if model:
@@ -281,7 +281,7 @@ elif _is_openclaw_command(normalized_command):
     # OpenClaw agent mode
     if "agent" not in final_command and "tui" not in final_command:
         final_command.insert(1, "agent")
-    session_key = f"clawteam-{team_name}-{agent_name}"
+    session_key = f"agentteam-{team_name}-{agent_name}"
     if model:
         final_command.extend(["--model", model])
     final_command.extend(["--session-id", session_key, "--message", prompt])
@@ -293,15 +293,15 @@ Both backends add to env_vars:
 
 ```python
 if model:
-    env_vars["CLAWTEAM_MODEL"] = model
+    env_vars["AGENTTEAM_MODEL"] = model
 ```
 
-**Purpose of `CLAWTEAM_MODEL`:** Allows spawned agents to introspect their assigned model (e.g., for logging, cost tracking, or self-identification in team status). It is read by `AgentIdentity` but does not affect model selection — that is already determined before spawn.
+**Purpose of `AGENTTEAM_MODEL`:** Allows spawned agents to introspect their assigned model (e.g., for logging, cost tracking, or self-identification in team status). It is read by `AgentIdentity` but does not affect model selection — that is already determined before spawn.
 
 ### 8. Config Changes (`config.py`)
 
 ```python
-class ClawTeamConfig(BaseModel):
+class AgentTeamConfig(BaseModel):
     ...existing fields...
     default_model: str = ""
     model_tiers: dict[str, str] = {}  # override tier→alias mapping
@@ -310,7 +310,7 @@ class ClawTeamConfig(BaseModel):
 Environment variable map addition:
 
 ```python
-"default_model": "CLAWTEAM_DEFAULT_MODEL",
+"default_model": "AGENTTEAM_DEFAULT_MODEL",
 ```
 
 ### 9. Model Resolution Function
@@ -395,7 +395,7 @@ This feature is **primarily scoped to OpenClaw**. When `command = ["claude"]` or
 
 - Claude Code already supports `--model` — AgentTeam can inject it for `_is_claude_command()` as well.
 - Codex CLI model selection mechanism should be checked; if it supports `--model`, inject similarly.
-- If a backend does not support `--model`, the resolved model string is still set in `CLAWTEAM_MODEL` env var for introspection, but no CLI flag is injected. A debug log message is emitted.
+- If a backend does not support `--model`, the resolved model string is still set in `AGENTTEAM_MODEL` env var for introspection, but no CLI flag is injected. A debug log message is emitted.
 
 ### 12. `launch_team` Wiring Detail
 
@@ -436,11 +436,11 @@ for agent in all_agents:
 | `agentteam/templates/__init__.py` | Add `model`, `model_tier` to `AgentDef` with validators; `model`, `model_strategy` to `TemplateDef` with validators; update `_parse_toml()` to forward new fields | S |
 | `agentteam/model_resolution.py` | New file: `resolve_model()` function, tier defaults, auto role map | S |
 | `agentteam/team/models.py` | Add `model_name` field to `TeamMember` | XS |
-| `agentteam/identity.py` | Add `model` field to `AgentIdentity`, read from `CLAWTEAM_MODEL` | XS |
-| `agentteam/config.py` | Add `default_model`, `model_tiers` to `ClawTeamConfig` | XS |
+| `agentteam/identity.py` | Add `model` field to `AgentIdentity`, read from `AGENTTEAM_MODEL` | XS |
+| `agentteam/config.py` | Add `default_model`, `model_tiers` to `AgentTeamConfig` | XS |
 | `agentteam/cli/commands.py` | Add `--model` to `spawn_agent` and `launch_team`; call `resolve_model()` | M |
 | `agentteam/spawn/base.py` | Add `model` param to `spawn()` signature | XS |
-| `agentteam/spawn/tmux_backend.py` | Pass `--model` to OpenClaw; propagate `CLAWTEAM_MODEL` env var | S |
+| `agentteam/spawn/tmux_backend.py` | Pass `--model` to OpenClaw; propagate `AGENTTEAM_MODEL` env var | S |
 | `agentteam/spawn/subprocess_backend.py` | Same as tmux backend | S |
 | `agentteam/spawn/prompt.py` | Include model info in agent prompt (optional) | XS |
 | `agentteam/templates/*.toml` | Add example model assignments to all 4 templates | S |

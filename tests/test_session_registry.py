@@ -391,7 +391,7 @@ class TestGetSessionRegistry:
         reg_module._registry = None
         
         # Set env var for data dir
-        os.environ["CLAWTEAM_DATA_DIR"] = str(temp_data_dir)
+        os.environ["AGENTTEAM_DATA_DIR"] = str(temp_data_dir)
         
         r1 = get_session_registry()
         r2 = get_session_registry()
@@ -399,5 +399,5 @@ class TestGetSessionRegistry:
         assert r1 is r2
         
         # Cleanup
-        del os.environ["CLAWTEAM_DATA_DIR"]
+        del os.environ["AGENTTEAM_DATA_DIR"]
         reg_module._registry = None

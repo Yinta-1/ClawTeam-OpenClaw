@@ -8,7 +8,7 @@ Detection logic:
   3. Structured signal: notify_task_complete() - deterministic signals from parsers like JSONL.
      ★ Claude Code specific acceleration. Use if available, but don't depend on it.
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

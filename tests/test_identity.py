@@ -4,44 +4,44 @@ from agentteam.identity import AgentIdentity, _env, _env_bool
 
 
 class TestEnvHelpers:
-    def test_env_reads_clawteam_first(self, monkeypatch):
-        monkeypatch.setenv("CLAWTEAM_AGENT_NAME", "alpha")
+    def test_env_reads_agentteam_first(self, monkeypatch):
+        monkeypatch.setenv("AGENTTEAM_AGENT_NAME", "alpha")
         monkeypatch.setenv("CLAUDE_CODE_AGENT_NAME", "beta")
-        assert _env("CLAWTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME") == "alpha"
+        assert _env("AGENTTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME") == "alpha"
 
     def test_env_falls_back_to_claude_code(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_AGENT_NAME", raising=False)
+        monkeypatch.delenv("AGENTTEAM_AGENT_NAME", raising=False)
         monkeypatch.setenv("CLAUDE_CODE_AGENT_NAME", "beta")
-        assert _env("CLAWTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME") == "beta"
+        assert _env("AGENTTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME") == "beta"
 
     def test_env_returns_default_when_both_missing(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_AGENT_NAME", raising=False)
+        monkeypatch.delenv("AGENTTEAM_AGENT_NAME", raising=False)
         monkeypatch.delenv("CLAUDE_CODE_AGENT_NAME", raising=False)
-        assert _env("CLAWTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME", "fallback") == "fallback"
+        assert _env("AGENTTEAM_AGENT_NAME", "CLAUDE_CODE_AGENT_NAME", "fallback") == "fallback"
 
     def test_env_bool_true_values(self, monkeypatch):
         for val in ("1", "true", "yes", "True", "YES"):
-            monkeypatch.setenv("CLAWTEAM_AGENT_LEADER", val)
-            assert _env_bool("CLAWTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is True
+            monkeypatch.setenv("AGENTTEAM_AGENT_LEADER", val)
+            assert _env_bool("AGENTTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is True
 
     def test_env_bool_false_values(self, monkeypatch):
         for val in ("0", "false", "no", ""):
-            monkeypatch.setenv("CLAWTEAM_AGENT_LEADER", val)
-            assert _env_bool("CLAWTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is False
+            monkeypatch.setenv("AGENTTEAM_AGENT_LEADER", val)
+            assert _env_bool("AGENTTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is False
 
     def test_env_bool_missing_is_false(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_AGENT_LEADER", raising=False)
+        monkeypatch.delenv("AGENTTEAM_AGENT_LEADER", raising=False)
         monkeypatch.delenv("CLAUDE_CODE_AGENT_LEADER", raising=False)
-        assert _env_bool("CLAWTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is False
+        assert _env_bool("AGENTTEAM_AGENT_LEADER", "CLAUDE_CODE_AGENT_LEADER") is False
 
 
 class TestFromEnv:
-    def test_from_env_with_clawteam_vars(self, monkeypatch):
-        monkeypatch.setenv("CLAWTEAM_AGENT_ID", "id-123")
-        monkeypatch.setenv("CLAWTEAM_AGENT_NAME", "worker-1")
-        monkeypatch.setenv("CLAWTEAM_AGENT_TYPE", "researcher")
-        monkeypatch.setenv("CLAWTEAM_TEAM_NAME", "my-team")
-        monkeypatch.setenv("CLAWTEAM_AGENT_LEADER", "1")
+    def test_from_env_with_agentteam_vars(self, monkeypatch):
+        monkeypatch.setenv("AGENTTEAM_AGENT_ID", "id-123")
+        monkeypatch.setenv("AGENTTEAM_AGENT_NAME", "worker-1")
+        monkeypatch.setenv("AGENTTEAM_AGENT_TYPE", "researcher")
+        monkeypatch.setenv("AGENTTEAM_TEAM_NAME", "my-team")
+        monkeypatch.setenv("AGENTTEAM_AGENT_LEADER", "1")
 
         identity = AgentIdentity.from_env()
         assert identity.agent_id == "id-123"
@@ -52,14 +52,14 @@ class TestFromEnv:
         assert identity.in_team is True
 
     def test_from_env_with_claude_code_fallback(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_AGENT_NAME", raising=False)
+        monkeypatch.delenv("AGENTTEAM_AGENT_NAME", raising=False)
         monkeypatch.setenv("CLAUDE_CODE_AGENT_NAME", "claude-agent")
         identity = AgentIdentity.from_env()
         assert identity.agent_name == "claude-agent"
 
     def test_from_env_defaults(self, monkeypatch):
-        for key in ("CLAWTEAM_AGENT_ID", "CLAWTEAM_AGENT_NAME", "CLAWTEAM_AGENT_TYPE",
-                     "CLAWTEAM_TEAM_NAME", "CLAWTEAM_AGENT_LEADER", "CLAWTEAM_USER"):
+        for key in ("AGENTTEAM_AGENT_ID", "AGENTTEAM_AGENT_NAME", "AGENTTEAM_AGENT_TYPE",
+                     "AGENTTEAM_TEAM_NAME", "AGENTTEAM_AGENT_LEADER", "AGENTTEAM_USER"):
             monkeypatch.delenv(key, raising=False)
         for key in ("CLAUDE_CODE_AGENT_ID", "CLAUDE_CODE_AGENT_NAME", "CLAUDE_CODE_AGENT_TYPE",
                      "CLAUDE_CODE_TEAM_NAME", "CLAUDE_CODE_AGENT_LEADER"):
@@ -73,9 +73,9 @@ class TestFromEnv:
         assert identity.in_team is False
 
     def test_from_env_user_from_config(self, tmp_path, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_USER", raising=False)
-        from agentteam.config import ClawTeamConfig, save_config
-        cfg = ClawTeamConfig(user="config-user")
+        monkeypatch.delenv("AGENTTEAM_USER", raising=False)
+        from agentteam.config import AgentTeamConfig, save_config
+        cfg = AgentTeamConfig(user="config-user")
         save_config(cfg)
 
         identity = AgentIdentity.from_env()
@@ -91,12 +91,12 @@ class TestToEnv:
             is_leader=False,
         )
         env = identity.to_env()
-        assert env["CLAWTEAM_AGENT_ID"] == "abc123"
-        assert env["CLAWTEAM_AGENT_NAME"] == "worker"
-        assert env["CLAWTEAM_AGENT_TYPE"] == "coder"
-        assert env["CLAWTEAM_AGENT_LEADER"] == "0"
-        assert "CLAWTEAM_USER" not in env
-        assert "CLAWTEAM_TEAM_NAME" not in env
+        assert env["AGENTTEAM_AGENT_ID"] == "abc123"
+        assert env["AGENTTEAM_AGENT_NAME"] == "worker"
+        assert env["AGENTTEAM_AGENT_TYPE"] == "coder"
+        assert env["AGENTTEAM_AGENT_LEADER"] == "0"
+        assert "AGENTTEAM_USER" not in env
+        assert "AGENTTEAM_TEAM_NAME" not in env
 
     def test_to_env_with_team_and_user(self):
         identity = AgentIdentity(
@@ -107,9 +107,9 @@ class TestToEnv:
             is_leader=True,
         )
         env = identity.to_env()
-        assert env["CLAWTEAM_USER"] == "alice"
-        assert env["CLAWTEAM_TEAM_NAME"] == "alpha"
-        assert env["CLAWTEAM_AGENT_LEADER"] == "1"
+        assert env["AGENTTEAM_USER"] == "alice"
+        assert env["AGENTTEAM_TEAM_NAME"] == "alpha"
+        assert env["AGENTTEAM_AGENT_LEADER"] == "1"
 
     def test_roundtrip_from_to_env(self, monkeypatch):
         original = AgentIdentity(

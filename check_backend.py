@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, 'C:\\Users\\31683\\.openclaw\\workspace\\ClawTeam-OpenClaw')
+sys.path.insert(0, 'C:\\Users\\31683\\.openclaw\\workspace\\AgentTeam-OpenClaw')
 from agentteam.spawn.openclaw_sdk_backend import OpenClawSDKBackend
 
 backend = OpenClawSDKBackend()

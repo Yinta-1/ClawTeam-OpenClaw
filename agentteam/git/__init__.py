@@ -1,4 +1,4 @@
-"""Git utilities for ClawTeam."""
+"""Git utilities for AgentTeam."""
 
 from .worktree import GitCommandError, WorktreeInfo, WorktreeManager, WorktreeStatus
 

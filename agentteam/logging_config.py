@@ -1,5 +1,5 @@
 """
-ClawTeam Structured Logging
+AgentTeam Structured Logging
 
 Provides structured JSON logging with context propagation and log aggregation support.
 """
@@ -72,7 +72,7 @@ class StructuredLogger:
     def __init__(self, name: str, level: str = "INFO", json_output: bool = False):
         self.name = name
         self.level = getattr(logging, level.upper(), logging.INFO)
-        self.json_output = json_output or os.environ.get("CLAWTEAM_LOG_JSON", "") == "1"
+        self.json_output = json_output or os.environ.get("AGENTTEAM_LOG_JSON", "") == "1"
         self._local = threading.local()
 
     def _get_context(self) -> dict:

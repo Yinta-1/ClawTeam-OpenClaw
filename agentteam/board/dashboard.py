@@ -1,4 +1,4 @@
-"""Command Center Dashboard - Global KPI aggregation for ClawTeam."""
+"""Command Center Dashboard - Global KPI aggregation for AgentTeam."""
 
 from __future__ import annotations
 

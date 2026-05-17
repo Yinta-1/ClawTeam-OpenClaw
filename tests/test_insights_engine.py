@@ -238,7 +238,7 @@ def test_report_generation_html(insights_engine):
     assert "<html>" in html_content.lower()
     assert "<head>" in html_content.lower()
     assert "<body>" in html_content.lower()
-    assert "ClawTeam Insights Report" in html_content
+    assert "AgentTeam Insights Report" in html_content
 
 
 def test_empty_database_stats(insights_engine):

@@ -11,7 +11,7 @@ HeadlessTerminalBuffer - 虚拟终端缓冲区
 - getLastLines(n) 获取最后 N 行
 - totalAppended 累计字节数
 
-@author ClawTeam
+@author AgentTeam
 """
 
 import logging

@@ -1346,7 +1346,7 @@ ChatServer (P17) ←──────────────┴─────
   },
   "projects": {
     "agentteam": {
-      "name": "ClawTeam升级",
+      "name": "AgentTeam升级",
       "status": "active",
       "priority": "high",
       "lastActivity": "2026-04-28T11:30:00Z"

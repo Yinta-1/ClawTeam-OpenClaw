@@ -7,16 +7,16 @@ import tempfile
 from pathlib import Path
 
 from agentteam.parser import OutputParser, ActivityEvent, ActivityEventType
-from agentteam.parser.integration import ClawTeamIntegration, get_integration, parse_and_notify
+from agentteam.parser.integration import AgentTeamIntegration, get_integration, parse_and_notify
 from agentteam.notification import NotificationManager, NotificationType
 
 
-class TestClawTeamIntegration:
-    """Tests for ClawTeamIntegration class."""
+class TestAgentTeamIntegration:
+    """Tests for AgentTeamIntegration class."""
     
     def test_create_integration(self):
         """Test creating integration instance."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         assert integration.team_name == "test-team"
         assert integration.get_parser() is not None
@@ -24,7 +24,7 @@ class TestClawTeamIntegration:
     
     def test_parse_output(self):
         """Test parsing output through integration."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         events = integration.parse_output(
             session_id="session-1",
@@ -37,7 +37,7 @@ class TestClawTeamIntegration:
     
     def test_notification_triggered_on_error(self):
         """Test that error triggers notification."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Error: test error\n")
         
@@ -48,7 +48,7 @@ class TestClawTeamIntegration:
     
     def test_notification_triggered_on_confirmation(self):
         """Test that confirmation request triggers notification."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Allow Bash? (y)\n")
         
@@ -58,7 +58,7 @@ class TestClawTeamIntegration:
     
     def test_websocket_push_callback(self):
         """Test WebSocket push callback."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         received = []
         integration.set_websocket_push_callback(
@@ -73,7 +73,7 @@ class TestClawTeamIntegration:
     
     def test_mark_session_ended(self):
         """Test marking session as ended."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Error: test\n")
         integration.mark_session_ended("session-1")
@@ -83,7 +83,7 @@ class TestClawTeamIntegration:
     
     def test_clear_session(self):
         """Test clearing session."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Error: test\n")
         integration.clear_session("session-1")
@@ -93,7 +93,7 @@ class TestClawTeamIntegration:
     
     def test_cleanup(self):
         """Test cleanup."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Error: test\n")
         integration.cleanup()
@@ -135,7 +135,7 @@ class TestAuditIntegration:
     def test_audit_logged_on_error(self, tmp_path):
         """Test that error events are logged to audit."""
         # This test requires audit module to be properly set up
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         # Parse error
         integration.parse_output("session-1", "Error: test error\n")
@@ -146,7 +146,7 @@ class TestAuditIntegration:
     
     def test_audit_logged_on_task_complete(self):
         """Test that task complete events are logged to audit."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Task completed successfully\n")
         
@@ -159,7 +159,7 @@ class TestMultiSession:
     
     def test_multiple_sessions(self):
         """Test handling multiple sessions."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         # Parse for multiple sessions
         integration.parse_output("session-1", "Error: error1\n")
@@ -174,7 +174,7 @@ class TestMultiSession:
     
     def test_session_isolation(self):
         """Test that sessions are isolated."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         integration.parse_output("session-1", "Error: error1\n")
         integration.parse_output("session-2", "Error: error2\n")
@@ -192,7 +192,7 @@ class TestProviderSpecific:
     
     def test_claude_code_provider(self):
         """Test Claude Code provider-specific parsing."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         events = integration.parse_output(
             "session-1",
@@ -206,7 +206,7 @@ class TestProviderSpecific:
     
     def test_generic_provider(self):
         """Test generic provider parsing."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         events = integration.parse_output(
             "session-1",
@@ -219,7 +219,7 @@ class TestProviderSpecific:
     
     def test_provider_switching(self):
         """Test switching providers for same session."""
-        integration = ClawTeamIntegration("test-team")
+        integration = AgentTeamIntegration("test-team")
         
         # First with Claude Code
         events1 = integration.parse_output(

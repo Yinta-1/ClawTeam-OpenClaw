@@ -1,5 +1,5 @@
 """
-ClawTeam Tools - Built-in and external tool integrations
+AgentTeam Tools - Built-in and external tool integrations
 """
 
 from .registry import ToolRegistry, get_registry

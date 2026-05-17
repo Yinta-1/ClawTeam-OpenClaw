@@ -1,4 +1,4 @@
-"""Audit logging for ClawTeam multi-agent teams.
+"""Audit logging for AgentTeam multi-agent teams.
 
 Records all significant events in append-only log files for compliance,
 debugging, and historical analysis. Each team has its own audit log directory.
@@ -30,7 +30,7 @@ def _audit_log_path(team_name: str) -> Path:
 
 
 class AuditEventType(str, Enum):
-    """Types of auditable events in ClawTeam."""
+    """Types of auditable events in AgentTeam."""
 
     TASK_CREATED = "task_created"
     TASK_ASSIGNED = "task_assigned"

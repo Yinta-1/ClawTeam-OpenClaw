@@ -73,12 +73,12 @@ def main(
     if data_dir:
         import os
 
-        os.environ["CLAWTEAM_DATA_DIR"] = data_dir
+        os.environ["AGENTTEAM_DATA_DIR"] = data_dir
         _data_dir = data_dir
     if transport:
         import os
 
-        os.environ["CLAWTEAM_TRANSPORT"] = transport
+        os.environ["AGENTTEAM_TRANSPORT"] = transport
 
 
 def _dump(model) -> dict:
@@ -124,7 +124,7 @@ def _deliver_to_running_agent(agent_name: str, team_name: str, content: str, fro
     import urllib.error
 
     # Read the running agents registry
-    data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+    data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
     registry_file = data_dir / "running_agents.json"
 
     if not registry_file.exists():
@@ -210,7 +210,7 @@ def _broadcast_activity_to_board(agent_name: str, team_name: str, status: str, m
     import urllib.request
     import urllib.error
 
-    board_port = os.environ.get("CLAWTEAM_BOARD_PORT", "8080")
+    board_port = os.environ.get("AGENTTEAM_BOARD_PORT", "8080")
     board_url = f"http://127.0.0.1:{board_port}/api/agents/activity"
 
     activity_data = {
@@ -430,7 +430,7 @@ def doctor_run():
 
     # Print results
     console.print()
-    table = Table(title="ClawTeam Doctor - Health Check Results", box=box.ROUNDED)
+    table = Table(title="AgentTeam Doctor - Health Check Results", box=box.ROUNDED)
     table.add_column("Check", style="cyan", width=20)
     table.add_column("Status", width=8)
     table.add_column("Details", style="dim")
@@ -597,9 +597,9 @@ def config_init(
 
     # Default configuration
     default_config = {
-        "# ClawTeam Configuration": None,
+        "# AgentTeam Configuration": None,
         "# Version": "0.6.0",
-        "# Documentation": "https://github.com/YintaTriss/ClawTeam-OpenClaw",
+        "# Documentation": "https://github.com/YintaTriss/AgentTeam-OpenClaw",
         "# Default settings": None,
         "data_dir": "~/.agentteam",
         "default_team": None,  # No default team
@@ -631,7 +631,7 @@ def config_init(
         yaml.dump(default_config, f, default_flow_style=False, sort_keys=False)
 
     console.print(f"[green]✓[/green] Created default config at {config_file}")
-    console.print(f"[dim]Edit this file to customize your ClawTeam settings.[/dim]")
+    console.print(f"[dim]Edit this file to customize your AgentTeam settings.[/dim]")
 
 
 @config_app.command("set")
@@ -643,16 +643,16 @@ def config_set(
     value: str = typer.Argument(..., help="Config value"),
 ):
     """Persistently set a configuration value."""
-    from agentteam.config import ClawTeamConfig, load_config, save_config
+    from agentteam.config import AgentTeamConfig, load_config, save_config
 
-    valid_keys = set(ClawTeamConfig.model_fields.keys())
+    valid_keys = set(AgentTeamConfig.model_fields.keys())
     if key not in valid_keys:
         console.print(f"[red]Invalid key '{key}'. Valid: {', '.join(sorted(valid_keys))}[/red]")
         raise typer.Exit(1)
 
     cfg = load_config()
     # Handle boolean fields (skip_permissions)
-    field_info = ClawTeamConfig.model_fields[key]
+    field_info = AgentTeamConfig.model_fields[key]
     if field_info.annotation is bool:
         setattr(cfg, key, value.lower() in ("true", "1", "yes"))
     else:
@@ -673,9 +673,9 @@ def config_get(
     ),
 ):
     """Get the effective value of a config key."""
-    from agentteam.config import ClawTeamConfig, get_effective
+    from agentteam.config import AgentTeamConfig, get_effective
 
-    valid_keys = set(ClawTeamConfig.model_fields.keys())
+    valid_keys = set(AgentTeamConfig.model_fields.keys())
     if key not in valid_keys:
         console.print(f"[red]Invalid key '{key}'. Valid: {', '.join(sorted(valid_keys))}[/red]")
         raise typer.Exit(1)
@@ -1490,8 +1490,8 @@ def inbox_watch(
     """Watch inbox for new messages (blocking, Ctrl+C to stop).
 
     With --exec, runs a shell command for each message. Message data is passed
-    via env vars: CLAWTEAM_MSG_FROM, CLAWTEAM_MSG_TO, CLAWTEAM_MSG_CONTENT,
-    CLAWTEAM_MSG_TYPE, CLAWTEAM_MSG_TIMESTAMP, CLAWTEAM_MSG_JSON.
+    via env vars: AGENTTEAM_MSG_FROM, AGENTTEAM_MSG_TO, AGENTTEAM_MSG_CONTENT,
+    AGENTTEAM_MSG_TYPE, AGENTTEAM_MSG_TIMESTAMP, AGENTTEAM_MSG_JSON.
     """
     from agentteam.identity import AgentIdentity
     from agentteam.team.mailbox import MailboxManager
@@ -3078,7 +3078,7 @@ def spawn_agent(
             team_name=_team,
             leader_name=leader_name,
             task=task,
-            user=_os.environ.get("CLAWTEAM_USER", ""),
+            user=_os.environ.get("AGENTTEAM_USER", ""),
             workspace_dir=cwd or "",
             workspace_branch=ws_branch,
             memory_scope=f"custom:team-{_team}",
@@ -3110,7 +3110,7 @@ def spawn_agent(
             member_name=_name,
             agent_id=_id,
             agent_type=agent_type,
-            user=_os2.environ.get("CLAWTEAM_USER", ""),
+            user=_os2.environ.get("AGENTTEAM_USER", ""),
         )
         member_added = True
     except ValueError:
@@ -3217,13 +3217,13 @@ def identity_set(
     """Print shell export commands to set identity environment variables."""
     lines = []
     if agent_id:
-        lines.append(f'export CLAWTEAM_AGENT_ID="{agent_id}"')
+        lines.append(f'export AGENTTEAM_AGENT_ID="{agent_id}"')
     if agent_name:
-        lines.append(f'export CLAWTEAM_AGENT_NAME="{agent_name}"')
+        lines.append(f'export AGENTTEAM_AGENT_NAME="{agent_name}"')
     if agent_type:
-        lines.append(f'export CLAWTEAM_AGENT_TYPE="{agent_type}"')
+        lines.append(f'export AGENTTEAM_AGENT_TYPE="{agent_type}"')
     if team:
-        lines.append(f'export CLAWTEAM_TEAM_NAME="{team}"')
+        lines.append(f'export AGENTTEAM_TEAM_NAME="{team}"')
 
     if not lines:
         console.print("[yellow]No options specified. Use --agent-id, --agent-name, --agent-type, --team[/yellow]")
@@ -3836,7 +3836,7 @@ def launch_team(
             leader_name=tmpl.leader.name,
             leader_id=leader_id,
             description=tmpl.description,
-            user=_os.environ.get("CLAWTEAM_USER", ""),
+            user=_os.environ.get("AGENTTEAM_USER", ""),
         )
     except ValueError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -3852,7 +3852,7 @@ def launch_team(
             member_name=agent.name,
             agent_id=aid,
             agent_type=agent.type,
-            user=_os.environ.get("CLAWTEAM_USER", ""),
+            user=_os.environ.get("AGENTTEAM_USER", ""),
         )
 
     # 5. Create tasks
@@ -3922,7 +3922,7 @@ def launch_team(
             team_name=t_name,
             leader_name=tmpl.leader.name,
             task=rendered,
-            user=_os.environ.get("CLAWTEAM_USER", ""),
+            user=_os.environ.get("AGENTTEAM_USER", ""),
             workspace_dir=cwd or "",
             workspace_branch=ws_branch,
             memory_scope=f"custom:team-{t_name}",
@@ -3995,7 +3995,7 @@ def launch_team(
         console.print(table)
         console.print()
         if be_name == "tmux":
-            console.print(f"[bold]Attach:[/bold] tmux attach -t clawteam-{t_name}")
+            console.print(f"[bold]Attach:[/bold] tmux attach -t agentteam-{t_name}")
         console.print(f"[bold]Board:[/bold]  agentteam board show {t_name}")
         console.print(f"[bold]Inbox:[/bold]  agentteam inbox peek {t_name} --agent <name>")
 
@@ -5382,7 +5382,7 @@ def agent_list(
         teams = [team]
     else:
         # Get all teams from data dir
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         teams = [d.name for d in data_dir.iterdir() if d.is_dir() and not d.name.startswith(".")]
 
     all_agents = []
@@ -5514,7 +5514,7 @@ def agent_info(
 
     if not team:
         # Search all teams
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)
@@ -5627,7 +5627,7 @@ def agent_health(
     # Find team if not provided
     actual_team = team
     if not actual_team:
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)
@@ -5670,7 +5670,7 @@ def agent_restart(
     # Find team if not provided
     actual_team = team
     if not actual_team:
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)
@@ -5752,7 +5752,7 @@ def agent_pause(
     # Find team if not provided
     actual_team = team
     if not actual_team:
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)
@@ -5799,7 +5799,7 @@ def agent_resume(
     # Find team if not provided
     actual_team = team
     if not actual_team:
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)
@@ -5846,7 +5846,7 @@ def agent_kill(
     # Find team if not provided
     actual_team = team
     if not actual_team:
-        data_dir = Path(os.environ.get("CLAWTEAM_DATA_DIR", "~/.agentteam")).expanduser()
+        data_dir = Path(os.environ.get("AGENTTEAM_DATA_DIR", "~/.agentteam")).expanduser()
         for t_dir in data_dir.iterdir():
             if t_dir.is_dir() and not t_dir.name.startswith("."):
                 info = get_agent_info(t_dir.name, name)

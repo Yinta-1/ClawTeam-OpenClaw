@@ -1,4 +1,4 @@
-cd C:\Users\31683\.openclaw\workspace\ClawTeam-OpenClaw
+cd C:\Users\31683\.openclaw\workspace\AgentTeam-OpenClaw
 $task = @"
 Implement AgentTeam Command Center Web Dashboard (SpectrAI-inspired):
 

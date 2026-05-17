@@ -1,4 +1,4 @@
-"""Session awareness for ClawTeam: track agent sessions, activity, and context.
+"""Session awareness for AgentTeam: track agent sessions, activity, and context.
 
 This module provides real-time awareness of:
 - Agent sessions and status

@@ -9,14 +9,14 @@ import sys
 from pathlib import Path
 
 
-def _looks_like_clawteam_entrypoint(value: str) -> bool:
+def _looks_like_agentteam_entrypoint(value: str) -> bool:
     """Return True when argv0 plausibly points at the agentteam CLI."""
 
     name = Path(value).name.lower()
     return name == "agentteam" or name.startswith("agentteam.")
 
 
-def resolve_clawteam_executable() -> str:
+def resolve_agentteam_executable() -> str:
     """Resolve the current agentteam executable.
 
     Prefer the current process entrypoint when running from a venv or editable
@@ -25,7 +25,7 @@ def resolve_clawteam_executable() -> str:
     """
 
     argv0 = (sys.argv[0] or "").strip()
-    if argv0 and _looks_like_clawteam_entrypoint(argv0):
+    if argv0 and _looks_like_agentteam_entrypoint(argv0):
         candidate = Path(argv0).expanduser()
         has_explicit_dir = candidate.parent != Path(".")
         if (candidate.is_absolute() or has_explicit_dir) and candidate.is_file():
@@ -39,7 +39,7 @@ def build_spawn_path(base_path: str | None = None) -> str:
     """Ensure the current agentteam executable directory is on PATH."""
 
     path_value = base_path if base_path is not None else os.environ.get("PATH", "")
-    executable = resolve_clawteam_executable()
+    executable = resolve_agentteam_executable()
     if not os.path.isabs(executable):
         return path_value
 
@@ -60,7 +60,7 @@ def propagate_openclaw_gateway_token(env_vars: dict[str, str]) -> None:
     resulting in 401 errors.  By setting the token in the environment before
     the child process starts, OpenClaw can pick it up immediately.
 
-    See: https://github.com/win4r/ClawTeam-OpenClaw/issues/51
+    See: https://github.com/win4r/AgentTeam-OpenClaw/issues/51
     """
     if env_vars.get("OPENCLAW_GATEWAY_TOKEN"):
         return  # already set by user

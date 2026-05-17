@@ -170,7 +170,7 @@ def load_template(name: str) -> TemplateDef:
     """Load a template by name.
 
     Search order: user templates (~/.agentteam/templates/) first,
-    then built-in templates (clawteam/templates/).
+    then built-in templates (agentteam/templates/).
     """
     filename = f"{name}.toml"
 

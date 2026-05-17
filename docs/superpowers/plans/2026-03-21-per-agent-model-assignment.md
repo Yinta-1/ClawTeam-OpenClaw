@@ -550,18 +550,18 @@ class TestAgentIdentityModel:
         assert ident.model is None
 
     def test_model_from_env(self, monkeypatch):
-        monkeypatch.setenv("CLAWTEAM_MODEL", "opus")
+        monkeypatch.setenv("AGENTTEAM_MODEL", "opus")
         ident = AgentIdentity.from_env()
         assert ident.model == "opus"
 
     def test_model_from_openclaw_env(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_MODEL", raising=False)
+        monkeypatch.delenv("AGENTTEAM_MODEL", raising=False)
         monkeypatch.setenv("OPENCLAW_MODEL", "sonnet-4.6")
         ident = AgentIdentity.from_env()
         assert ident.model == "sonnet-4.6"
 
     def test_model_not_set(self, monkeypatch):
-        monkeypatch.delenv("CLAWTEAM_MODEL", raising=False)
+        monkeypatch.delenv("AGENTTEAM_MODEL", raising=False)
         monkeypatch.delenv("OPENCLAW_MODEL", raising=False)
         monkeypatch.delenv("CLAUDE_CODE_MODEL", raising=False)
         ident = AgentIdentity.from_env()
@@ -570,12 +570,12 @@ class TestAgentIdentityModel:
     def test_to_env_includes_model(self):
         ident = AgentIdentity(model="opus")
         env = ident.to_env()
-        assert env["CLAWTEAM_MODEL"] == "opus"
+        assert env["AGENTTEAM_MODEL"] == "opus"
 
     def test_to_env_omits_model_when_none(self):
         ident = AgentIdentity()
         env = ident.to_env()
-        assert "CLAWTEAM_MODEL" not in env
+        assert "AGENTTEAM_MODEL" not in env
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
@@ -602,13 +602,13 @@ Add `model` field to `AgentIdentity` dataclass (after line 36):
 
 Update `from_env()` (lines 43-59) — add to the `cls(...)` call:
 ```python
-        model=_env("CLAWTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
+        model=_env("AGENTTEAM_MODEL", "CLAUDE_CODE_MODEL") or None,
 ```
 
 Update `to_env()` (after line 73) — add:
 ```python
         if self.model:
-            env["CLAWTEAM_MODEL"] = self.model
+            env["AGENTTEAM_MODEL"] = self.model
 ```
 
 - [ ] **Step 5: Run tests to verify they pass**
@@ -629,7 +629,7 @@ git commit -m "feat: add model field to TeamMember and AgentIdentity"
 ### Task 4: Config — Add default_model and model_tiers
 
 **Files:**
-- Modify: `agentteam/config.py:12-19` (ClawTeamConfig)
+- Modify: `agentteam/config.py:12-19` (AgentTeamConfig)
 - Modify: `agentteam/config.py:53-61` (env_map in get_effective)
 - Modify: `tests/test_config.py`
 
@@ -638,25 +638,25 @@ git commit -m "feat: add model field to TeamMember and AgentIdentity"
 Add to `tests/test_config.py`:
 
 ```python
-# Add to TestClawTeamConfig class:
+# Add to TestAgentTeamConfig class:
 
     def test_default_model_empty(self):
-        cfg = ClawTeamConfig()
+        cfg = AgentTeamConfig()
         assert cfg.default_model == ""
 
     def test_model_tiers_empty(self):
-        cfg = ClawTeamConfig()
+        cfg = AgentTeamConfig()
         assert cfg.model_tiers == {}
 
     def test_custom_model_config(self):
-        cfg = ClawTeamConfig(default_model="opus", model_tiers={"strong": "gpt-5.4"})
+        cfg = AgentTeamConfig(default_model="opus", model_tiers={"strong": "gpt-5.4"})
         assert cfg.default_model == "opus"
         assert cfg.model_tiers["strong"] == "gpt-5.4"
 
 # Add to TestLoadSaveConfig class:
 
     def test_model_config_roundtrip(self):
-        cfg = ClawTeamConfig(default_model="opus", model_tiers={"strong": "gpt-5.4"})
+        cfg = AgentTeamConfig(default_model="opus", model_tiers={"strong": "gpt-5.4"})
         save_config(cfg)
         loaded = load_config()
         assert loaded.default_model == "opus"
@@ -665,7 +665,7 @@ Add to `tests/test_config.py`:
 # Add to TestGetEffective class:
 
     def test_default_model_from_env(self, monkeypatch):
-        monkeypatch.setenv("CLAWTEAM_DEFAULT_MODEL", "opus")
+        monkeypatch.setenv("AGENTTEAM_DEFAULT_MODEL", "opus")
         val, source = get_effective("default_model")
         assert val == "opus"
         assert source == "env"
@@ -673,10 +673,10 @@ Add to `tests/test_config.py`:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_config.py::TestClawTeamConfig::test_default_model_empty tests/test_config.py::TestGetEffective::test_default_model_from_env -v`
+Run: `cd ~/Projects/AgentTeam-OpenClaw && python -m pytest tests/test_config.py::TestAgentTeamConfig::test_default_model_empty tests/test_config.py::TestGetEffective::test_default_model_from_env -v`
 Expected: FAIL — `default_model` not a field.
 
-- [ ] **Step 3: Add fields to ClawTeamConfig**
+- [ ] **Step 3: Add fields to AgentTeamConfig**
 
 Edit `agentteam/config.py` line 19, add after `skip_permissions`:
 
@@ -690,7 +690,7 @@ Edit `agentteam/config.py` line 19, add after `skip_permissions`:
 Edit `agentteam/config.py` line 60, add after `"skip_permissions"` entry:
 
 ```python
-        "default_model": "CLAWTEAM_DEFAULT_MODEL",
+        "default_model": "AGENTTEAM_DEFAULT_MODEL",
 ```
 
 - [ ] **Step 5: Run tests to verify they pass**
@@ -724,10 +724,10 @@ Add to `tests/test_spawn_backends.py`:
 def test_tmux_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
     """When model is provided and command is openclaw, --model should appear in the tmux command."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -779,10 +779,10 @@ def test_tmux_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
 def test_tmux_backend_no_model_flag_when_none(monkeypatch, tmp_path):
     """When model is None, --model should NOT appear."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     run_calls: list[list[str]] = []
 
@@ -834,10 +834,10 @@ def test_tmux_backend_no_model_flag_when_none(monkeypatch, tmp_path):
 def test_subprocess_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
     """Subprocess backend should include --model in the openclaw command."""
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
-    clawteam_bin = tmp_path / "venv" / "bin" / "agentteam"
-    clawteam_bin.parent.mkdir(parents=True)
-    clawteam_bin.write_text("#!/bin/sh\n")
-    monkeypatch.setattr(sys, "argv", [str(clawteam_bin)])
+    agentteam_bin = tmp_path / "venv" / "bin" / "agentteam"
+    agentteam_bin.parent.mkdir(parents=True)
+    agentteam_bin.write_text("#!/bin/sh\n")
+    monkeypatch.setattr(sys, "argv", [str(agentteam_bin)])
 
     captured: dict[str, object] = {}
 
@@ -868,7 +868,7 @@ def test_subprocess_backend_passes_model_to_openclaw(monkeypatch, tmp_path):
 
     assert "--model" in captured["cmd"]
     assert "opus" in captured["cmd"]
-    assert captured["env"]["CLAWTEAM_MODEL"] == "opus"
+    assert captured["env"]["AGENTTEAM_MODEL"] == "opus"
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
@@ -905,7 +905,7 @@ Edit `agentteam/spawn/tmux_backend.py`:
 4. In the env_vars dict (around line 44-62), add after existing env vars:
 ```python
         if model:
-            env_vars["CLAWTEAM_MODEL"] = model
+            env_vars["AGENTTEAM_MODEL"] = model
 ```
 
 - [ ] **Step 5: Add model to SubprocessBackend.spawn()**
@@ -919,7 +919,7 @@ Edit `agentteam/spawn/subprocess_backend.py`:
     elif _is_openclaw_command(normalized_command):
         if "agent" not in final_command and "tui" not in final_command:
             final_command.insert(1, "agent")
-        session_key = f"clawteam-{team_name}-{agent_name}"
+        session_key = f"agentteam-{team_name}-{agent_name}"
         if model:
             final_command.extend(["--model", model])
         final_command.extend(["--session-id", session_key, "--message", prompt])
@@ -928,7 +928,7 @@ Edit `agentteam/spawn/subprocess_backend.py`:
 3. In spawn_env setup, add:
 ```python
         if model:
-            spawn_env["CLAWTEAM_MODEL"] = model
+            spawn_env["AGENTTEAM_MODEL"] = model
 ```
 
 - [ ] **Step 6: Run all spawn backend tests**

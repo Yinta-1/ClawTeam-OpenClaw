@@ -3,7 +3,7 @@
 参考 SpectrAI UsageEstimator.ts 实现。
 支持字符估算、持久化、趋势分析、Web UI 集成。
 
-@author ClawTeam
+@author AgentTeam
 """
 
 from __future__ import annotations

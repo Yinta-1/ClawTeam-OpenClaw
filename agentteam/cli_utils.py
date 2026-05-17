@@ -1,5 +1,5 @@
 """
-CLI utilities for ClawTeam
+CLI utilities for AgentTeam
 
 Provides interactive CLI features like colored output and progress indicators.
 """

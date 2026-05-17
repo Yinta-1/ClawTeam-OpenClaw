@@ -1,5 +1,5 @@
 /**
- * Skills Manager - Skill management interface for ClawTeam Web UI
+ * Skills Manager - Skill management interface for AgentTeam Web UI
  * 
  * Features:
  * - Skill list display with categories
@@ -8,7 +8,7 @@
  * - Skill search and filtering
  * - Execute skills with parameters
  * 
- * @author ClawTeam Frontend
+ * @author AgentTeam Frontend
  */
 
 class SkillsManager {

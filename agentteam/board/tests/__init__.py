@@ -1,1 +1,1 @@
-"""Test package for ClawTeam board."""
+"""Test package for AgentTeam board."""

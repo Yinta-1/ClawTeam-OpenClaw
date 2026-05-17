@@ -1,4 +1,4 @@
-"""Git worktree workspace isolation for ClawTeam agents."""
+"""Git worktree workspace isolation for AgentTeam agents."""
 
 from __future__ import annotations
 

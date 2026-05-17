@@ -1,4 +1,4 @@
-"""Output parsing engine for ClawTeam multi-agent teams.
+"""Output parsing engine for AgentTeam multi-agent teams.
 
 Parses AI provider outputs, detects activity events, estimates token usage,
 and supports event deduplication.
