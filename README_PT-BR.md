@@ -54,7 +54,7 @@
 
 <p align="center">
 
-  <a href="https://github.com/HKUDS/AgentTeam"><img src="https://img.shields.io/badge/upstream-HKUDS%2FAgentTeam-purple?style=for-the-badge" alt="Upstream"></a>
+  <a href="https://github.com/HKUDS/ClawTeam"><img src="https://img.shields.io/badge/upstream-HKUDS%2FAgentTeam-purple?style=for-the-badge" alt="Upstream"></a>
 
   <a href="#-inÃ­cio-rÃ¡pido"><img src="https://img.shields.io/badge/Quick_Start-3_min-blue?style=for-the-badge" alt="InÃ­cio RÃ¡pido"></a>
 
@@ -78,7 +78,7 @@
 
 
 
-> **Fork de [HKUDS/AgentTeam](https://github.com/HKUDS/AgentTeam)** com integraÃ§Ã£o profunda ao OpenClaw: agente `openclaw` como padrÃ£o, isolamento de sessÃ£o por agente, autoconfiguraÃ§Ã£o de aprovaÃ§Ã£o de execuÃ§Ã£o e backends de spawn robustecidos para produÃ§Ã£o. Todas as correÃ§Ãµes do upstream sÃ£o sincronizadas.
+> **Fork de [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam)** com integraÃ§Ã£o profunda ao OpenClaw: agente `openclaw` como padrÃ£o, isolamento de sessÃ£o por agente, autoconfiguraÃ§Ã£o de aprovaÃ§Ã£o de execuÃ§Ã£o e backends de spawn robustecidos para produÃ§Ã£o. Todas as correÃ§Ãµes do upstream sÃ£o sincronizadas.
 
 
 
@@ -356,7 +356,7 @@ openclaw --version  # Or: claude --version / codex --version
 
 ```bash
 
-git clone https://github.com/win4r/AgentTeam-OpenClaw.git
+git clone https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git
 
 cd AgentTeam-OpenClaw
 
@@ -532,7 +532,7 @@ Os passos 2 a 6 acima tambÃ©m estÃ£o disponÃ­veis como um Ãºnico script:
 
 ```bash
 
-git clone https://github.com/win4r/AgentTeam-OpenClaw.git
+git clone https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git
 
 cd AgentTeam-OpenClaw
 
@@ -1037,7 +1037,7 @@ agentteam config health
 
 
 
-> **Branch:** [`feat/per-agent-model-assignment`](https://github.com/win4r/AgentTeam-OpenClaw/tree/feat/per-agent-model-assignment)
+> **Branch:** [`feat/per-agent-model-assignment`](https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw/tree/feat/per-agent-model-assignment)
 
 >
 
@@ -1053,7 +1053,7 @@ Atribua modelos diferentes a papÃ©is de agentes diferentes para melhores compe
 
 # Install from the feature branch
 
-pip install -e "git+https://github.com/win4r/AgentTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
+pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
 
 ```
 
@@ -1107,7 +1107,7 @@ agentteam launch my-template --model-strategy auto     # auto-assign by role
 
 
 
-Veja a [issue #1](https://github.com/win4r/AgentTeam-OpenClaw/issues/1) para a solicitaÃ§Ã£o completa da funcionalidade e discussÃ£o.
+Veja a [issue #1](https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw/issues/1) para a solicitaÃ§Ã£o completa da funcionalidade e discussÃ£o.
 
 
 

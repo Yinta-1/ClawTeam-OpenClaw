@@ -54,7 +54,7 @@
 
 <p align="center">
 
-  <a href="https://github.com/HKUDS/AgentTeam"><img src="https://img.shields.io/badge/upstream-HKUDS%2FAgentTeam-purple?style=for-the-badge" alt="Upstream"></a>
+  <a href="https://github.com/HKUDS/ClawTeam"><img src="https://img.shields.io/badge/upstream-HKUDS%2FAgentTeam-purple?style=for-the-badge" alt="Upstream"></a>
 
   <a href="#-å¿«ééå§?><img src="https://img.shields.io/badge/Quick_Start-3_min-blue?style=for-the-badge" alt="Quick Start"></a>
 
@@ -78,7 +78,7 @@
 
 
 
-> **[HKUDS/AgentTeam](https://github.com/HKUDS/AgentTeam) çååçæ?*ï¼æ·±åº¦æ´å?OpenClawï¼é è¨­ä½¿ç?`openclaw` æºè½é«ãæ¯åæºè½é«ç¨ç«æè©±éé¢ãå·è¡ææ¬èªåéç½®ï¼ä»¥åç¶éçç¢ç°å¢é©è­çååå¾ç«¯ãææä¸æ¸¸ä¿®å¾©åå·²åæ­¥ã?
+> **[HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam) çååçæ?*ï¼æ·±åº¦æ´å?OpenClawï¼é è¨­ä½¿ç?`openclaw` æºè½é«ãæ¯åæºè½é«ç¨ç«æè©±éé¢ãå·è¡ææ¬èªåéç½®ï¼ä»¥åç¶éçç¢ç°å¢é©è­çååå¾ç«¯ãææä¸æ¸¸ä¿®å¾©åå·²åæ­¥ã?
 
 
 æ¨è¨­å®ç®æ¨ï¼æºè½é«éç¾¤èçå©ä¸çä¸å?â?ååå·¥ä½èãæåä»»åãåèª¿éåãåä½µçµæã?
@@ -339,7 +339,7 @@ openclaw --version  # Or: claude --version / codex --version
 
 ```bash
 
-git clone https://github.com/win4r/AgentTeam-OpenClaw.git
+git clone https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git
 
 cd AgentTeam-OpenClaw
 
@@ -506,7 +506,7 @@ openclaw skills list | grep agentteam
 
 ```bash
 
-git clone https://github.com/win4r/AgentTeam-OpenClaw.git
+git clone https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git
 
 cd AgentTeam-OpenClaw
 
@@ -993,7 +993,7 @@ agentteam config health
 ## ææºè½é«åéæ¨¡åï¼é è¦½çï¼?
 
 
-> **åæ¯ï¼?*[`feat/per-agent-model-assignment`](https://github.com/win4r/AgentTeam-OpenClaw/tree/feat/per-agent-model-assignment)
+> **åæ¯ï¼?*[`feat/per-agent-model-assignment`](https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw/tree/feat/per-agent-model-assignment)
 
 >
 
@@ -1007,7 +1007,7 @@ agentteam config health
 
 # Install from the feature branch
 
-pip install -e "git+https://github.com/win4r/AgentTeam-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
+pip install -e "git+https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw.git@feat/per-agent-model-assignment#egg=agentteam"
 
 ```
 
@@ -1061,7 +1061,7 @@ agentteam launch my-template --model-strategy auto     # auto-assign by role
 
 
 
-è©³è¦ [issue #1](https://github.com/win4r/AgentTeam-OpenClaw/issues/1) çå®æ´åè½éæ±èè¨è«ã?
+è©³è¦ [issue #1](https://github.com/win4r/ClawTeam-OpenClaw-OpenClaw/issues/1) çå®æ´åè½éæ±èè¨è«ã?
 
 
 ---

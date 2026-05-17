@@ -35,7 +35,7 @@
 
 ---
 
-> **AgentTeam** is a production-hardened fork of [HKUDS/AgentTeam](https://github.com/HKUDS/AgentTeam), purpose-built for OpenClaw users who need enterprise-grade multi-agent coordination.
+> **AgentTeam** is a production-hardened fork of [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam), purpose-built for OpenClaw users who need enterprise-grade multi-agent coordination.
 >
 > All upstream fixes are synced. This is not a demo — it's production software.
 
@@ -266,8 +266,8 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 **上游项目：**
 
-- [HKUDS/AgentTeam](https://github.com/HKUDS/AgentTeam) — 原始框架，多智能体协调理论奠基
-- [win4r/AgentTeam](https://github.com/win4r/AgentTeam) — 直接上游分支，OpenClaw 集成先行者（v0.3.0）
+- [HKUDS/ClawTeam](https://github.com/HKUDS/ClawTeam) — 原始框架，多智能体协调理论奠基
+- [win4r/ClawTeam-OpenClaw](https://github.com/win4r/ClawTeam-OpenClaw) — 直接上游分支，OpenClaw 集成先行者（v0.3.0）
 - [OpenClaw](https://openclaw.ai) — 默认 Agent 引擎，深度集成支持
 
 **核心技术参考：**
